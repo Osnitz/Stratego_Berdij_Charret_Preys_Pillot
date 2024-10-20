@@ -1,4 +1,7 @@
 //
+// Created by matthieu on 20/10/24.
+//
+//
 // Created by matthieu on 19/10/24.
 //
 #include "BattleState.h"
@@ -18,6 +21,10 @@ namespace state
     }
     void InitState::handleInput(Game* game)
     {
+        update(game);
+    }
+    void InitState::update(Game* game)
+    {
         game->setState(new PlacementState());
     }
 
@@ -29,6 +36,10 @@ namespace state
         //game->switchTurn();
     }
     void PlacementState::handleInput(Game* game)
+    {
+        update(game);
+    }
+    void PlacementState::update(Game* game)
     {
         game->setState(new PlayerTurnState());
     }
@@ -42,6 +53,10 @@ namespace state
     }
     void PlayerTurnState::handleInput(Game* game)
     {
+        update(game);
+    }
+    void PlayerTurnState::update(Game* game)
+    {
         game->setState(new BattleState());
     }
 
@@ -54,6 +69,10 @@ namespace state
     }
     void BattleState::handleInput(Game* game)
     {
+        update(game);
+    }
+    void BattleState::update(Game* game)
+    {
         game->setState(new WinState());
     }
 
@@ -65,6 +84,10 @@ namespace state
         //game->endGame();
     }
     void WinState::handleInput(Game* game)
+    {
+        update(game);
+    }
+    void WinState::update(Game* game)
     {
         game->setState(new WaitingState());
     }
@@ -81,13 +104,17 @@ namespace state
         std::cin >> answer;
         if (answer == 'y')
         {
-            game->setState(new InitState());
+            update(game);
         }
         else
         {
             std::cout << "\nThank you for playing! See you next time." << std::endl;
             exit(0);
         }
+    }
+    void WaitingState::update(Game* game)
+    {
+        game->setState(new InitState());
     }
 
 
