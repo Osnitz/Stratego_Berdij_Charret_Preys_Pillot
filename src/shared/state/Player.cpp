@@ -4,6 +4,10 @@
 
 #include "Player.h"
 #include "Pieces.h"
+
+using namespace state;
+
+
 Player :: Player() {
 
 }
@@ -11,11 +15,11 @@ Player :: Player() {
 Player:: ~Player(){};
 
 void Player:: remove(Pieces * piece) {
-    std::pair<int,int> positions=piece.getPosition();
+    std::pair<int,int> positions=piece->getPosition();
     for(int i=0;i<myPieces.size();i++) {
         std::pair<int,int> mypos=myPieces[i].getPosition();
-        if(positions[0]==mypos[0]&&positions[1]==mypos[1]) {
-            myPieces.erase(i);
+        if(positions.first==mypos.first &&positions.second==mypos.second) {
+            myPieces.erase(myPieces.begin()+i);
             exit(EXIT_SUCCESS);
         }
     }
@@ -24,16 +28,18 @@ void Player:: remove(Pieces * piece) {
 
 void Player:: add(Pieces *piece) {
     int size=capturedPieces.size();
-    int value=piece.getvalue();
+    int value=piece->getValue();
     for(int i=0;i<size;i++) {
-        int myvalue=capturedPieces[i].getvalue();
+        int myvalue=capturedPieces[i].getValue();
         if(value<=myvalue) {
-            capturedPieces.insert(i,piece);
+            capturedPieces.insert(capturedPieces.begin()+i,*piece);
             return;
         }
     }
-    capturedPieces.pushback(piece);
+    capturedPieces.push_back(*piece);
     return;
 }
 
-void Player::choose(Pieces *piece){}
+void move (std::pair<int,int> piecepos,std::pair<int,int> wantedpos) {
+
+}
