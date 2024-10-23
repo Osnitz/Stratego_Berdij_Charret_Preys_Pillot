@@ -22,6 +22,16 @@ namespace state {
         delete currentState;
     }
 
+    Game* Game::getInstance()
+    {
+        if (instance == nullptr)
+        {
+            instance = new Game();
+        }
+        return instance;
+    }
+Game * get
+
     void Game::startGame() {
         currentState-> enter(this);
     }
