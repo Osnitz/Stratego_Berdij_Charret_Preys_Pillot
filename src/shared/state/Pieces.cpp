@@ -24,7 +24,7 @@ std::string state::Pieces::getName() {
     return name;
 }
 
-void state::Pieces::Walk(Pieces* piece, const std::pair<int, int> &position) {
+void Pieces::CheckRange(Pieces* piece, const std::pair<int, int> &position) {
     int newx = position.first;
     int newy = position.second;
 
@@ -68,7 +68,7 @@ void state::Pieces::setPosition(const std::pair<int, int> &position) {
     std::cout << name << " was moved to (" << newx << ", " << newy << ")." << std::endl;
 }
 
-void state::Pieces::attack(Pieces *myPiece, const std::pair<int, int> &position, Player *player) {
+void Pieces::attack(Pieces *myPiece, const std::pair<int, int> &position, Player *player) {
     Pieces *attackedPiece = board->getPiece(position);
 
     if (attackedPiece == nullptr) {
@@ -112,5 +112,16 @@ void state::Pieces::attack(Pieces *myPiece, const std::pair<int, int> &position,
         player->remove(this);
         player->remove(attackedPiece);
         return;
+    }
+}
+
+void Pieces:: CheckCase (std::pair<int,int> position,Board *board) {
+    std::vector<std::vector<Player * >> grid=board->getGrid();
+    if(grid[position.first][position.second]==NULL) {
+        this->setPosition(position);
+        return;
+    }
+    if(grid[position.first][position.second]==) {
+
     }
 }

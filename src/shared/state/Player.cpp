@@ -4,6 +4,7 @@
 
 #include "Player.h"
 #include "Pieces.h"
+#include <iostream>
 
 using namespace state;
 
@@ -17,7 +18,7 @@ Player :: Player() {
 
 Player:: ~Player(){};
 
-void Player:: remove(Pieces * piece) {
+void Player:: removePiece(Pieces * piece) {
     std::pair<int,int> positions=piece->getPosition();
     for(int i=0;i<myPieces.size();i++) {
         std::pair<int,int> mypos=myPieces[i].getPosition();
@@ -29,7 +30,7 @@ void Player:: remove(Pieces * piece) {
     exit(EXIT_FAILURE);
 }
 
-void Player:: add(Pieces *piece) {
+void Player:: addCaptured(Pieces *piece) {
     int size=capturedPieces.size();
     int value=piece->getValue();
     for(int i=0;i<size;i++) {
@@ -42,6 +43,9 @@ void Player:: add(Pieces *piece) {
     capturedPieces.push_back(*piece);
 }
 
-void move (std::pair<int,int> piecepos,std::pair<int,int> wantedpos) {
-
+void Player:: displayCaptured () {
+    int size=capturedPieces.size();
+    for(int i=0;i<size;i++) {
+        std::cout << capturedPieces[i].getName()<< std::endl;
+    }
 }
