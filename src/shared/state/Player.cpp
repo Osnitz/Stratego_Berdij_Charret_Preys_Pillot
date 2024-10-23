@@ -9,7 +9,10 @@ using namespace state;
 
 
 Player :: Player() {
-
+    std::vector<Pieces> myPieces;
+    bool isTurn;
+    std::vector<Pieces>  capturedPieces;
+    std::vector<Pieces>  knownPieces;
 }
 
 Player:: ~Player(){};
@@ -37,7 +40,6 @@ void Player:: add(Pieces *piece) {
         }
     }
     capturedPieces.push_back(*piece);
-    return;
 }
 
 void move (std::pair<int,int> piecepos,std::pair<int,int> wantedpos) {

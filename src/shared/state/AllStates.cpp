@@ -16,7 +16,7 @@ namespace state
 {
     void InitState::enter(Game* game)
     {
-        printf("---InitState---\n");
+        printf("---InitState ---\n");
         handleInput(game);
     }
     void InitState::handleInput(Game* game)
