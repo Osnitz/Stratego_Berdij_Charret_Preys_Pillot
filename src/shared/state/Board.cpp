@@ -2,7 +2,6 @@
 // Created by Souhaila.B on 21/10/2024.
 //
 #include "Board.h"
-#include "Player.h"
 #include <iostream>
 #include <stdexcept> // Pour std::out_of_range
 
@@ -11,7 +10,7 @@ state::Board* state::Board::instance = nullptr;
 
 // Constructeur privé
 state::Board::Board() {
-    // Initialiser une grille vide 10x10 (par exemple)
+    // Initialiser une grille vide 10x10
     grid.resize(10, std::vector<int>(10, 0)); // 0 représente une case vide
 }
 
@@ -28,24 +27,36 @@ state::Board* state::Board::getInstance() {
     return instance;
 }
 
-// Affiche la grille
-// Affiche la grille
-// Affiche la grille
+// Affiche la grille vide délimitée par des tirets et des barres verticales avec les numéros dans la grille
 void state::Board::displayBoard() {
-    // Afficher la ligne supérieure avec des numéros de colonnes
-    std::cout << "   "; // Pour l'alignement des numéros de colonnes
+    // Afficher la première ligne de numéros de colonnes dans la grille
+    std::cout << "    "; // Alignement initial pour la première ligne de la grille
     for (int col = 0; col < grid[0].size(); ++col) {
-        std::cout << col << " "; // Afficher les numéros de colonne
+        std::cout << "  " << col << "   "; // Ajustement de l'espacement pour les numéros de colonnes
     }
     std::cout << std::endl;
 
-    // Afficher la grille avec des numéros de lignes
+    // Afficher la ligne de délimitation sous les numéros de colonnes
+    std::cout << "   "; // Alignement initial pour les tirets
+    for (int col = 0; col < grid[0].size(); ++col) {
+        std::cout << "------"; // Délimitation horizontale
+    }
+    std::cout << "-" << std::endl; // Fin de la délimitation à droite
+
+    // Afficher la grille vide avec des délimitations et numéros de lignes
     for (int row = 0; row < grid.size(); ++row) {
-        std::cout << row << " "; // Afficher le numéro de ligne
-        for (int piece : grid[row]) {
-            std::cout << piece << " "; // Afficher les éléments de la grille
+        std::cout << row << "  "; // Afficher le numéro de ligne à l'intérieur de la grille
+        for (int col = 0; col < grid[row].size(); ++col) {
+            std::cout << "|     "; // Cases vides avec des barres verticales
         }
-        std::cout << std::endl;
+        std::cout << "|" << std::endl;
+
+        // Afficher la ligne de délimitation sous chaque ligne
+        std::cout << "   "; // Alignement pour les tirets
+        for (int col = 0; col < grid[0].size(); ++col) {
+            std::cout << "------"; // Délimitation horizontale
+        }
+        std::cout << "-" << std::endl; // Fin de la délimitation à droite
     }
 }
 
