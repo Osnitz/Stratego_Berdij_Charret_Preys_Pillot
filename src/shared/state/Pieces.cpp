@@ -4,6 +4,7 @@
 
 #include "Pieces.h"
 #include "Board.h"
+#include "Player.h"
 
 #include <iostream>
 
@@ -16,7 +17,7 @@ std::pair<int, int> state::Pieces::getPosition() {
     return {x, y};
 }
 
-int state::Pieces::getValue() const {
+int state::Pieces::getValue() {
     return value;
 }
 
@@ -24,41 +25,50 @@ std::string state::Pieces::getName() {
     return name;
 }
 
-void Pieces::CheckRange(Pieces* piece, const std::pair<int, int> &position) {
-    int newx = position.first;
-    int newy = position.second;
-
-    piece = board->getPiece(position);
-
-    if (piece->getName() == "Flag" || piece->getName() == "Bomb") {
-        std::cout << "Objects can't move on their own. Go back to school !" << std::endl;
-        return;
-    } else if (piece->getName() == "Scout") {
-
-    }
-    else {
-        if (!((std::abs(newx - this->x) == 1 && newy == this->y) || (std::abs(newy - this->y) == 1 && newx == this->x))) {
-            std::cout << "This piece can only move 1 space in a straight line!" << std::endl;
-            setPosition(position);
-            return;
-        }
-         }
+int state::Pieces::getRange() {
+    return range;
 }
 
-void CheckBoard(std::pair<int, int> position){
+bool CheckBoard(std::pair<int, int> position){
     int NewX = position.first;
     int NewY = position.second;
     if ((NewX < 0) || (NewY < 0) || (NewX > 9) || (NewY > 9)) {
         std::cout << "Out of bounds" << std::endl;
-        return;
+        return false;
     }
     if ((NewY == 4) || (NewY == 5)) {
         if ((NewX == 2) || (NewX == 3) || (NewX == 6) || (NewX == 7)) {
             std::cout << "You can't cross lakes !" << std::endl;
-            return;
+            return false;
         }
     }
+    return true;
 }
+
+bool CheckRange(Pieces* myPiece, std::pair<int, int> position) {
+    int x = myPiece->getPosition().first;
+    int y = myPiece->getPosition().second;
+    int Newx = position.first;
+    int Newy = position.second;
+
+    int range = myPiece->getRange();
+
+    if ((std::abs(Newx - x) <= range && Newy == y) || (std::abs(Newy - y) <= range && Newx == x)) {
+        return true;
+    }
+    return false;
+}
+
+/*void Pieces::CheckCase (std::pair<int,int> position,Board *board) {
+    std::vector<std::vector<Player * >> grid=board->getGrid();
+    if(grid[position.first][position.second]==NULL) {
+        this->setPosition(position);
+        return;
+    }
+    if(grid[position.first][position.second]==) {
+
+    }
+}*/
 
 void state::Pieces::setPosition(const std::pair<int, int> &position) {
     int newx = position.first;
@@ -68,7 +78,7 @@ void state::Pieces::setPosition(const std::pair<int, int> &position) {
     std::cout << name << " was moved to (" << newx << ", " << newy << ")." << std::endl;
 }
 
-void Pieces::attack(Pieces *myPiece, const std::pair<int, int> &position, Player *player) {
+void state::Pieces::attack(std::pair<int, int> position, Pieces *myPiece, Player *player) {
     Pieces *attackedPiece = board->getPiece(position);
 
     if (attackedPiece == nullptr) {
@@ -79,11 +89,11 @@ void Pieces::attack(Pieces *myPiece, const std::pair<int, int> &position, Player
     if (attackedPiece->getName() == "Bomb") {
         if (this->getName() == "Miner") {
             std::cout << "Good job ! The bomb is no more. " << std::endl;
-            player->remove(attackedPiece);
+            player->addCaptured(attackedPiece);
             return;
         } else {
             std::cout << "Rest well ! The war is over for you. " << std::endl;
-            player->remove(this);
+            player->removePiece(this);
             return;
         }
     }
@@ -91,37 +101,27 @@ void Pieces::attack(Pieces *myPiece, const std::pair<int, int> &position, Player
     if (attackedPiece->getName() == "Marshal") {
         if (this->getName() == "Spy") {
             std::cout << "Well done sir ! Their leader is gone. " << std::endl;
-            player->remove(attackedPiece);
+            player->addCaptured(attackedPiece);
             return;
         } else {
             std::cout << "What a shame ! You really wanted to be hero, didn't you ? " << std::endl;
-            player->remove(this);
+            player->removePiece(this);
             return;
         }
     }
     if (this->getValue() > attackedPiece->getValue()) {
         std::cout << "The enemy is down ! It was a " << attackedPiece->getName() << "." << std::endl;
-        player->remove(attackedPiece);
+        player->addCaptured(attackedPiece);
         return;
     } else if (this->getValue() < attackedPiece->getValue()) {
         std::cout << "The enemy is too strong ! It was a " << attackedPiece->getName() << "." << std::endl;
-        player->remove(this);
+        player->removePiece(this);
         return;
     } else if (this->getValue() == attackedPiece->getValue()) {
         std::cout << "It's a tie ! It was a " << attackedPiece->getName() << " too." << std::endl;
-        player->remove(this);
-        player->remove(attackedPiece);
+        player->removePiece(this);
+        player->addCaptured(attackedPiece);
         return;
     }
 }
 
-void Pieces:: CheckCase (std::pair<int,int> position,Board *board) {
-    std::vector<std::vector<Player * >> grid=board->getGrid();
-    if(grid[position.first][position.second]==NULL) {
-        this->setPosition(position);
-        return;
-    }
-    if(grid[position.first][position.second]==) {
-
-    }
-}
