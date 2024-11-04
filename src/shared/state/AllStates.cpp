@@ -4,7 +4,6 @@
 //
 // Created by matthieu on 19/10/24.
 //
-#include "BattleState.h"
 #include "InitState.h"
 #include "PlacementState.h"
 #include "PlayerTurnState.h"
@@ -12,6 +11,9 @@
 #include "WinState.h"
 #include "Game.h"
 #include <iostream>
+
+#include "Board.h"
+
 namespace state
 {
     void InitState::enter(Game* game)
@@ -51,31 +53,41 @@ namespace state
         handleInput(game);
         //game->switchTurn();
     }
-    void PlayerTurnState::handleInput(Game* game)
-    {
+
+    void PlayerTurnState::handleInput(Game* game) {
+        int x;
+        int y;
+        std::cout << "Quelle piece voulez-vous jouer ?" << std::endl;
+        std::cin >> (x, y);
+        std::pair<int, int> position;
+        position.first=x;
+        position.second=y;
+        Board *board=Board::getInstance();
+        board->Board::getPiece(position);
+        std::cout << "Quelle est votre destination ?" << std::endl;
+        int newx;
+        int newy;
+        std::cin >> (newx, newy);
+        std::pair<int, int> destination;
+        destination.first=newx;
+        destination.second=newy;
+        if (Pieces::CheckBoard) {
+            if (Pieces::CheckRange) {
+                if (Pieces::CheckCase == "Empty" || Pieces::CheckCase == "Ennemy") {
+                    update(game);
+                }
+                else {
+                    handleInput(game);
+                }
+            }
+        }
         update(game);
     }
+
     void PlayerTurnState::update(Game* game)
     {
-        game->setState(new BattleState());
-    }
 
-
-    void BattleState::enter(Game* game)
-    {
-        printf("--- BattleState ---\n");
-        handleInput(game);
-        //game->checkVictory();
     }
-    void BattleState::handleInput(Game* game)
-    {
-        update(game);
-    }
-    void BattleState::update(Game* game)
-    {
-        game->setState(new WinState());
-    }
-
 
     void WinState::enter(Game* game)
     {
