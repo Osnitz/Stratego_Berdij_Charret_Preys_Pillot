@@ -8,6 +8,8 @@
 
 #include <iostream>
 
+#include "Game.h"
+
 using namespace std;
 using namespace state;
 
@@ -59,15 +61,19 @@ bool CheckRange(Pieces* myPiece, std::pair<int, int> position) {
     return false;
 }
 
-/*void Pieces::CheckCase (std::pair<int,int> position,Board *board) {
+/*void Pieces::CheckCase (std::pair<int,int> position,Board *board,Player *player, Game *game) {
     std::vector<std::vector<Player * >> grid=board->getGrid();
     if(grid[position.first][position.second]==NULL) {
         this->setPosition(position);
         return;
     }
-    if(grid[position.first][position.second]==) {
-
+    if(grid[position.first][position.second]!=player) {
+        this->attack(position,?,player);
+        return;
     }
+    State state=game->getState();
+    state.handleInput(game);
+    return;
 }*/
 
 void state::Pieces::setPosition(const std::pair<int, int> &position) {
