@@ -30,7 +30,6 @@ namespace state {
         }
         return instance;
     }
-Game * get
 
     void Game::startGame() {
         currentState-> enter(this);
@@ -52,5 +51,4 @@ Game * get
         currentState = state;
         currentState->enter(this);
     }
-
 }

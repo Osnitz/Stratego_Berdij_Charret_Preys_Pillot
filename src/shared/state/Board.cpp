@@ -11,7 +11,7 @@ state::Board* state::Board::instance = nullptr;
 // Constructeur privé
 state::Board::Board() {
     // Initialiser une grille vide 10x10
-    grid.resize(10, std::vector<int>(10, 0)); // 0 représente une case vide
+    //grid.resize(10, std::vector<int>(10, 0)); // 0 représente une case vide
 }
 
 // Destructeur
@@ -28,7 +28,7 @@ state::Board* state::Board::getInstance() {
 }
 
 // Affiche la grille vide délimitée par des tirets et des barres verticales avec les numéros dans la grille
-void state::Board::displayBoard() {
+void state::Board::displayBoard(Player & player) {
     // Afficher la première ligne de numéros de colonnes dans la grille
     std::cout << "    "; // Alignement initial pour la première ligne de la grille
     for (int col = 0; col < grid[0].size(); ++col) {
