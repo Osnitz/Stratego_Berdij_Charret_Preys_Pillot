@@ -61,20 +61,24 @@ bool CheckRange(Pieces* myPiece, std::pair<int, int> position) {
     return false;
 }
 
-/*void Pieces::CheckCase (std::pair<int,int> position,Board *board,Player *player, Game *game) {
+int Pieces::CheckCase (std::pair<int,int> position,Board *board,Player *player, Game *game) {
     std::vector<std::vector<Player * >> grid=board->getGrid();
     if(grid[position.first][position.second]==NULL) {
         this->setPosition(position);
-        return;
+        return 0;
     }
-    if(grid[position.first][position.second]!=player) {
+    if(grid[position.first][position.second].isturn()) {
         this->attack(position,?,player);
-        return;
+        return 1;
     }
-    State state=game->getState();
-    state.handleInput(game);
     return;
-}*/
+}
+
+if (CheckBoard) {
+    if (CheckRange) {
+        if (CheckCase == 0) {
+        this->update().game; SetPosition()
+}
 
 void state::Pieces::setPosition(const std::pair<int, int> &position) {
     int newx = position.first;

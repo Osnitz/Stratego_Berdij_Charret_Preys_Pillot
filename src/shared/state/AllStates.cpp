@@ -86,7 +86,11 @@ namespace state
 
     void PlayerTurnState::update(Game* game)
     {
-
+        Player player=game->getPlayer();
+        std::vector<Pieces>  capturedPieces=player.getCaptured();
+        if(capturedPieces[0].getValue()==0) {
+            game->setState(new WinState());
+        }
     }
 
     void WinState::enter(Game* game)
