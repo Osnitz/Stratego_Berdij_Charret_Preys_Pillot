@@ -61,20 +61,18 @@ bool CheckRange(Pieces* myPiece, std::pair<int, int> position) {
     return false;
 }
 
-/*void Pieces::CheckCase (std::pair<int,int> position,Board *board,Player *player, Game *game) {
-    std::vector<std::vector<Player * >> grid=board->getGrid();
+string Pieces::CheckCase (std::pair<int,int> position,Board *board,Player *player) {
+    std::vector<std::vector<Player * >> grid=board->getgrid();
     if(grid[position.first][position.second]==NULL) {
         this->setPosition(position);
-        return;
+        return "Empty";
     }
-    if(grid[position.first][position.second]!=player) {
-        this->attack(position,?,player);
-        return;
+    if(!(grid[position.first][position.second]->getTurn())) {
+        this->attack(position,player);
+        return "Ennemy";
     }
-    State state=game->getState();
-    state.handleInput(game);
-    return;
-}*/
+    return "Ally";
+}
 
 void state::Pieces::setPosition(const std::pair<int, int> &position) {
     int newx = position.first;
@@ -84,7 +82,7 @@ void state::Pieces::setPosition(const std::pair<int, int> &position) {
     std::cout << name << " was moved to (" << newx << ", " << newy << ")." << std::endl;
 }
 
-void state::Pieces::attack(std::pair<int, int> position, Pieces *myPiece, Player *player) {
+void state::Pieces::attack(std::pair<int, int> position, Player *player) {
     Pieces *attackedPiece = board->getPiece(position);
 
     if (attackedPiece == nullptr) {
