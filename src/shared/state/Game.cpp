@@ -17,7 +17,7 @@ namespace state {
         Player1 = new Player();
         Player2 = new Player();
         currentState = new InitState();
-        currentPlayer = 0;
+        currentPlayer = nullptr;
     }
 
     Game::~Game() {
@@ -41,16 +41,22 @@ namespace state {
     }
 
     void Game::switchTurn() {
-        if(currentPlayer == 0) {
+        if(currentPlayer == nullptr) {
             std::random_device rd;  // Obtain a random number from hardware
             std::mt19937 gen(rd()); // Seed the generator
             std::uniform_int_distribution<> distr(1, 2); // Define the range
-            currentPlayer = distr(gen); // Generate the random number
-        }
-        if (currentPlayer == 1) {
-            currentPlayer = 2;
+            int randomPlayer = distr(gen); // Generate the random number
+            if (randomPlayer == 1) {
+                currentPlayer = Player1;
+            } else {
+                currentPlayer = Player2;
+            }
         } else {
-            currentPlayer = 1;
+            if (currentPlayer == Player1) {
+                currentPlayer = Player2;
+            } else {
+                currentPlayer = Player1;
+            }
         }
     }
 
@@ -67,13 +73,10 @@ namespace state {
         currentState->enter(this);
     }
 
-    Player * Game::getCurrentPlayer() {
-        if(currentPlayer == 0) {
+    Player* Game::getCurrentPlayer() {
+        if (currentPlayer == nullptr) {
             throw std::invalid_argument("No current player");
         }
-        if (currentPlayer == 1) {
-            return Player1;
-        }
-        return Player2;
+        return currentPlayer;
     }
 }
