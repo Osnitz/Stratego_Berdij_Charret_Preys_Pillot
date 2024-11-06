@@ -464,6 +464,10 @@ gen_class (umlclassnode *node)
                     umlo->key.attr.name[0] != '~')
                     emit (" = %s", umlo->key.attr.value);
             }
+            // Add pure virtual function initialization
+            if (umlo->key.attr.inheritance_type == '1' || umlo->key.attr.isabstract) {
+                emit (" = 0");
+            }
             emit (";\n");
             umlo = umlo->next;
         }

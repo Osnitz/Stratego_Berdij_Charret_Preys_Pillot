@@ -4,7 +4,6 @@
 //
 // Created by matthieu on 19/10/24.
 //
-#include "BattleState.h"
 #include "InitState.h"
 #include "PlacementState.h"
 #include "PlayerTurnState.h"
@@ -57,25 +56,8 @@ namespace state
     }
     void PlayerTurnState::update(Game* game)
     {
-        game->setState(new BattleState());
-    }
-
-
-    void BattleState::enter(Game* game)
-    {
-        printf("--- BattleState ---\n");
-        handleInput(game);
-        //game->checkVictory();
-    }
-    void BattleState::handleInput(Game* game)
-    {
-        update(game);
-    }
-    void BattleState::update(Game* game)
-    {
         game->setState(new WinState());
     }
-
 
     void WinState::enter(Game* game)
     {
