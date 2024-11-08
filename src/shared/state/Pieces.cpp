@@ -13,25 +13,35 @@
 using namespace std;
 using namespace state;
 
-Board *board = Board::getInstance();
+
+Pieces::Pieces(int value, std::string name, int x, int y) {
+    this->value = value;
+    this->name = name;
+    this->range = 1;
+    this->x = x;
+    this->y = y;
+}
+
+Pieces::~Pieces() {
+}
 
 std::pair<int, int> state::Pieces::getPosition() {
     return {x, y};
 }
 
-int state::Pieces::getValue() {
+int Pieces::getValue() {
     return value;
 }
 
-std::string state::Pieces::getName() {
+std::string Pieces::getName() {
     return name;
 }
 
-int state::Pieces::getRange() {
+int Pieces::getRange() {
     return range;
 }
 
-bool CheckBoard(std::pair<int, int> position){
+bool Pieces::CheckBoard(std::pair<int, int> position){
     int NewX = position.first;
     int NewY = position.second;
     if ((NewX < 0) || (NewY < 0) || (NewX > 9) || (NewY > 9)) {
@@ -47,13 +57,13 @@ bool CheckBoard(std::pair<int, int> position){
     return true;
 }
 
-bool CheckRange(Pieces* myPiece, std::pair<int, int> position) {
-    int x = myPiece->getPosition().first;
-    int y = myPiece->getPosition().second;
+bool Pieces::CheckRange(std::pair<int, int> position) {
+    int x = this->getPosition().first;
+    int y = this->getPosition().second;
     int Newx = position.first;
     int Newy = position.second;
 
-    int range = myPiece->getRange();
+    int range = this->getRange();
 
     if ((std::abs(Newx - x) <= range && Newy == y) || (std::abs(Newy - y) <= range && Newx == x)) {
         return true;
@@ -61,20 +71,25 @@ bool CheckRange(Pieces* myPiece, std::pair<int, int> position) {
     return false;
 }
 
-string Pieces::CheckCase (std::pair<int,int> position,Board *board,Player *player) {
-    std::vector<std::vector<Player * >> grid=board->getgrid();
-    if(grid[position.first][position.second]==NULL) {
+string Pieces::CheckCase (std::pair<int,int> position) {
+    auto game = Game::getInstance();
+    Board* board = Board::getInstance();
+    Pieces *targetPiece = board->getPiece(position);
+    Player* currentPlayer = game->getCurrentPlayer();
+
+    if (targetPiece == nullptr) {
         this->setPosition(position);
         return "Empty";
     }
-    if(!(grid[position.first][position.second]->getTurn())) {
-        this->attack(position,player);
-        return "Ennemy";
+    if (!currentPlayer->belongTo(targetPiece)) {
+        this->attack(position, currentPlayer);
+        return "Enemy";
     }
+
     return "Ally";
 }
 
-void state::Pieces::setPosition(const std::pair<int, int> &position) {
+void Pieces::setPosition(const std::pair<int, int> &position) {
     int newx = position.first;
     int newy = position.second;
     this->x = newx;
@@ -82,7 +97,8 @@ void state::Pieces::setPosition(const std::pair<int, int> &position) {
     std::cout << name << " was moved to (" << newx << ", " << newy << ")." << std::endl;
 }
 
-void state::Pieces::attack(std::pair<int, int> position, Player *player) {
+void Pieces::attack(std::pair<int, int> position, Player *player) {
+    Board *board = Board::getInstance();
     Pieces *attackedPiece = board->getPiece(position);
 
     if (attackedPiece == nullptr) {
