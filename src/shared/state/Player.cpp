@@ -27,6 +27,10 @@ void Player::removePiece(Pieces* piece) {
     }
 }
 
+void Player::addPiece(Pieces* piece) {
+    myPieces.push_back(piece);
+}
+
 void Player:: addCaptured(Pieces *piece) {
     int size=capturedPieces.size();
     int value=piece->getValue();
