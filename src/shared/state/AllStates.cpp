@@ -35,7 +35,7 @@ namespace state
     {
         printf("--- PlacementState---\n");
         handleInput(game);
-        //game->switchTurn();
+        game->switchTurn();
     }
     void PlacementState::handleInput(Game* game)
     {
@@ -51,45 +51,56 @@ namespace state
     {
         printf("--- PlayerTurnState ---\n");
         handleInput(game);
-        //game->switchTurn();
+        game->switchTurn();
     }
 
     void PlayerTurnState::handleInput(Game* game) {
         int x;
         int y;
         std::cout << "Quelle piece voulez-vous jouer ?" << std::endl;
-        std::cin >> (x, y);
+        std::cin >> x;
+        std::cin >> y;
         std::pair<int, int> position;
         position.first=x;
         position.second=y;
         Board *board=Board::getInstance();
-        board->Board::getPiece(position);
+        Pieces * pieceToMove = board->getPiece(position);
+
+        if (!game->getCurrentPlayer()->belongTo(pieceToMove)) {
+            std::cout << "Ce n'est pas votre piece !" << std::endl;
+            handleInput(game);
+            return;
+        }
+
         std::cout << "Quelle est votre destination ?" << std::endl;
         int newx;
         int newy;
-        std::cin >> (newx, newy);
+        std::cin >> newx;
+        std::cin >> newy;
         std::pair<int, int> destination;
         destination.first=newx;
         destination.second=newy;
-        if (Pieces::CheckBoard) {
-            if (Pieces::CheckRange) {
-                if (Pieces::CheckCase == "Empty" || Pieces::CheckCase == "Ennemy") {
+        if (pieceToMove->CheckBoard(destination)) {
+            if (pieceToMove->CheckRange(destination)) {
+                if (pieceToMove->CheckCase(destination) == "Empty" ||
+                    pieceToMove->CheckCase(destination) == "Ennemy") {
                     update(game);
+                    return;
                 }
-                else {
-                    handleInput(game);
-                }
+                handleInput(game);
             }
         }
-        update(game);
     }
 
     void PlayerTurnState::update(Game* game)
     {
-        Player player=game->getPlayer();
-        std::vector<Pieces>  capturedPieces=player.getCaptured();
-        if(capturedPieces[0].getValue()==0) {
+        Player * player=game->getCurrentPlayer();
+        std::vector<Pieces*>  capturedPieces=player->getCaptured();
+        if(capturedPieces[0]->getValue()==0) {
             game->setState(new WinState());
+        }
+        else {
+            game->setState(new PlayerTurnState());
         }
     }
 
