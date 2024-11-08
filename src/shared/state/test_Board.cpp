@@ -43,6 +43,7 @@ void testGetPieceValidPosition() {
     } else {
         std::cout << "GetPieceValidPosition test passed!" << std::endl;
     }
+    board->removeFromBoard(piece);
     delete piece;
 }
 
@@ -75,9 +76,11 @@ void testGetPieceInvalidPosition() {
 void testDisplayBoard() {
     Board* board = Board::getInstance();
     auto piece = new Pieces(4,"Soldat2",0,1);
+    auto piece2 = new Pieces(4,"Soldat3",0,0);
     Player player;
     player.addPiece(piece);
     board->setPieceOnBoard(piece);
+    board->setPieceOnBoard(piece2);
     std::cout << "DisplayBoard test output:" << std::endl;
     board->displayBoard(player);
 }
