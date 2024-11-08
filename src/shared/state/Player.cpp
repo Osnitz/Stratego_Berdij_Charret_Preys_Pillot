@@ -21,7 +21,7 @@ Player:: ~Player(){};
 void Player:: removePiece(Pieces * piece) {
     std::pair<int,int> positions=piece->getPosition();
     for(int i=0;i<myPieces.size();i++) {
-        std::pair<int,int> mypos=myPieces[i].getPosition();
+        std::pair<int,int> mypos=myPieces[i]->getPosition();
         if(positions.first==mypos.first &&positions.second==mypos.second) {
             myPieces.erase(myPieces.begin()+i);
             exit(EXIT_SUCCESS);
@@ -34,18 +34,18 @@ void Player:: addCaptured(Pieces *piece) {
     int size=capturedPieces.size();
     int value=piece->getValue();
     for(int i=0;i<size;i++) {
-        int myvalue=capturedPieces[i].getValue();
+        int myvalue=capturedPieces[i]->getValue();
         if(value<=myvalue) {
-            capturedPieces.insert(capturedPieces.begin()+i,*piece);
+            capturedPieces.insert(capturedPieces.begin()+i,piece);
             return;
         }
     }
-    capturedPieces.push_back(*piece);
+    capturedPieces.push_back(piece);
 }
 
 void Player:: displayCaptured () {
     int size=capturedPieces.size();
     for(int i=0;i<size;i++) {
-        std::cout << capturedPieces[i].getName()<< std::endl;
+        std::cout << capturedPieces[i]->getName()<< std::endl;
     }
 }
