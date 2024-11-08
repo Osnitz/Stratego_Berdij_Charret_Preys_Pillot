@@ -36,7 +36,7 @@ void testInitializeGrid() {
 
 void testGetPieceValidPosition() {
     Board* board = Board::getInstance();
-    auto piece = new Pieces(3,"Soldat",0,0);
+    auto piece = new Pieces(4,"Soldat",0,0);
     board->setPieceOnBoard(piece);
     if (board->getPiece({0, 0}) != piece) {
         std::cerr << "GetPieceValidPosition test failed!" << std::endl;
@@ -74,7 +74,10 @@ void testGetPieceInvalidPosition() {
 
 void testDisplayBoard() {
     Board* board = Board::getInstance();
+    auto piece = new Pieces(4,"Soldat2",0,1);
     Player player;
+    player.addPiece(piece);
+    board->setPieceOnBoard(piece);
     std::cout << "DisplayBoard test output:" << std::endl;
     board->displayBoard(player);
 }

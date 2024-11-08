@@ -82,3 +82,8 @@ void Board::setPieceOnBoard(Pieces* piece) {
     std::pair<int, int> position = piece->getPosition();
     grid[position.first][position.second] = piece;
 }
+
+void Board::removeFromBoard(Pieces* piece) {
+    std::pair<int, int> position = piece->getPosition();
+    grid[position.first][position.second] = nullptr;
+}
