@@ -55,6 +55,10 @@ namespace state
     }
 
     void PlayerTurnState::handleInput(Game* game) {
+        if (game->Purgatory != nullptr) {
+            game->getCurrentPlayer()->addCaptured(game->Purgatory);
+            game->Purgatory = nullptr;
+        }
         int x;
         int y;
         std::cout << "Quelle piece voulez-vous jouer ?" << std::endl;
@@ -83,7 +87,7 @@ namespace state
         if (pieceToMove->CheckBoard(destination)) {
             if (pieceToMove->CheckRange(destination)) {
                 if (pieceToMove->CheckCase(destination) == "Empty" ||
-                    pieceToMove->CheckCase(destination) == "Ennemy") {
+                    pieceToMove->CheckCase(destination) == "Enemy") {
                     update(game);
                     return;
                 }

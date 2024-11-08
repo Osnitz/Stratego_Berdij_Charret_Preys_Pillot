@@ -4,6 +4,7 @@
 
 #include "Player.h"
 #include "Pieces.h"
+#include "Board.h"
 #include <iostream>
 
 using namespace state;
@@ -32,6 +33,7 @@ void Player::addPiece(Pieces* piece) {
 }
 
 void Player:: addCaptured(Pieces *piece) {
+    Board::getInstance()->removeFromBoard(piece);
     int size=capturedPieces.size();
     int value=piece->getValue();
     for(int i=0;i<size;i++) {
