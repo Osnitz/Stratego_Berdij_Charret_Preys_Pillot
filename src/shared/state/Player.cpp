@@ -50,6 +50,10 @@ std::vector<Pieces*> Player:: getCaptured() {
     return capturedPieces;
 }
 
+std::vector<Pieces*> Player:: getMyPieces() {
+    return myPieces;
+}
+
 bool Player::belongTo(Pieces* piece) {
     for (std::size_t i = 0; i < myPieces.size(); i++) {
         if (myPieces[i] == piece) {
