@@ -13,6 +13,8 @@
 using namespace std;
 using namespace state;
 
+Board *board = Board::getInstance();
+auto game = Game::getInstance();
 
 Pieces::Pieces(int value, std::string name, int x, int y) {
     this->value = value;
@@ -72,8 +74,6 @@ bool Pieces::CheckRange(std::pair<int, int> position) {
 }
 
 string Pieces::CheckCase (std::pair<int,int> position) {
-    auto game = Game::getInstance();
-    Board* board = Board::getInstance();
     Pieces *targetPiece = board->getPiece(position);
     Player* currentPlayer = game->getCurrentPlayer();
 
@@ -101,9 +101,9 @@ void Pieces::setPosition(const std::pair<int, int> &position) {
 }
 
 void Pieces::attack(std::pair<int, int> position) {
-    Board *board = Board::getInstance();
+
     Pieces *attackedPiece = board->getPiece(position);
-    auto player = Game::getInstance()->getCurrentPlayer();
+    auto player = game->getCurrentPlayer();
 
     if (attackedPiece == nullptr) {
         std::cout << "No target found" << std::endl;
@@ -121,7 +121,7 @@ void Pieces::attack(std::pair<int, int> position) {
             player->addCaptured(attackedPiece);
             board->removeFromBoard(this);
             player->removePiece(this);
-            Game::getInstance()->Purgatory = this;
+            game->Purgatory = this;
             return;
         }
     }
@@ -144,14 +144,14 @@ void Pieces::attack(std::pair<int, int> position) {
         std::cout << "The enemy is too strong ! It was a " << attackedPiece->getName() << "." << std::endl;
         board->removeFromBoard(this);
         player->removePiece(this);
-        Game::getInstance()->Purgatory = this;
+        game->Purgatory = this;
         return;
     } else if (this->getValue() == attackedPiece->getValue()) {
         std::cout << "It's a tie ! It was a " << attackedPiece->getName() << " too." << std::endl;
         player->addCaptured(attackedPiece);
         board->removeFromBoard(this);
         player->removePiece(this);
-        Game::getInstance()->Purgatory = this;
+        game->Purgatory = this;
         return;
     }
 }

@@ -16,6 +16,8 @@
 
 namespace state
 {
+    Board *board=Board::getInstance();
+
     void InitState::enter(Game* game)
     {
         printf("---InitState ---\n");
@@ -67,7 +69,6 @@ namespace state
         std::pair<int, int> position;
         position.first=x;
         position.second=y;
-        Board *board=Board::getInstance();
         Pieces * pieceToMove = board->getPiece(position);
 
         if (!game->getCurrentPlayer()->belongTo(pieceToMove)) {
