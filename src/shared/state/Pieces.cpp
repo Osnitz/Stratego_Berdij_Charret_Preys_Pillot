@@ -115,6 +115,7 @@ void Pieces::attack(std::pair<int, int> position) {
             std::cout << "Good job ! The bomb is no more. " << std::endl;
             player->addCaptured(attackedPiece);
             this->setPosition(position);
+            game->Graveyard = attackedPiece;
             return;
         } else {
             std::cout << "Rest well ! The war is over for you. " << std::endl;
@@ -122,6 +123,7 @@ void Pieces::attack(std::pair<int, int> position) {
             board->removeFromBoard(this);
             player->removePiece(this);
             game->Purgatory = this;
+            game->Graveyard = attackedPiece;
             return;
         }
     }
@@ -131,6 +133,7 @@ void Pieces::attack(std::pair<int, int> position) {
             std::cout << "Well done sir ! Their leader is gone. " << std::endl;
             player->addCaptured(attackedPiece);
             this->setPosition(position);
+            game->Graveyard = attackedPiece;
             return;
         }
     }
@@ -139,6 +142,7 @@ void Pieces::attack(std::pair<int, int> position) {
         std::cout << "The enemy is down ! It was a " << attackedPiece->getName() << "." << std::endl;
         player->addCaptured(attackedPiece);
         this->setPosition(position);
+        game->Graveyard = attackedPiece;
         return;
     } else if (this->getValue() < attackedPiece->getValue()) {
         std::cout << "The enemy is too strong ! It was a " << attackedPiece->getName() << "." << std::endl;
@@ -152,6 +156,7 @@ void Pieces::attack(std::pair<int, int> position) {
         board->removeFromBoard(this);
         player->removePiece(this);
         game->Purgatory = this;
+        game->Graveyard = attackedPiece;
         return;
     }
 }

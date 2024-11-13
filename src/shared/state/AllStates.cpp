@@ -61,6 +61,10 @@ namespace state
             game->getCurrentPlayer()->addCaptured(game->Purgatory);
             game->Purgatory = nullptr;
         }
+        if (game->Graveyard != nullptr) {
+            game->getCurrentPlayer()->removePiece(game->Graveyard);
+            game->Graveyard = nullptr;
+        }
         int x;
         int y;
         std::cout << "Quelle piece voulez-vous jouer ?" << std::endl;
@@ -117,6 +121,7 @@ namespace state
     }
     void WinState::handleInput(Game* game)
     {
+
         update(game);
     }
     void WinState::update(Game* game)
