@@ -12,7 +12,6 @@ using namespace state;
 
 Player :: Player() {
     std::vector<Pieces*> myPieces;
-    bool isTurn;
     std::vector<Pieces*>  capturedPieces;
     std::vector<Pieces*>  knownPieces;
 }
