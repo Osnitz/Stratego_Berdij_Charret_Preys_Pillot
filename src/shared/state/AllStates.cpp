@@ -10,8 +10,9 @@
 #include "WaitingState.h"
 #include "WinState.h"
 #include "Game.h"
+#include "IATurnState.h"
 #include <iostream>
-
+#include <random>
 #include "Board.h"
 
 namespace state
@@ -21,8 +22,21 @@ namespace state
     void InitState::enter(Game* game)
     {
         printf("---InitState ---\n");
+        printf("Welcome to the game!\n");
+        printf("Do you want to play against the AI or another Player? (1/2): \n");
+        std::string answer;
+        std::cin >> answer;
+        if (answer == "1")
+        {
+            game->setAI(true);
+        }
+        else
+        {
+            game->setAI(false);
+        }
         handleInput(game);
     }
+
     void InitState::handleInput(Game* game)
     {
         update(game);
@@ -52,9 +66,9 @@ namespace state
     void PlayerTurnState::enter(Game* game)
     {
         printf("--- PlayerTurnState ---\n");
+        std::cout << "C'est le tour du joueur: " << (game->getCurrentPlayer()== game->getPlayer1() ? "Player 1" : "Player 2") << std::endl;
         handleInput(game);
     }
-
     void PlayerTurnState::handleInput(Game* game) {
         if (game->Purgatory != nullptr) {
             game->getCurrentPlayer()->addCaptured(game->Purgatory);
@@ -99,7 +113,6 @@ namespace state
             }
         }
     }
-
     void PlayerTurnState::update(Game* game)
     {
         Player * player=game->getCurrentPlayer();
@@ -109,9 +122,44 @@ namespace state
         }
         else {
             game->switchTurn();
-            game->setState(new PlayerTurnState());
+            if (game->getCurrentPlayer() == game->getPlayer2() && game->againstIA) {
+                game->setState(new IATurnState());
+            } else {
+                game->setState(new PlayerTurnState());
+            }
         }
     }
+
+
+    void IATurnState::enter(Game* game)
+    {
+        printf("--- IATurnState ---\n");
+        handleInput(game);
+    }
+
+    void IATurnState::handleInput(Game* game)
+    {
+        Player* aiPlayer = game->getCurrentPlayer();
+        std::vector<Pieces*> aiPieces = aiPlayer->getMyPieces();
+
+        if (aiPieces.empty()) {
+            std::cout << "No pieces available for AI to move." << std::endl;
+            return;
+        }
+
+        std::random_device rd;
+        std::mt19937 gen(rd());
+        std::uniform_int_distribution<> distr(0, aiPieces.size() - 1);
+        Pieces* pieceToMove = aiPieces[distr(gen)];
+
+    }
+
+    void IATurnState::update(Game* game)
+    {
+        game->switchTurn();
+        game->setState(new PlayerTurnState());
+    }
+
 
     void WinState::enter(Game* game)
     {

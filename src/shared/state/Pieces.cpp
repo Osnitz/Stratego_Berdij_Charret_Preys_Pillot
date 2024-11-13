@@ -161,3 +161,35 @@ void Pieces::attack(std::pair<int, int> position) {
     }
 }
 
+std::vector<std::pair<int, int>> Pieces::canMove(Pieces* pieceToMove) {
+    std::vector<std::pair<int, int>> possiblePositions;
+
+    if (pieceToMove == nullptr) {
+        return possiblePositions;
+    }
+
+    auto position = pieceToMove->getPosition();
+    int x = position.first;
+    int y = position.second;
+    int range = pieceToMove->getRange();
+
+    // Check all positions within the range in each direction
+    for (int i = 1; i <= range; ++i) {
+        std::vector<std::pair<int, int>> positionsToCheck = {
+            {x, y - i}, // Above
+            {x, y + i}, // Below
+            {x - i, y}, // Left
+            {x + i, y}  // Right
+        };
+
+        for (const auto& pos : positionsToCheck) {
+            if (CheckBoard(pos) && (CheckCase(pos) == "Empty")||(CheckCase(pos) == "Enemy")) {
+                possiblePositions.push_back(pos);
+            }
+        }
+    }
+    return possiblePositions;
+}
+
+
+
