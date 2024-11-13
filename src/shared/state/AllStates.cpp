@@ -53,7 +53,6 @@ namespace state
     {
         printf("--- PlayerTurnState ---\n");
         handleInput(game);
-        game->switchTurn();
     }
 
     void PlayerTurnState::handleInput(Game* game) {
@@ -109,6 +108,7 @@ namespace state
             game->setState(new WinState());
         }
         else {
+            game->switchTurn();
             game->setState(new PlayerTurnState());
         }
     }
