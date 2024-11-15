@@ -50,8 +50,8 @@ namespace state
     void PlacementState::enter(Game* game)
     {
         printf("--- PlacementState---\n");
-        handleInput(game);
         game->switchTurn();
+        handleInput(game);
     }
     void PlacementState::handleInput(Game* game)
     {
@@ -59,7 +59,11 @@ namespace state
     }
     void PlacementState::update(Game* game)
     {
-        game->setState(new PlayerTurnState());
+        if (game->getCurrentPlayer() == game->getPlayer2() && game->againstIA) {
+            game->setState(new IATurnState());
+        } else {
+            game->setState(new PlayerTurnState());
+        }
     }
 
 
@@ -88,8 +92,17 @@ namespace state
         position.second=y;
         Pieces * pieceToMove = board->getPiece(position);
 
-        if (!game->getCurrentPlayer()->belongTo(pieceToMove)) {
-            std::cout << "Ce n'est pas votre piece !" << std::endl;
+        while (true) {
+            if (!game->getCurrentPlayer()->belongTo(pieceToMove)) {
+                std::cout << "Ce n'est pas votre piece !" << std::endl;
+                continue;
+            }
+            break;
+        }
+
+        auto possiblePositions = pieceToMove->canMove(pieceToMove);
+        if (possiblePositions.empty()) {
+            std::cout << "Aucun mouvement possible pour cette piece." << std::endl;
             handleInput(game);
             return;
         }
@@ -102,16 +115,18 @@ namespace state
         std::pair<int, int> destination;
         destination.first=newx;
         destination.second=newy;
-        if (pieceToMove->CheckBoard(destination)) {
-            if (pieceToMove->CheckRange(destination)) {
-                if (pieceToMove->CheckCase(destination) == "Empty" ||
-                    pieceToMove->CheckCase(destination) == "Enemy") {
-                    update(game);
-                    return;
-                }
-                handleInput(game);
+
+        for(auto possible_position : possiblePositions)
+        {
+            if(possible_position==destination)
+            {
+                pieceToMove->setPosition(destination);
+                update(game);
+                return;
             }
         }
+        std::cerr<<"Destination non valide"<<std::endl;
+        handleInput(game);
     }
     void PlayerTurnState::update(Game* game)
     {
@@ -151,7 +166,16 @@ namespace state
         std::mt19937 gen(rd());
         std::uniform_int_distribution<> distr(0, aiPieces.size() - 1);
         Pieces* pieceToMove = aiPieces[distr(gen)];
-
+        auto possiblePositions = pieceToMove->canMove(pieceToMove);
+        while(possiblePositions.empty())
+        {
+            pieceToMove = aiPieces[distr(gen)];
+            possiblePositions = pieceToMove->canMove(pieceToMove);
+        }
+        std::uniform_int_distribution<> distr2(0, possiblePositions.size() - 1);
+        auto destination = possiblePositions[distr2(gen)];
+        pieceToMove->setPosition(destination);
+        update(game);
     }
 
     void IATurnState::update(Game* game)
