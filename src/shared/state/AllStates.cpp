@@ -53,13 +53,16 @@ namespace state
     {
         printf("--- PlayerTurnState ---\n");
         handleInput(game);
-        game->switchTurn();
     }
 
     void PlayerTurnState::handleInput(Game* game) {
         if (game->Purgatory != nullptr) {
             game->getCurrentPlayer()->addCaptured(game->Purgatory);
             game->Purgatory = nullptr;
+        }
+        if (game->Graveyard != nullptr) {
+            game->getCurrentPlayer()->removePiece(game->Graveyard);
+            game->Graveyard = nullptr;
         }
         int x;
         int y;
@@ -105,6 +108,7 @@ namespace state
             game->setState(new WinState());
         }
         else {
+            game->switchTurn();
             game->setState(new PlayerTurnState());
         }
     }
@@ -117,6 +121,7 @@ namespace state
     }
     void WinState::handleInput(Game* game)
     {
+
         update(game);
     }
     void WinState::update(Game* game)
