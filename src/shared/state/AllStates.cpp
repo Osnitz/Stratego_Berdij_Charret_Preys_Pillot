@@ -71,6 +71,7 @@ namespace state
     {
         printf("--- PlayerTurnState ---\n");
         std::cout << "C'est le tour du joueur: " << (game->getCurrentPlayer()== game->getPlayer1() ? "Player 1" : "Player 2") << std::endl;
+        board->displayBoard(*game->getCurrentPlayer());
         handleInput(game);
     }
     void PlayerTurnState::handleInput(Game* game) {
@@ -84,20 +85,25 @@ namespace state
         }
         int x;
         int y;
+
         std::cout << "Quelle piece voulez-vous jouer ?" << std::endl;
         std::cin >> x;
         std::cin >> y;
         std::pair<int, int> position;
         position.first=x;
         position.second=y;
-        Pieces * pieceToMove = board->getPiece(position);
 
-        while (true) {
-            if (!game->getCurrentPlayer()->belongTo(pieceToMove)) {
-                std::cout << "Ce n'est pas votre piece !" << std::endl;
-                continue;
-            }
-            break;
+
+        Pieces * pieceToMove = board->getPiece(position);
+        if (pieceToMove == nullptr) {
+            std::cout << "Aucune piece a cette position." << std::endl;
+            handleInput(game);
+            return;
+        }
+        if (!game->getCurrentPlayer()->belongTo(pieceToMove)) {
+            std::cout << "Ce n'est pas votre piece !" << std::endl;
+            handleInput(game);
+            return;
         }
 
         auto possiblePositions = pieceToMove->canMove(pieceToMove);
@@ -120,6 +126,12 @@ namespace state
         {
             if(possible_position==destination)
             {
+                if(pieceToMove->CheckCase(destination)=="Enemy")
+                {
+                    pieceToMove->attack(destination);
+                    update(game);
+                    return;
+                }
                 pieceToMove->setPosition(destination);
                 update(game);
                 return;
@@ -132,7 +144,7 @@ namespace state
     {
         Player * player=game->getCurrentPlayer();
         std::vector<Pieces*>  capturedPieces=player->getCaptured();
-        if(capturedPieces[0]->getValue()==0) {
+        if(!capturedPieces.empty() && capturedPieces[0]->getValue()==0) {
             game->setState(new WinState());
         }
         else {
@@ -174,6 +186,12 @@ namespace state
         }
         std::uniform_int_distribution<> distr2(0, possiblePositions.size() - 1);
         auto destination = possiblePositions[distr2(gen)];
+        if(pieceToMove->CheckCase(destination)=="Enemy")
+        {
+            pieceToMove->attack(destination);
+            update(game);
+            return;
+        }
         pieceToMove->setPosition(destination);
         update(game);
     }

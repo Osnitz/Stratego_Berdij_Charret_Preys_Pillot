@@ -12,7 +12,7 @@ using namespace state;
 
 Player :: Player() {
     std::vector<Pieces*> myPieces;
-    std::vector<Pieces*>  capturedPieces;
+    std::vector<Pieces*>  capturedPieces= {nullptr};
     std::vector<Pieces*>  knownPieces;
 }
 

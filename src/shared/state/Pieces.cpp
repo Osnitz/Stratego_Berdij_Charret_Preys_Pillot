@@ -76,11 +76,9 @@ string Pieces::CheckCase (std::pair<int,int> position) {
     Player* currentPlayer = game->getCurrentPlayer();
 
     if (targetPiece == nullptr) {
-        this->setPosition(position);
         return "Empty";
     }
     if (!currentPlayer->belongTo(targetPiece)) {
-        attack(position);
         return "Enemy";
     }
 
