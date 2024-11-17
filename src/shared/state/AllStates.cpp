@@ -86,7 +86,7 @@ namespace state
         int x;
         int y;
 
-        std::cout << "Quelle piece voulez-vous jouer ?" << std::endl;
+        std::cout << "Quelle piece voulez-vous jouer ? (format: x y)" << std::endl;
         std::cin >> x;
         std::cin >> y;
         std::pair<int, int> position;
@@ -113,7 +113,7 @@ namespace state
             return;
         }
 
-        std::cout << "Quelle est votre destination ?" << std::endl;
+        std::cout << "Quelle est votre destination ? (format: x y)" << std::endl;
         int newx;
         int newy;
         std::cin >> newx;
