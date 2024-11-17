@@ -32,7 +32,7 @@ using namespace state;
 int main() {
     auto game= Game::getInstance();
     auto board = Board::getInstance();
-    auto piece1 = new Pieces(1, "Spy", 4, 0);
+    auto piece1 = new Pieces(6, "Spy", 4, 0);
     auto piece2 = new Pieces(2, "Marshal", 0, 1);
     auto piece3 = new Pieces(3, "General", 0, 2);
     auto piece4 = new Pieces(4, "Colonel", 0, 3);

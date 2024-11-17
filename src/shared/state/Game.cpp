@@ -82,7 +82,7 @@ namespace state {
     }
 
     void Game::setAI(bool AIvalue) {
-        this->againstIA = AIvalue;
+        againstIA = AIvalue;
     }
 
     Player* Game::getPlayer1() {
