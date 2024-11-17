@@ -45,7 +45,7 @@ bool Pieces::CheckBoard(std::pair<int, int> position){
     int NewX = position.first;
     int NewY = position.second;
     if ((NewX < 0) || (NewY < 0) || (NewX > 9) || (NewY > 9)) {
-        std::cout << "Out of bounds" << std::endl;
+        //std::cout << "Out of bounds" << std::endl;
         return false;
     }
     if ((NewY == 4) || (NewY == 5)) {

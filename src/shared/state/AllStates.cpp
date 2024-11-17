@@ -176,16 +176,29 @@ namespace state
 
         std::random_device rd;
         std::mt19937 gen(rd());
-        std::uniform_int_distribution<> distr(0, aiPieces.size() - 1);
-        Pieces* pieceToMove = aiPieces[distr(gen)];
-        auto possiblePositions = pieceToMove->canMove(pieceToMove);
-        while(possiblePositions.empty())
-        {
-            pieceToMove = aiPieces[distr(gen)];
-            possiblePositions = pieceToMove->canMove(pieceToMove);
+
+        // Filtrer les pièces ayant des mouvements possibles
+        std::vector<Pieces*> movablePieces;
+        for (auto* piece : aiPieces) {
+            if (!piece->canMove(piece).empty()) {
+                movablePieces.push_back(piece);
+            }
         }
+
+        if (movablePieces.empty()) {
+            std::cout << "No valid moves available for AI." << std::endl;
+            return;
+        }
+
+        // Choisir une pièce au hasard parmi celles pouvant se déplacer
+        std::uniform_int_distribution<> distr(0, movablePieces.size() - 1);
+        Pieces* pieceToMove = movablePieces[distr(gen)];
+
+        // Obtenir les positions possibles pour cette pièce
+        auto possiblePositions = pieceToMove->canMove(pieceToMove);
         std::uniform_int_distribution<> distr2(0, possiblePositions.size() - 1);
         auto destination = possiblePositions[distr2(gen)];
+
         if(pieceToMove->CheckCase(destination)=="Enemy")
         {
             pieceToMove->attack(destination);
