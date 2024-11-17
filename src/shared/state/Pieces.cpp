@@ -50,7 +50,7 @@ bool Pieces::CheckBoard(std::pair<int, int> position){
     }
     if ((NewY == 4) || (NewY == 5)) {
         if ((NewX == 2) || (NewX == 3) || (NewX == 6) || (NewX == 7)) {
-            std::cout << "You can't cross lakes !" << std::endl;
+            std::cerr << "You can't cross lakes !\n" << std::endl;
             return false;
         }
     }
@@ -93,7 +93,7 @@ void Pieces::setPosition(const std::pair<int, int> &position) {
     this->x = newx;
     this->y = newy;
     board->setPieceOnBoard(this);
-    std::cout << name << " was moved to (" << newx << ", " << newy << ")." << std::endl;
+    std::cout << name << " was moved to (" << newx << ", " << newy << ").\n" << std::endl;
 }
 
 void Pieces::attack(std::pair<int, int> position) {
@@ -102,19 +102,19 @@ void Pieces::attack(std::pair<int, int> position) {
     auto player = game->getCurrentPlayer();
 
     if (attackedPiece == nullptr) {
-        std::cout << "No target found" << std::endl;
+        std::cerr << "No target found\n" << std::endl;
         return;
     }
 
     if (attackedPiece->getName() == "Bomb") {
         if (this->getName() == "Miner") {
-            std::cout << "Good job ! The bomb is no more. " << std::endl;
+            std::cout << "Good job ! The bomb is no more.\n" << std::endl;
             player->addCaptured(attackedPiece);
             setPosition(position);
             game->Graveyard = attackedPiece;
             return;
         } else {
-            std::cout << "Rest well ! The war is over for you. " << std::endl;
+            std::cout << "Rest well ! The war is over for you.\n" << std::endl;
             player->addCaptured(attackedPiece);
             board->removeFromBoard(this);
             player->removePiece(this);
@@ -125,7 +125,7 @@ void Pieces::attack(std::pair<int, int> position) {
     }
 
     if (attackedPiece->getName() == "Marshal" && getName() == "Spy") {
-        std::cout << "Well done sir ! Their leader is gone. " << std::endl;
+        std::cout << "Well done sir ! Their leader is gone.\n" << std::endl;
         player->addCaptured(attackedPiece);
         setPosition(position);
         Game::getInstance()->Graveyard = attackedPiece;
@@ -133,19 +133,19 @@ void Pieces::attack(std::pair<int, int> position) {
     }
 
     if (getValue() > attackedPiece->getValue()) {
-        std::cout << "The enemy is down ! It was a " << attackedPiece->getName() << "." << std::endl;
+        std::cout << "The enemy is down ! It was a " << attackedPiece->getName() << ".\n" << std::endl;
         player->addCaptured(attackedPiece);
         setPosition(position);
         game->Graveyard = attackedPiece;
 
     } else if (getValue() < attackedPiece->getValue()) {
-        std::cout << "The enemy is too strong ! It was a " << attackedPiece->getName() << "." << std::endl;
+        std::cout << "The enemy is too strong ! It was a " << attackedPiece->getName() << ".\n" << std::endl;
         board->removeFromBoard(this);
         player->removePiece(this);
         game->Purgatory = this;
 
     } else {
-        std::cout << "It's a tie ! It was a " << attackedPiece->getName() << " too." << std::endl;
+        std::cout << "It's a tie ! It was a " << attackedPiece->getName() << " too.\n" << std::endl;
         player->addCaptured(attackedPiece);
         board->removeFromBoard(this);
         player->removePiece(this);

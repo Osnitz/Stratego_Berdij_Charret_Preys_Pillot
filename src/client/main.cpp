@@ -35,7 +35,7 @@ int main() {
     auto piece1 = new Pieces(6, "Spy", 4, 0);
     auto piece2 = new Pieces(2, "Marshal", 0, 1);
     auto piece3 = new Pieces(3, "General", 0, 2);
-    auto piece4 = new Pieces(4, "Colonel", 0, 3);
+    auto piece4 = new Pieces(4, "Colonel", 1, 4);
     auto piece5 = new Pieces(5, "Major", 0, 4);
 
     auto piece6 = new Pieces(6, "Captain", 5, 0);
