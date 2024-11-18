@@ -52,7 +52,7 @@ void Board::displayBoard(Player &player) {
             } else if (player.belongTo(piece)) {
                 std::cout << "|  " << piece->getValue() << "  "; // Pièce du joueur actuel
             } else {
-                std::cout << "|  !  "; // Pièce de l'adversaire
+                std::cout << "|  ?  "; // Pièce de l'adversaire
             }
         }
         std::cout << "|" << std::endl;
