@@ -1,4 +1,4 @@
-/*#include <iostream>
+#include <iostream>
 
 // The following lines are here to check that SFML is installed and working
 #include <SFML/Graphics.hpp>
@@ -13,7 +13,12 @@ void testSFML() {
 using namespace std;
 using namespace state;
 
-int main(int argc,char* argv[])
+int main() {
+    auto game = Game::getInstance();
+    game->startGame();
+}
+
+/*int main(int argc,char* argv[])
 {
     cout << "It works !" << endl;
     return 0;
@@ -23,7 +28,7 @@ int main(int argc,char* argv[])
 // Created by matthieu on 19/10/24.
 //
 #include <iostream>
-#include "state/Game.h"
+/*#include "state/Game.h"
 #include "state/Player.h"
 #include "state/Board.h"
 
@@ -70,5 +75,5 @@ int main() {
     }
     game->startGame();
     return 0;
- }
+ }*/
 

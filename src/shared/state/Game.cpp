@@ -9,6 +9,7 @@
 #include "Player.h"
 #include "InitState.h"
 #include "random"
+
 namespace state {
      Game* Game::instance=nullptr;
 
