@@ -31,14 +31,14 @@ void Board::displayBoard(Player &player) {
     // Afficher la première ligne de numéros de colonnes dans la grille
     std::cout << "    "; // Alignement initial pour la première ligne de la grille
     for (std::size_t col = 0; col < grid[0].size(); ++col) {
-        std::cout << "  " << col << "   "; // Ajustement de l'espacement pour les numéros de colonnes
+        std::cout << "   " << col << "   "; // Ajustement de l'espacement pour les numéros de colonnes
     }
     std::cout << std::endl;
 
     // Afficher la ligne de délimitation sous les numéros de colonnes
     std::cout << "   "; // Alignement initial pour les tirets
     for (std::size_t col = 0; col < grid[0].size(); ++col) {
-        std::cout << "------"; // Délimitation horizontale
+        std::cout << "-------"; // Délimitation horizontale
     }
     std::cout << "-" << std::endl; // Fin de la délimitation à droite
 
@@ -46,13 +46,22 @@ void Board::displayBoard(Player &player) {
     for (std::size_t row = 0; row < grid.size(); ++row) {
         std::cout << row << "  "; // Afficher le numéro de ligne à l'intérieur de la grille
         for (std::size_t col = 0; col < grid[row].size(); ++col) {
-            Pieces* piece = grid[row][col];
-            if (piece == nullptr) {
-                std::cout << "|     "; // Case vide
-            } else if (player.belongTo(piece)) {
-                std::cout << "|  " << piece->getValue() << "  "; // Pièce du joueur actuel
+            if ((row == 4 && (col == 2 || col == 3 || col == 6 || col == 7)) || (row == 5 && (col == 2 || col == 3 || col == 6 || col == 7))) {
+                std::cout << "|  XX  "; // Lacs
             } else {
-                std::cout << "|  ?  "; // Pièce de l'adversaire
+                Pieces* piece = grid[row][col];
+                if (piece == nullptr) {
+                    std::cout << "|      "; // Case vide
+                } else if (player.belongTo(piece)) {
+                    int value = piece->getValue();
+                    if (value < 10) {
+                        std::cout << "|  0" << piece->getValue() << "  ";
+                    } else {
+                        std::cout << "|  " << piece->getValue() << "  ";
+                    }
+                } else {
+                    std::cout << "|  ??  "; // Pièce de l'adversaire
+                }
             }
         }
         std::cout << "|" << std::endl;
@@ -60,7 +69,7 @@ void Board::displayBoard(Player &player) {
         // Afficher la ligne de délimitation sous chaque ligne
         std::cout << "   "; // Alignement pour les tirets
         for (std::size_t col = 0; col < grid[0].size(); ++col) {
-            std::cout << "------"; // Délimitation horizontale
+            std::cout << "-------"; // Délimitation horizontale
         }
         std::cout << "-" << std::endl; // Fin de la délimitation à droite
     }
