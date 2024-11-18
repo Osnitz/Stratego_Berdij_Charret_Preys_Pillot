@@ -18,6 +18,7 @@ namespace state {
         Player2 = new Player();
         currentState = new InitState();
         currentPlayer = nullptr;
+        againstIA = false;
     }
 
     Game::~Game() {
@@ -78,5 +79,16 @@ namespace state {
             throw std::invalid_argument("No current player");
         }
         return currentPlayer;
+    }
+
+    void Game::setAI(bool AIvalue) {
+        againstIA = AIvalue;
+    }
+
+    Player* Game::getPlayer1() {
+        return Player1;
+    }
+    Player* Game::getPlayer2() {
+        return Player2;
     }
 }

@@ -10,8 +10,9 @@
 #include "WaitingState.h"
 #include "WinState.h"
 #include "Game.h"
+#include "IATurnState.h"
 #include <iostream>
-
+#include <random>
 #include "Board.h"
 
 namespace state
@@ -21,8 +22,21 @@ namespace state
     void InitState::enter(Game* game)
     {
         printf("---InitState ---\n");
+        printf("Welcome to the game!\n");
+        printf("Do you want to play against the AI or another Player? (1/2): \n");
+        std::string answer;
+        std::cin >> answer;
+        if (answer == "1")
+        {
+            game->setAI(true);
+        }
+        else
+        {
+            game->setAI(false);
+        }
         handleInput(game);
     }
+
     void InitState::handleInput(Game* game)
     {
         update(game);
@@ -36,8 +50,8 @@ namespace state
     void PlacementState::enter(Game* game)
     {
         printf("--- PlacementState---\n");
-        handleInput(game);
         game->switchTurn();
+        handleInput(game);
     }
     void PlacementState::handleInput(Game* game)
     {
@@ -45,16 +59,21 @@ namespace state
     }
     void PlacementState::update(Game* game)
     {
-        game->setState(new PlayerTurnState());
+        if (game->getCurrentPlayer() == game->getPlayer2() && game->againstIA) {
+            game->setState(new IATurnState());
+        } else {
+            game->setState(new PlayerTurnState());
+        }
     }
 
 
     void PlayerTurnState::enter(Game* game)
     {
         printf("--- PlayerTurnState ---\n");
+        std::cout << "C'est le tour du joueur: " << (game->getCurrentPlayer()== game->getPlayer1() ? "Player 1" : "Player 2\n") << std::endl;
+        board->displayBoard(*game->getCurrentPlayer());
         handleInput(game);
     }
-
     void PlayerTurnState::handleInput(Game* game) {
         if (game->Purgatory != nullptr) {
             game->getCurrentPlayer()->addCaptured(game->Purgatory);
@@ -66,21 +85,35 @@ namespace state
         }
         int x;
         int y;
-        std::cout << "Quelle piece voulez-vous jouer ?" << std::endl;
+
+        std::cout << "Quelle piece voulez-vous jouer ? (format: x y)\n" << std::endl;
         std::cin >> x;
         std::cin >> y;
         std::pair<int, int> position;
         position.first=x;
         position.second=y;
-        Pieces * pieceToMove = board->getPiece(position);
 
+
+        Pieces * pieceToMove = board->getPiece(position);
+        if (pieceToMove == nullptr) {
+            std::cerr << "Aucune piece a cette position.\n" << std::endl;
+            handleInput(game);
+            return;
+        }
         if (!game->getCurrentPlayer()->belongTo(pieceToMove)) {
-            std::cout << "Ce n'est pas votre piece !" << std::endl;
+            std::cerr << "Ce n'est pas votre piece !\n" << std::endl;
             handleInput(game);
             return;
         }
 
-        std::cout << "Quelle est votre destination ?" << std::endl;
+        auto possiblePositions = pieceToMove->canMove(pieceToMove);
+        if (possiblePositions.empty()) {
+            std::cerr<< "Aucun mouvement possible pour cette piece.\n" << std::endl;
+            handleInput(game);
+            return;
+        }
+
+        std::cout << "Quelle est votre destination ? (format: x y)\n" << std::endl;
         int newx;
         int newy;
         std::cin >> newx;
@@ -88,30 +121,100 @@ namespace state
         std::pair<int, int> destination;
         destination.first=newx;
         destination.second=newy;
-        if (pieceToMove->CheckBoard(destination)) {
-            if (pieceToMove->CheckRange(destination)) {
-                if (pieceToMove->CheckCase(destination) == "Empty" ||
-                    pieceToMove->CheckCase(destination) == "Enemy") {
+
+        for(auto possible_position : possiblePositions)
+        {
+            if(possible_position==destination)
+            {
+                if(pieceToMove->CheckCase(destination)=="Enemy")
+                {
+                    pieceToMove->attack(destination);
                     update(game);
                     return;
                 }
-                handleInput(game);
+                pieceToMove->setPosition(destination);
+                update(game);
+                return;
             }
         }
+        std::cerr<<"Destination non valide\n"<<std::endl;
+        handleInput(game);
     }
-
     void PlayerTurnState::update(Game* game)
     {
         Player * player=game->getCurrentPlayer();
         std::vector<Pieces*>  capturedPieces=player->getCaptured();
-        if(capturedPieces[0]->getValue()==0) {
+        if(!capturedPieces.empty() && capturedPieces[0]->getValue()==0) {
             game->setState(new WinState());
         }
         else {
             game->switchTurn();
-            game->setState(new PlayerTurnState());
+            if (game->getCurrentPlayer() == game->getPlayer2() && game->againstIA) {
+                game->setState(new IATurnState());
+            } else {
+                game->setState(new PlayerTurnState());
+            }
         }
     }
+
+
+    void IATurnState::enter(Game* game)
+    {
+        printf("--- IATurnState ---\n");
+        handleInput(game);
+    }
+
+    void IATurnState::handleInput(Game* game)
+    {
+        Player* aiPlayer = game->getCurrentPlayer();
+        std::vector<Pieces*> aiPieces = aiPlayer->getMyPieces();
+
+        if (aiPieces.empty()) {
+            std::cerr << "No pieces available for AI to move.\n" << std::endl;
+            return;
+        }
+
+        std::random_device rd;
+        std::mt19937 gen(rd());
+
+        // Filtrer les pièces ayant des mouvements possibles
+        std::vector<Pieces*> movablePieces;
+        for (auto* piece : aiPieces) {
+            if (!piece->canMove(piece).empty()) {
+                movablePieces.push_back(piece);
+            }
+        }
+
+        if (movablePieces.empty()) {
+            std::cerr << "No valid moves available for AI.\n" << std::endl;
+            return;
+        }
+
+        // Choisir une pièce au hasard parmi celles pouvant se déplacer
+        std::uniform_int_distribution<> distr(0, movablePieces.size() - 1);
+        Pieces* pieceToMove = movablePieces[distr(gen)];
+
+        // Obtenir les positions possibles pour cette pièce
+        auto possiblePositions = pieceToMove->canMove(pieceToMove);
+        std::uniform_int_distribution<> distr2(0, possiblePositions.size() - 1);
+        auto destination = possiblePositions[distr2(gen)];
+
+        if(pieceToMove->CheckCase(destination)=="Enemy")
+        {
+            pieceToMove->attack(destination);
+            update(game);
+            return;
+        }
+        pieceToMove->setPosition(destination);
+        update(game);
+    }
+
+    void IATurnState::update(Game* game)
+    {
+        game->switchTurn();
+        game->setState(new PlayerTurnState());
+    }
+
 
     void WinState::enter(Game* game)
     {
@@ -145,7 +248,7 @@ namespace state
         }
         else
         {
-            std::cout << "\nThank you for playing! See you next time." << std::endl;
+            std::cout << "\nThank you for playing! See you next time.\n" << std::endl;
             exit(0);
         }
     }
