@@ -36,11 +36,58 @@ namespace state
     void PlacementState::enter(Game* game)
     {
         printf("--- PlacementState---\n");
-        handleInput(game);
         game->switchTurn();
+        handleInput(game);
+
     }
     void PlacementState::handleInput(Game* game)
     {
+        auto player = game->getCurrentPlayer();
+
+        std::cout << "Quelle configuration voulez-vous ? \n" << std::endl;
+        std::cout << "1 : Offensive, 2 : Defensive, 3 : Balance \n" << std::endl;
+        std::string choice;
+        std::cin >> choice;
+        if (choice == "1") {
+            player->chargeConfig("../src/shared/state/config/Offensive.csv");
+        }
+        else if (choice == "2") {
+            player->chargeConfig("../src/shared/state/config/Defensive.csv");
+        }
+        else if (choice == "3") {
+            player->chargeConfig("../src/shared/state/config/Balance.csv");
+        }
+        else {
+            std::cerr << "Incorrect choice entered" << std::endl;
+            handleInput(game);
+            return;
+        }
+
+        game->switchTurn();
+        player = game->getCurrentPlayer();
+
+        std::cout << "Quelle configuration voulez-vous ? \n" << std::endl;
+        std::cout << "1 : Offensive, 2 : Defensive, 3 : Balance \n" << std::endl;
+        std::string choice2;
+        std::cin >> choice2;
+        if (choice2 == "1") {
+            player->chargeConfig("../src/shared/state/config/Offensive.csv");
+        }
+        else if (choice2 == "2") {
+            player->chargeConfig("../src/shared/state/config/Defensive.csv");
+        }
+        else if (choice2 == "3") {
+            player->chargeConfig("../src/shared/state/config/Balance.csv");
+        }
+        else {
+            std::cerr << "Incorrect choice entered" << std::endl;
+            game->switchTurn();
+            handleInput(game);
+            return;
+        }
+
+        game->switchTurn();
+
         update(game);
     }
     void PlacementState::update(Game* game)
@@ -100,7 +147,7 @@ namespace state
     void PlayerTurnState::update(Game* game)
     {
         Player * player=game->getCurrentPlayer();
-        std::vector<Pieces*>  capturedPieces=player->getCaptured();
+        std::vector<Pieces*> capturedPieces=player->getCaptured();
         if(capturedPieces[0]->getValue()==0) {
             game->setState(new WinState());
         }

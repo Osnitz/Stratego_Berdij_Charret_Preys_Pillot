@@ -9,8 +9,11 @@
 #include "Player.h"
 #include "InitState.h"
 #include "random"
+
 namespace state {
      Game* Game::instance=nullptr;
+
+    std::vector<std::vector<Pieces*>> CompoDef;
 
     Game::Game() {
         board = Board::getInstance();
@@ -79,4 +82,9 @@ namespace state {
         }
         return currentPlayer;
     }
+
+    Player* Game::getPlayer1() {
+    return Player1;
+    }
+
 }

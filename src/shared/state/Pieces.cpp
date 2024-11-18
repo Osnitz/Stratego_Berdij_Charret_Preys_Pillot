@@ -16,10 +16,17 @@ using namespace state;
 Board *board = Board::getInstance();
 auto game = Game::getInstance();
 
-Pieces::Pieces(int value, std::string name, int x, int y) {
+/*Pieces::Pieces(int value, std::string name, int x, int y) {
     this->value = value;
     this->name = name;
     this->range = 1;
+    this->x = x;
+    this->y = y;
+}*/
+
+Pieces::Pieces(int value, std::string name, int x, int y) {
+    this->value = value;
+    this->name = name;
     this->x = x;
     this->y = y;
 }

@@ -3,6 +3,9 @@
 //
 #include "Board.h"
 #include <iostream>
+#include <map>
+
+#include "Game.h"
 
 using namespace state;
 
