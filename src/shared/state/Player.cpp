@@ -40,7 +40,7 @@ void Player:: addCaptured(Pieces *piece) {
     Board::getInstance()->removeFromBoard(piece);
     auto size=capturedPieces.size();
     int value=piece->getValue();
-    for(int i=0;i<size;i++) {
+    for(std::size_t i=0;i<size;i++) {
         int myvalue=capturedPieces[i]->getValue();
         if(value<=myvalue) {
             capturedPieces.insert(capturedPieces.begin()+i,piece);
@@ -74,7 +74,7 @@ void Player:: displayCaptured () {
         return;
     }
     auto size=capturedPieces.size();
-    for(int i=0;i<size;i++) {
+    for(std::size_t i=0;i<size;i++) {
         std::cout << capturedPieces[i]->getName()<< std::endl;
     }
 }
