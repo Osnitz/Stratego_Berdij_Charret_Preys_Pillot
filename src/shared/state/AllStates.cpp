@@ -83,12 +83,20 @@ namespace state
             game->getCurrentPlayer()->removePiece(game->Graveyard);
             game->Graveyard = nullptr;
         }
-        int x;
-        int y;
+        int x,y;
 
         std::cout << "Quelle piece voulez-vous jouer ? (format: x y)\n" << std::endl;
-        std::cin >> x;
-        std::cin >> y;
+        while(true) {
+            std::cin >> x>>y;
+            if(std::cin.fail()) {
+                std::cerr<<"Veuillez entrer un entier"<<std::endl;
+                std::cin.clear();
+                std::cin.ignore(std::numeric_limits<std::streamsize>::max(),'\n');
+            }
+            else{break;}
+        }
+
+
         std::pair<int, int> position;
         position.first=x;
         position.second=y;
@@ -116,8 +124,15 @@ namespace state
         std::cout << "Quelle est votre destination ? (format: x y)\n" << std::endl;
         int newx;
         int newy;
-        std::cin >> newx;
-        std::cin >> newy;
+        while(true) {
+            std::cin >> newx>>newy;
+            if(std::cin.fail()) {
+                std::cerr<<"Veuillez entrer un entier"<<std::endl;
+                std::cin.clear();
+                std::cin.ignore(std::numeric_limits<std::streamsize>::max(),'\n');
+            }
+            else{break;}
+        }
         std::pair<int, int> destination;
         destination.first=newx;
         destination.second=newy;
