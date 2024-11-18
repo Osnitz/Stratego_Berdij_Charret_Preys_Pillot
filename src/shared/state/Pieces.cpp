@@ -5,9 +5,7 @@
 #include "Pieces.h"
 #include "Board.h"
 #include "Player.h"
-
 #include <iostream>
-
 #include "Game.h"
 
 using namespace std;
@@ -16,17 +14,15 @@ using namespace state;
 Board *board = Board::getInstance();
 auto game = Game::getInstance();
 
-/*Pieces::Pieces(int value, std::string name, int x, int y) {
+Pieces::Pieces(int value, string name, int x, int y) {
     this->value = value;
     this->name = name;
-    this->range = 1;
-    this->x = x;
-    this->y = y;
-}*/
-
-Pieces::Pieces(int value, std::string name, int x, int y) {
-    this->value = value;
-    this->name = name;
+    if(value==2) {
+        this->range = 10;
+    }else if(value==11||value==0) {
+        this->range = 0;
+    }
+    else{this->range=1;}
     this->x = x;
     this->y = y;
 }
@@ -34,7 +30,7 @@ Pieces::Pieces(int value, std::string name, int x, int y) {
 Pieces::~Pieces() {
 }
 
-std::pair<int, int> state::Pieces::getPosition() {
+pair<int, int> Pieces::getPosition() {
     return {x, y};
 }
 
@@ -42,7 +38,7 @@ int Pieces::getValue() {
     return value;
 }
 
-std::string Pieces::getName() {
+string Pieces::getName() {
     return name;
 }
 
@@ -50,23 +46,24 @@ int Pieces::getRange() {
     return range;
 }
 
-bool Pieces::CheckBoard(std::pair<int, int> position){
+bool Pieces::CheckBoard(pair<int, int> position){
     int NewX = position.first;
     int NewY = position.second;
     if ((NewX < 0) || (NewY < 0) || (NewX > 9) || (NewY > 9)) {
-        std::cout << "Out of bounds" << std::endl;
+
+        //std::cout << "Out of bounds" << std::endl;
         return false;
     }
     if ((NewY == 4) || (NewY == 5)) {
         if ((NewX == 2) || (NewX == 3) || (NewX == 6) || (NewX == 7)) {
-            std::cout << "You can't cross lakes !" << std::endl;
+            std::cerr << "You can't cross lakes !\n" << std::endl;
             return false;
         }
     }
     return true;
 }
 
-bool Pieces::CheckRange(std::pair<int, int> position) {
+/*bool Pieces::CheckRange(std::pair<int, int> position) {
     int x = this->getPosition().first;
     int y = this->getPosition().second;
     int Newx = position.first;
@@ -74,29 +71,27 @@ bool Pieces::CheckRange(std::pair<int, int> position) {
 
     int range = this->getRange();
 
-    if ((std::abs(Newx - x) <= range && Newy == y) || (std::abs(Newy - y) <= range && Newx == x)) {
+    if ((abs(Newx - x) <= range && Newy == y) || (abs(Newy - y) <= range && Newx == x)) {
         return true;
     }
     return false;
-}
+}*/
 
-string Pieces::CheckCase (std::pair<int,int> position) {
+string Pieces::CheckCase (pair<int,int> position) {
     Pieces *targetPiece = board->getPiece(position);
     Player* currentPlayer = game->getCurrentPlayer();
 
     if (targetPiece == nullptr) {
-        this->setPosition(position);
         return "Empty";
     }
     if (!currentPlayer->belongTo(targetPiece)) {
-        this->attack(position);
         return "Enemy";
     }
 
     return "Ally";
 }
 
-void Pieces::setPosition(const std::pair<int, int> &position) {
+void Pieces::setPosition(const pair<int, int> &position) {
     Board* board = Board::getInstance();
     int newx = position.first;
     int newy = position.second;
@@ -104,62 +99,135 @@ void Pieces::setPosition(const std::pair<int, int> &position) {
     this->x = newx;
     this->y = newy;
     board->setPieceOnBoard(this);
-    std::cout << name << " was moved to (" << newx << ", " << newy << ")." << std::endl;
+    std::cout << name << " was moved to (" << newx << ", " << newy << ").\n" << std::endl;
 }
 
-void Pieces::attack(std::pair<int, int> position) {
+void Pieces::attack(pair<int, int> position) {
 
     Pieces *attackedPiece = board->getPiece(position);
     auto player = game->getCurrentPlayer();
 
     if (attackedPiece == nullptr) {
-        std::cout << "No target found" << std::endl;
+        std::cerr << "No target found\n" << std::endl;
         return;
     }
 
     if (attackedPiece->getName() == "Bomb") {
         if (this->getName() == "Miner") {
-            std::cout << "Good job ! The bomb is no more. " << std::endl;
+
+            std::cout << "Good job ! The bomb is no more.\n" << std::endl;
             player->addCaptured(attackedPiece);
-            this->setPosition(position);
+            setPosition(position);
+            game->Graveyard = attackedPiece;
             return;
         } else {
-            std::cout << "Rest well ! The war is over for you. " << std::endl;
+
+            std::cout << "Rest well ! The war is over for you.\n" << std::endl;
             player->addCaptured(attackedPiece);
             board->removeFromBoard(this);
             player->removePiece(this);
             game->Purgatory = this;
+            game->Graveyard = attackedPiece;
             return;
         }
     }
 
-    if (attackedPiece->getName() == "Marshal") {
-        if (this->getName() == "Spy") {
-            std::cout << "Well done sir ! Their leader is gone. " << std::endl;
-            player->addCaptured(attackedPiece);
-            this->setPosition(position);
-            return;
-        }
+    if (attackedPiece->getName() == "Marshal" && getName() == "Spy") {
+        std::cout << "Well done sir ! Their leader is gone.\n" << std::endl;
+        player->addCaptured(attackedPiece);
+        setPosition(position);
+        Game::getInstance()->Graveyard = attackedPiece;
+        return;
     }
 
-    if (this->getValue() > attackedPiece->getValue()) {
-        std::cout << "The enemy is down ! It was a " << attackedPiece->getName() << "." << std::endl;
+    if (getValue() > attackedPiece->getValue()) {
+        std::cout << "The enemy is down ! It was a " << attackedPiece->getName() << ".\n" << std::endl;
         player->addCaptured(attackedPiece);
-        this->setPosition(position);
-        return;
-    } else if (this->getValue() < attackedPiece->getValue()) {
-        std::cout << "The enemy is too strong ! It was a " << attackedPiece->getName() << "." << std::endl;
+        setPosition(position);
+        game->Graveyard = attackedPiece;
+
+    } else if (getValue() < attackedPiece->getValue()) {
+        std::cout << "The enemy is too strong ! It was a " << attackedPiece->getName() << ".\n" << std::endl;
         board->removeFromBoard(this);
         player->removePiece(this);
         game->Purgatory = this;
-        return;
-    } else if (this->getValue() == attackedPiece->getValue()) {
-        std::cout << "It's a tie ! It was a " << attackedPiece->getName() << " too." << std::endl;
+
+    } else {
+        std::cout << "It's a tie ! It was a " << attackedPiece->getName() << " too.\n" << std::endl;
         player->addCaptured(attackedPiece);
         board->removeFromBoard(this);
         player->removePiece(this);
         game->Purgatory = this;
-        return;
+        game->Graveyard = attackedPiece;
     }
 }
+
+std::vector<std::pair<int, int>> Pieces::canMove(Pieces* pieceToMove) {
+    std::vector<std::pair<int, int>> possiblePositions;
+
+    if (pieceToMove == nullptr) {
+        return possiblePositions;
+    }
+
+    auto position = pieceToMove->getPosition();
+    int x = position.first;
+    int y = position.second;
+    int range = pieceToMove->getRange();
+
+    for (int i = 1; i <= range; ++i) {
+        std::pair<int, int> posAbove = {x, y - i};
+        if (CheckBoard(posAbove)) {
+            std::string caseStatus = CheckCase(posAbove);
+            if (caseStatus != "Ally") {
+                possiblePositions.push_back(posAbove);
+            }
+            if (caseStatus != "Empty") {
+                break;
+            }
+        }
+    }
+
+    for (int i = 1; i <= range; ++i) {
+        std::pair<int, int> posBelow = {x, y + i};
+        if (CheckBoard(posBelow)) {
+            std::string caseStatus = CheckCase(posBelow);
+            if (caseStatus != "Ally") {
+                possiblePositions.push_back(posBelow);
+            }
+            if (caseStatus != "Empty") {
+                break;
+            }
+        }
+    }
+
+    for (int i = 1; i <= range; ++i) {
+        std::pair<int, int> posLeft = {x - i, y};
+        if (CheckBoard(posLeft)) {
+            std::string caseStatus = CheckCase(posLeft);
+            if (caseStatus != "Ally") {
+                possiblePositions.push_back(posLeft);
+            }
+            if (caseStatus != "Empty") {
+                break;
+            }
+        }
+    }
+
+    for (int i = 1; i <= range; ++i) {
+        std::pair<int, int> posRight = {x + i, y};
+        if (CheckBoard(posRight)) {
+            std::string caseStatus = CheckCase(posRight);
+            if (caseStatus != "Ally") {
+                possiblePositions.push_back(posRight);
+            }
+            if (caseStatus != "Empty") {
+                break;
+            }
+        }
+    }
+
+    return possiblePositions;
+}
+
+
 

@@ -13,14 +13,13 @@
 namespace state {
      Game* Game::instance=nullptr;
 
-    std::vector<std::vector<Pieces*>> CompoDef;
-
     Game::Game() {
         board = Board::getInstance();
         Player1 = new Player();
         Player2 = new Player();
         currentState = new InitState();
         currentPlayer = nullptr;
+        againstIA = false;
     }
 
     Game::~Game() {
@@ -83,8 +82,14 @@ namespace state {
         return currentPlayer;
     }
 
-    Player* Game::getPlayer1() {
-    return Player1;
+    void Game::setAI(bool AIvalue) {
+        againstIA = AIvalue;
     }
 
+    Player* Game::getPlayer1() {
+        return Player1;
+    }
+    Player* Game::getPlayer2() {
+        return Player2;
+    }
 }
