@@ -19,12 +19,17 @@ Player :: Player() {
 Player:: ~Player(){};
 
 void Player::removePiece(Pieces* piece) {
+    if (myPieces.empty()) {
+        std::cerr<<"No piece left"<<std::endl;
+        return;
+    }
     for (std::size_t i = 0; i < myPieces.size(); i++) {
         if (myPieces[i] == piece) {
             myPieces.erase(myPieces.begin() + i);
-            break;
+            return;
         }
     }
+    std::cerr<<"Can't remove this piece : it doesn't exist!"<<std::endl;
 }
 
 void Player::addPiece(Pieces* piece) {
@@ -33,7 +38,7 @@ void Player::addPiece(Pieces* piece) {
 
 void Player:: addCaptured(Pieces *piece) {
     Board::getInstance()->removeFromBoard(piece);
-    int size=capturedPieces.size();
+    auto size=capturedPieces.size();
     int value=piece->getValue();
     for(int i=0;i<size;i++) {
         int myvalue=capturedPieces[i]->getValue();
@@ -64,7 +69,11 @@ bool Player::belongTo(Pieces* piece) {
 
 
 void Player:: displayCaptured () {
-    int size=capturedPieces.size();
+    if(capturedPieces.empty()) {
+        std::cerr<<"You have no captured pieces"<<std::endl;
+        return;
+    }
+    auto size=capturedPieces.size();
     for(int i=0;i<size;i++) {
         std::cout << capturedPieces[i]->getName()<< std::endl;
     }
