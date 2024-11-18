@@ -208,6 +208,7 @@ namespace state
         std::vector<Pieces*>  capturedPieces=player->getCaptured();
         if(!capturedPieces.empty() && capturedPieces[0]->getValue()==0) {
             game->setState(new WinState());
+            game->setState(new WinState());
         }
         else {
             game->switchTurn();
