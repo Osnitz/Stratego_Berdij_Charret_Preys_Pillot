@@ -10,7 +10,7 @@
 #include "WaitingState.h"
 #include "WinState.h"
 #include "Game.h"
-#include "IATurnState.h"
+#include "AITurnState.h"
 #include <iostream>
 #include <random>
 #include "Board.h"
@@ -62,8 +62,6 @@ namespace state
         }
     }
 
-    }
-
     void PlacementState::handleInput(Game* game) {
         for (int i = 0; i < 2; ++i) {
             auto player = game->getCurrentPlayer();
@@ -73,28 +71,27 @@ namespace state
         update(game);
     }
 
-        std::cout << "What configuration do you want ? \n" << std::endl;
-        std::cout << "1 : Offensive, 2 : Defensive, 3 : Balance \n" << std::endl;
+    void PlacementState::loadPlayerConfig(Player* player) {
+        std::cout << "Quelle configuration voulez-vous ? \n";
+        std::cout << "1 : Offensive, 2 : Defensive, 3 : Balance \n";
         std::string choice;
         std::cin >> choice;
         if (choice == "1") {
-            player->chargeConfig("../src/shared/state/config/Offensive.csv");
+            player->loadConfig("../src/shared/state/config/Offensive.csv");
         } else if (choice == "2") {
-            player->chargeConfig("../src/shared/state/config/Defensive.csv");
+            player->loadConfig("../src/shared/state/config/Defensive.csv");
         } else if (choice == "3") {
-            player->chargeConfig("../src/shared/state/config/Balance.csv");
+            player->loadConfig("../src/shared/state/config/Balance.csv");
         } else {
             std::cerr << "Incorrect choice entered" << std::endl;
             loadPlayerConfig(player);
         }
     }
 
-        update(game);
-    }
     void PlacementState::update(Game* game)
     {
         if (game->getCurrentPlayer() == game->getPlayer2() && game->againstIA) {
-            game->setState(new IATurnState());
+            game->setState(new AITurnState());
         } else {
             game->setState(new PlayerTurnState());
         }
@@ -198,6 +195,7 @@ namespace state
         board->displayBoard(*game->getCurrentPlayer());
         handleInput(game);
     }
+
     void PlayerTurnState::handleInput(Game* game) {
         if (game->Purgatory != nullptr) {
             game->getCurrentPlayer()->addCaptured(game->Purgatory);
@@ -291,7 +289,7 @@ namespace state
         else {
             game->switchTurn();
             if (game->getCurrentPlayer() == game->getPlayer2() && game->againstIA) {
-                game->setState(new IATurnState());
+                game->setState(new AITurnState());
             } else {
                 game->setState(new PlayerTurnState());
             }
@@ -299,13 +297,13 @@ namespace state
     }
 
 
-    void IATurnState::enter(Game* game)
+    void AITurnState::enter(Game* game)
     {
         printf("--- IATurnState ---\n");
         handleInput(game);
     }
 
-    void IATurnState::handleInput(Game* game)
+    void AITurnState::handleInput(Game* game)
     {
         Player* aiPlayer = game->getCurrentPlayer();
         std::vector<Pieces*> aiPieces = aiPlayer->getMyPieces();
@@ -350,7 +348,7 @@ namespace state
         update(game);
     }
 
-    void IATurnState::update(Game* game)
+    void AITurnState::update(Game* game)
     {
         game->switchTurn();
         game->setState(new PlayerTurnState());

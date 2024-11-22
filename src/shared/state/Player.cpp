@@ -25,7 +25,7 @@ Player :: Player() {
 Player:: ~Player(){};
 
 
-void Player::chargeConfig(string fileName){
+void Player::loadConfig(string fileName){
     Game *game = Game::getInstance();
     Board *board = Board::getInstance();
     ifstream file(fileName);
