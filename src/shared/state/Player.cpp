@@ -14,41 +14,42 @@
 #include "Game.h"
 
 using namespace state;
+using namespace std;
 
 Player :: Player() {
-    std::vector<Pieces*> myPieces;
-    std::vector<Pieces*>  capturedPieces= {nullptr};
-    std::vector<Pieces*>  knownPieces;
+    vector<Pieces*> myPieces;
+    vector<Pieces*>  capturedPieces= {nullptr};
+    vector<Pieces*>  knownPieces;
 }
 
 Player:: ~Player(){};
 
 
-void Player::loadConfig(std::string fileName){
+void Player::chargeConfig(string fileName){
     Game *game = Game::getInstance();
     Board *board = Board::getInstance();
-    std::ifstream file(fileName);
+    ifstream file(fileName);
 
     if (!file.is_open()) {
-        std::cerr << "File " << fileName << " not found " << std::endl;
+        cerr << "File " << fileName << " not found " << endl;
     }
-    std::string line;
-    std::getline(file, line);
-    while (std::getline(file, line)) {
-        //std::cout << line << std::endl;
-        std::stringstream ss(line);
-        std::string cell;
-        std::vector<std::string> dataline;
+    string line;
+    getline(file, line);
+    while (getline(file, line)) {
+        cout << line << endl;
+        stringstream ss(line);
+        string cell;
+        vector<string> dataline;
 
-        while (std::getline(ss, cell, ',')) {
-            cell.erase(std::remove(cell.begin(), cell.end(), '"'), cell.end());
+        while (getline(ss, cell, ',')) {
+            cell.erase(remove(cell.begin(), cell.end(), '"'), cell.end());
             dataline.push_back(cell);
         }
 
         std::string name = dataline.at(0);
-        int value = std::stoi(dataline.at(1));
-        int x = std::stoi(dataline.at(2));
-        int y = std::stoi(dataline.at(3));
+        int value = stoi(dataline.at(1));
+        int x = stoi(dataline.at(2));
+        int y = stoi(dataline.at(3));
 
 
         if (game->getCurrentPlayer() == game->getPlayer1()) {
@@ -68,16 +69,16 @@ void Player::loadConfig(std::string fileName){
 
 void Player::removePiece(Pieces* piece) {
     if (myPieces.empty()) {
-        std::cerr<<"No piece left"<<std::endl;
+        cerr<<"No piece left"<<endl;
         return;
     }
-    for (std::size_t i = 0; i < myPieces.size(); i++) {
+    for (size_t i = 0; i < myPieces.size(); i++) {
         if (myPieces[i] == piece) {
             myPieces.erase(myPieces.begin() + i);
             return;
         }
     }
-    std::cerr<<"Can't remove this piece : it doesn't exist!"<<std::endl;
+    cerr<<"Can't remove this piece : it doesn't exist!"<<endl;
 }
 
 void Player::addPiece(Pieces* piece) {
@@ -98,16 +99,16 @@ void Player::addCaptured(Pieces *piece) {
     capturedPieces.push_back(piece);
 }
 
-std::vector<Pieces*> Player:: getCaptured() {
+vector<Pieces*> Player:: getCaptured() {
     return capturedPieces;
 }
 
-std::vector<Pieces*> Player:: getMyPieces() {
+vector<Pieces*> Player:: getMyPieces() {
     return myPieces;
 }
 
 bool Player::belongTo(Pieces* piece) {
-    for (std::size_t i = 0; i < myPieces.size(); i++) {
+    for (size_t i = 0; i < myPieces.size(); i++) {
         if (myPieces[i] == piece) {
             return true;
         }
@@ -117,11 +118,11 @@ bool Player::belongTo(Pieces* piece) {
 
 void Player:: displayCaptured () {
     if(capturedPieces.empty()) {
-        std::cerr<<"You have no captured pieces"<<std::endl;
+        cerr<<"You have no captured pieces"<<endl;
         return;
     }
     auto size=capturedPieces.size();
-    for(std::size_t i=0;i<size;i++) {
-        std::cout << capturedPieces[i]->getName()<< std::endl;
+    for(size_t i=0;i<size;i++) {
+        cout << capturedPieces[i]->getName()<< endl;
     }
 }

@@ -73,9 +73,8 @@ namespace state
         update(game);
     }
 
-    void PlacementState::loadPlayerConfig(Player* player) {
-        std::cout << "Quelle configuration voulez-vous ? \n";
-        std::cout << "1 : Offensive, 2 : Defensive, 3 : Balance \n";
+        std::cout << "What configuration do you want ? \n" << std::endl;
+        std::cout << "1 : Offensive, 2 : Defensive, 3 : Balance \n" << std::endl;
         std::string choice;
         std::cin >> choice;
         if (choice == "1") {
@@ -90,6 +89,8 @@ namespace state
         }
     }
 
+        update(game);
+    }
     void PlacementState::update(Game* game)
     {
         if (game->getCurrentPlayer() == game->getPlayer2() && game->againstIA) {
@@ -193,7 +194,7 @@ namespace state
     void PlayerTurnState::enter(Game* game)
     {
         printf("--- PlayerTurnState ---\n");
-        std::cout << "C'est le tour du joueur: " << (game->getCurrentPlayer()== game->getPlayer1() ? "Player 1" : "Player 2\n") << std::endl;
+        std::cout << "It's time for : " << (game->getCurrentPlayer()== game->getPlayer1() ? "Player 1" : "Player 2\n") << std::endl;
         board->displayBoard(*game->getCurrentPlayer());
         handleInput(game);
     }
@@ -208,11 +209,11 @@ namespace state
         }
         int x,y;
 
-        std::cout << "Quelle piece voulez-vous jouer ? (format: x y)" << std::endl;
+        std::cout << "Which piece do you want to play ? (format: x y)" << std::endl;
         while(true) {
             std::cin >> x>>y;
             if(std::cin.fail()) {
-                std::cerr<<"Veuillez entrer un entier"<<std::endl;
+                std::cerr<<"Please enter an integer"<<std::endl;
                 std::cin.clear();
                 std::cin.ignore(std::numeric_limits<std::streamsize>::max(),'\n');
             }
@@ -227,30 +228,30 @@ namespace state
 
         Pieces * pieceToMove = board->getPiece(position);
         if (pieceToMove == nullptr) {
-            std::cerr << "Aucune piece a cette position." << std::endl;
+            std::cerr << "There is no piece in this location !" << std::endl;
             handleInput(game);
             return;
         }
         if (!game->getCurrentPlayer()->belongTo(pieceToMove)) {
-            std::cerr << "Ce n'est pas votre piece !" << std::endl;
+            std::cerr << "This is not your piece !" << std::endl;
             handleInput(game);
             return;
         }
 
         auto possiblePositions = pieceToMove->canMove(pieceToMove);
         if (possiblePositions.empty()) {
-            std::cerr<< "Aucun mouvement possible pour cette piece." << std::endl;
+            std::cerr<< "This piece has no possible move !" << std::endl;
             handleInput(game);
             return;
         }
 
-        std::cout << "Quelle est votre destination ? (format: x y)" << std::endl;
+        std::cout << "What is your destination ? (format: x y)" << std::endl;
         int newx;
         int newy;
         while(true) {
             std::cin >> newx>>newy;
             if(std::cin.fail()) {
-                std::cerr<<"Veuillez entrer un entier"<<std::endl;
+                std::cerr<<"Please enter an integer"<<std::endl;
                 std::cin.clear();
                 std::cin.ignore(std::numeric_limits<std::streamsize>::max(),'\n');
             }
@@ -275,7 +276,7 @@ namespace state
                 return;
             }
         }
-        std::cerr<<"Destination non valide"<<std::endl;
+        std::cerr<<"Invalid destination"<<std::endl;
         pieceToMove->CheckBoard(destination,false);
         handleInput(game);
     }
@@ -317,7 +318,7 @@ namespace state
         std::random_device rd;
         std::mt19937 gen(rd());
 
-        // Filtrer les pièces ayant des mouvements possibles
+        // Filter the pieces with possible moves
         std::vector<Pieces*> movablePieces;
         for (auto* piece : aiPieces) {
             if (!piece->canMove(piece).empty()) {
@@ -330,11 +331,11 @@ namespace state
             return;
         }
 
-        // Choisir une pièce au hasard parmi celles pouvant se déplacer
+        // Select a piece at random from those that can move
         std::uniform_int_distribution<> distr(0, movablePieces.size() - 1);
         Pieces* pieceToMove = movablePieces[distr(gen)];
 
-        // Obtenir les positions possibles pour cette pièce
+        // Get the possible positions for this piece
         auto possiblePositions = pieceToMove->canMove(pieceToMove);
         std::uniform_int_distribution<> distr2(0, possiblePositions.size() - 1);
         auto destination = possiblePositions[distr2(gen)];
@@ -358,7 +359,7 @@ namespace state
 
     void WinState::enter(Game* game)
     {
-        printf("--- WinState ---\n");
+        printf("The flag has been captured! Congratulations! \n YOU WIN!!!!\n");
         handleInput(game);
         //game->endGame();
     }
