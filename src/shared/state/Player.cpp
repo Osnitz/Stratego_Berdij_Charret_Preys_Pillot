@@ -24,7 +24,7 @@ Player :: Player() {
 Player:: ~Player(){};
 
 
-void Player::chargeConfig(std::string fileName){
+void Player::loadConfig(std::string fileName){
     Game *game = Game::getInstance();
     Board *board = Board::getInstance();
     std::ifstream file(fileName);
@@ -35,7 +35,7 @@ void Player::chargeConfig(std::string fileName){
     std::string line;
     std::getline(file, line);
     while (std::getline(file, line)) {
-        std::cout << line << std::endl;
+        //std::cout << line << std::endl;
         std::stringstream ss(line);
         std::string cell;
         std::vector<std::string> dataline;

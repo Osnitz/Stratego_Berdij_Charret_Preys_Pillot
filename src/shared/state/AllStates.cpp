@@ -14,6 +14,7 @@
 #include <iostream>
 #include <random>
 #include "Board.h"
+#include "AIPlacementState.h"
 
 namespace state
 {
@@ -41,6 +42,7 @@ namespace state
     {
         update(game);
     }
+
     void InitState::update(Game* game)
     {
         game->setState(new PlacementState());
@@ -51,25 +53,30 @@ namespace state
     {
         printf("--- PlacementState---\n");
         game->switchTurn();
-        handleInput(game);
-
+        if (game->againstIA) {
+            game->setState(new AIPlacementState());
+        }
+        else
+        {
+            handleInput(game);
+        }
     }
+
     void PlacementState::handleInput(Game* game)
     {
         auto player = game->getCurrentPlayer();
-
         std::cout << "Quelle configuration voulez-vous ? \n" << std::endl;
         std::cout << "1 : Offensive, 2 : Defensive, 3 : Balance \n" << std::endl;
         std::string choice;
         std::cin >> choice;
         if (choice == "1") {
-            player->chargeConfig("../src/shared/state/config/Offensive.csv");
+            player->loadConfig("../src/shared/state/config/Offensive.csv");
         }
         else if (choice == "2") {
-            player->chargeConfig("../src/shared/state/config/Defensive.csv");
+            player->loadConfig("../src/shared/state/config/Defensive.csv");
         }
         else if (choice == "3") {
-            player->chargeConfig("../src/shared/state/config/Balance.csv");
+            player->loadConfig("../src/shared/state/config/Balance.csv");
         }
         else {
             std::cerr << "Incorrect choice entered" << std::endl;
@@ -78,6 +85,7 @@ namespace state
         }
 
         game->switchTurn();
+
         player = game->getCurrentPlayer();
 
         std::cout << "Quelle configuration voulez-vous ? \n" << std::endl;
@@ -85,13 +93,13 @@ namespace state
         std::string choice2;
         std::cin >> choice2;
         if (choice2 == "1") {
-            player->chargeConfig("../src/shared/state/config/Offensive.csv");
+            player->loadConfig("../src/shared/state/config/Offensive.csv");
         }
         else if (choice2 == "2") {
-            player->chargeConfig("../src/shared/state/config/Defensive.csv");
+            player->loadConfig("../src/shared/state/config/Defensive.csv");
         }
         else if (choice2 == "3") {
-            player->chargeConfig("../src/shared/state/config/Balance.csv");
+            player->loadConfig("../src/shared/state/config/Balance.csv");
         }
         else {
             std::cerr << "Incorrect choice entered" << std::endl;
@@ -101,9 +109,9 @@ namespace state
         }
 
         game->switchTurn();
-
         update(game);
     }
+
     void PlacementState::update(Game* game)
     {
         if (game->getCurrentPlayer() == game->getPlayer2() && game->againstIA) {
@@ -114,6 +122,96 @@ namespace state
     }
 
 
+    void AIPlacementState::enter(Game* game) {
+        handleInput(game);
+    }
+
+    void AIPlacementState::handleInput(Game* game) {
+        auto player = game->getCurrentPlayer();
+
+        if (game->getPlayer1()==player){// Load configuration for Player 1
+            std::cout << "Player 1, choose your configuration: \n";
+            std::cout << "1: Offensive, 2: Defensive, 3: Balance \n";
+            std::string choice1;
+            while(true) {
+                std::cin >> choice1;
+                if (choice1 == "1" || choice1 == "2" || choice1 == "3") {
+                    break;
+                }
+                std::cerr << "Incorrect choice entered" << std::endl;
+            }
+            if (choice1 == "1") {
+                player->loadConfig("../src/shared/state/config/Offensive.csv");
+            } else if (choice1 == "2") {
+                player->loadConfig("../src/shared/state/config/Defensive.csv");
+            } else if (choice1 == "3") {
+                player->loadConfig("../src/shared/state/config/Balance.csv");
+            }
+            game->switchTurn();
+            player = game->getCurrentPlayer();
+            // Load configuration for Player 2 (AI)
+            std::cout<<"Loading AI configuration...\n"<<std::endl;
+            std::random_device rd;
+            std::mt19937 gen(rd());
+            std::uniform_int_distribution<> distr(1, 3);
+            std::string choice2 = std::to_string(distr(gen));
+            if (choice2 == "1") {
+                player->loadConfig("../src/shared/state/config/Offensive.csv");
+            } else if (choice2 == "2") {
+                player->loadConfig("../src/shared/state/config/Defensive.csv");
+            } else if (choice2 == "3") {
+                player->loadConfig("../src/shared/state/config/Balance.csv");
+            }
+            game->switchTurn();
+            update(game);
+            return;
+        }
+
+        player = game->getCurrentPlayer();
+        // Load configuration for Player 2 (AI)
+        std::cout<<"Loading AI configuration...\n"<<std::endl;
+        std::random_device rd;
+        std::mt19937 gen(rd());
+        std::uniform_int_distribution<> distr(1, 3);
+        std::string choice2 = std::to_string(distr(gen));
+        if (choice2 == "1") {
+            player->loadConfig("../src/shared/state/config/Offensive.csv");
+        } else if (choice2 == "2") {
+            player->loadConfig("../src/shared/state/config/Defensive.csv");
+        } else if (choice2 == "3") {
+            player->loadConfig("../src/shared/state/config/Balance.csv");
+        }
+
+        game->switchTurn();
+        player = game->getCurrentPlayer();
+        std::cout << "Player 1, choose your configuration: \n";
+        std::cout << "1: Offensive, 2: Defensive, 3: Balance \n";
+        std::string choice1;
+        while(true)
+        {
+            std::cin >> choice1;
+            if (choice1 == "1" || choice1 == "2" || choice1 == "3") {
+                break;
+            }
+            std::cerr << "Incorrect choice entered" << std::endl;
+        }
+
+        if (choice1 == "1") {
+            player->loadConfig("../src/shared/state/config/Offensive.csv");
+        } else if (choice1 == "2") {
+            player->loadConfig("../src/shared/state/config/Defensive.csv");
+        } else if (choice1 == "3") {
+            player->loadConfig("../src/shared/state/config/Balance.csv");
+        }
+        game->switchTurn();
+        update(game);
+    }
+
+    void AIPlacementState::update(Game* game) {
+        game->setState(new PlayerTurnState());
+    }
+
+
     void PlayerTurnState::enter(Game* game)
     {
         printf("--- PlayerTurnState ---\n");
@@ -121,6 +219,7 @@ namespace state
         board->displayBoard(*game->getCurrentPlayer());
         handleInput(game);
     }
+
     void PlayerTurnState::handleInput(Game* game) {
         if (game->Purgatory != nullptr) {
             game->getCurrentPlayer()->addCaptured(game->Purgatory);
@@ -203,6 +302,7 @@ namespace state
         pieceToMove->CheckBoard(destination,false);
         handleInput(game);
     }
+
     void PlayerTurnState::update(Game* game)
     {
         Player * player=game->getCurrentPlayer();
@@ -285,21 +385,25 @@ namespace state
         handleInput(game);
         //game->endGame();
     }
+
     void WinState::handleInput(Game* game)
     {
 
         update(game);
     }
+
     void WinState::update(Game* game)
     {
         game->setState(new WaitingState());
     }
+
 
     void WaitingState::enter(Game* game)
     {
         printf("--- WaitingState ---\n");
         handleInput(game);
     }
+
     void WaitingState::handleInput(Game* game)
     {
         printf("Do you want to play again? (y/n): \n");
@@ -315,6 +419,7 @@ namespace state
             exit(0);
         }
     }
+
     void WaitingState::update(Game* game)
     {
         game->setState(new InitState());
