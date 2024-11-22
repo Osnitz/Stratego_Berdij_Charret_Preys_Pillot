@@ -54,9 +54,15 @@ namespace state
         handleInput(game);
 
     }
-    void PlacementState::handleInput(Game* game)
-    {
-        auto player = game->getCurrentPlayer();
+
+    void PlacementState::handleInput(Game* game) {
+        for (int i = 0; i < 2; ++i) {
+            auto player = game->getCurrentPlayer();
+            loadPlayerConfig(player);
+            game->switchTurn();
+        }
+        update(game);
+    }
 
         std::cout << "What configuration do you want ? \n" << std::endl;
         std::cout << "1 : Offensive, 2 : Defensive, 3 : Balance \n" << std::endl;
@@ -64,43 +70,15 @@ namespace state
         std::cin >> choice;
         if (choice == "1") {
             player->chargeConfig("../src/shared/state/config/Offensive.csv");
-        }
-        else if (choice == "2") {
+        } else if (choice == "2") {
             player->chargeConfig("../src/shared/state/config/Defensive.csv");
-        }
-        else if (choice == "3") {
+        } else if (choice == "3") {
             player->chargeConfig("../src/shared/state/config/Balance.csv");
-        }
-        else {
+        } else {
             std::cerr << "Incorrect choice entered" << std::endl;
-            handleInput(game);
-            return;
+            loadPlayerConfig(player);
         }
-
-        game->switchTurn();
-        player = game->getCurrentPlayer();
-
-        std::cout << "What configuration do you want ? \n" << std::endl;
-        std::cout << "1 : Offensive, 2 : Defensive, 3 : Balance \n" << std::endl;
-        std::string choice2;
-        std::cin >> choice2;
-        if (choice2 == "1") {
-            player->chargeConfig("../src/shared/state/config/Offensive.csv");
-        }
-        else if (choice2 == "2") {
-            player->chargeConfig("../src/shared/state/config/Defensive.csv");
-        }
-        else if (choice2 == "3") {
-            player->chargeConfig("../src/shared/state/config/Balance.csv");
-        }
-        else {
-            std::cerr << "Incorrect choice entered" << std::endl;
-            game->switchTurn();
-            handleInput(game);
-            return;
-        }
-
-        game->switchTurn();
+    }
 
         update(game);
     }
