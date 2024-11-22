@@ -132,7 +132,7 @@ namespace state
         }
         int x,y;
 
-        std::cout << "Quelle piece voulez-vous jouer ? (format: x y)\n" << std::endl;
+        std::cout << "Quelle piece voulez-vous jouer ? (format: x y)" << std::endl;
         while(true) {
             std::cin >> x>>y;
             if(std::cin.fail()) {
@@ -151,24 +151,24 @@ namespace state
 
         Pieces * pieceToMove = board->getPiece(position);
         if (pieceToMove == nullptr) {
-            std::cerr << "Aucune piece a cette position.\n" << std::endl;
+            std::cerr << "Aucune piece a cette position." << std::endl;
             handleInput(game);
             return;
         }
         if (!game->getCurrentPlayer()->belongTo(pieceToMove)) {
-            std::cerr << "Ce n'est pas votre piece !\n" << std::endl;
+            std::cerr << "Ce n'est pas votre piece !" << std::endl;
             handleInput(game);
             return;
         }
 
         auto possiblePositions = pieceToMove->canMove(pieceToMove);
         if (possiblePositions.empty()) {
-            std::cerr<< "Aucun mouvement possible pour cette piece.\n" << std::endl;
+            std::cerr<< "Aucun mouvement possible pour cette piece." << std::endl;
             handleInput(game);
             return;
         }
 
-        std::cout << "Quelle est votre destination ? (format: x y)\n" << std::endl;
+        std::cout << "Quelle est votre destination ? (format: x y)" << std::endl;
         int newx;
         int newy;
         while(true) {
@@ -199,7 +199,8 @@ namespace state
                 return;
             }
         }
-        std::cerr<<"Destination non valide\n"<<std::endl;
+        std::cerr<<"Destination non valide"<<std::endl;
+        pieceToMove->CheckBoard(destination,false);
         handleInput(game);
     }
     void PlayerTurnState::update(Game* game)
@@ -232,7 +233,7 @@ namespace state
         std::vector<Pieces*> aiPieces = aiPlayer->getMyPieces();
 
         if (aiPieces.empty()) {
-            std::cerr << "No pieces available for AI to move.\n" << std::endl;
+            std::cerr << "No pieces available for AI to move." << std::endl;
             return;
         }
 
@@ -248,7 +249,7 @@ namespace state
         }
 
         if (movablePieces.empty()) {
-            std::cerr << "No valid moves available for AI.\n" << std::endl;
+            std::cerr << "No valid moves available for AI." << std::endl;
             return;
         }
 

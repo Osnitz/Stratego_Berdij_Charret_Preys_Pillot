@@ -31,7 +31,7 @@ void testCheckBoard() {
     pair<int, int> outOfBoard={-1,10};
     pair<int, int> inTheLake={2,4};
     pair<int, int> goodPosition={1,4};
-    if(!piece.CheckBoard(outOfBoard)&&!piece.CheckBoard(inTheLake)&&piece.CheckBoard(goodPosition)) {
+    if(!piece.CheckBoard(outOfBoard,false)&&!piece.CheckBoard(inTheLake,false)&&piece.CheckBoard(goodPosition,false)) {
         cout << "CheckBoard test passed!" << endl;
     }else {
         cerr << "CheckBoard test failed!" << endl;
