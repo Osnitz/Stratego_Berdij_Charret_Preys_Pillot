@@ -46,16 +46,22 @@ int Pieces::getRange() {
     return range;
 }
 
-bool Pieces::CheckBoard(pair<int, int> position){
+bool Pieces::CheckBoard(pair<int, int> position,bool silent){
     int NewX = position.first;
     int NewY = position.second;
     if ((NewX < 0) || (NewY < 0) || (NewX > 9) || (NewY > 9)) {
-        //std::cout << "Out of bounds" << std::endl;
+        if (!silent)
+        {
+            std::cout << "Out of bounds" << std::endl;
+        }
         return false;
     }
-    if ((NewY == 4) || (NewY == 5)) {
-        if ((NewX == 2) || (NewX == 3) || (NewX == 6) || (NewX == 7)) {
-            std::cerr << "You can't cross lakes !\n" << std::endl;
+    if ((NewX == 4) || (NewX == 5)) {
+        if ((NewY == 2) || (NewY == 3) || (NewY == 6) || (NewY == 7)) {
+            if (!silent)
+            {
+                std::cerr << "You can't cross lakes !" << std::endl;
+            }
             return false;
         }
     }
@@ -107,7 +113,7 @@ void Pieces::attack(pair<int, int> position) {
     auto player = game->getCurrentPlayer();
 
     if (attackedPiece == nullptr) {
-        std::cerr << "No target found\n" << std::endl;
+        std::cerr << "No target found" << std::endl;
         return;
     }
 
@@ -175,7 +181,7 @@ std::vector<std::pair<int, int>> Pieces::canMove(Pieces* pieceToMove) {
 
     for (int i = 1; i <= range; ++i) {
         std::pair<int, int> posAbove = {x, y - i};
-        if (CheckBoard(posAbove)) {
+        if (CheckBoard(posAbove,true)) {
             std::string caseStatus = CheckCase(posAbove);
             if (caseStatus != "Ally") {
                 possiblePositions.push_back(posAbove);
@@ -188,7 +194,7 @@ std::vector<std::pair<int, int>> Pieces::canMove(Pieces* pieceToMove) {
 
     for (int i = 1; i <= range; ++i) {
         std::pair<int, int> posBelow = {x, y + i};
-        if (CheckBoard(posBelow)) {
+        if (CheckBoard(posBelow,true)) {
             std::string caseStatus = CheckCase(posBelow);
             if (caseStatus != "Ally") {
                 possiblePositions.push_back(posBelow);
@@ -201,7 +207,7 @@ std::vector<std::pair<int, int>> Pieces::canMove(Pieces* pieceToMove) {
 
     for (int i = 1; i <= range; ++i) {
         std::pair<int, int> posLeft = {x - i, y};
-        if (CheckBoard(posLeft)) {
+        if (CheckBoard(posLeft,true)) {
             std::string caseStatus = CheckCase(posLeft);
             if (caseStatus != "Ally") {
                 possiblePositions.push_back(posLeft);
@@ -214,7 +220,7 @@ std::vector<std::pair<int, int>> Pieces::canMove(Pieces* pieceToMove) {
 
     for (int i = 1; i <= range; ++i) {
         std::pair<int, int> posRight = {x + i, y};
-        if (CheckBoard(posRight)) {
+        if (CheckBoard(posRight,true)) {
             std::string caseStatus = CheckCase(posRight);
             if (caseStatus != "Ally") {
                 possiblePositions.push_back(posRight);
