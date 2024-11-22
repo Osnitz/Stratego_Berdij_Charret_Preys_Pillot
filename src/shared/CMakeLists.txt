@@ -21,7 +21,8 @@ add_library(${lib_shared_target} STATIC ${shared_sources} ${jsoncpp_sources}
         state/test_Game.cpp
         state/test_Player.cpp
         state/test_Pieces.cpp
-        state/test_Pieces.cpp)
+        state/test_Pieces.cpp
+        state/test.cpp)
 
 add_dependencies(${lib_shared_target} generate-headers)
 target_include_directories(${lib_shared_target} PUBLIC

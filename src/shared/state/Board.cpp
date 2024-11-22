@@ -28,30 +28,30 @@ Board* Board::getInstance() {
 }
 
 void Board::displayBoard(Player &player) {
-    // Afficher la première ligne de numéros de colonnes dans la grille
-    std::cout << "    "; // Alignement initial pour la première ligne de la grille
+    // Print the first line of column's number in the grid
+    std::cout << "    "; // Initial alignment for the first row of the grid
     for (std::size_t col = 0; col < grid[0].size(); ++col) {
-        std::cout << "   " << col << "   "; // Ajustement de l'espacement pour les numéros de colonnes
+        std::cout << "   " << col << "   "; // Adjusting the spacing for column numbers
     }
     std::cout << std::endl;
 
-    // Afficher la ligne de délimitation sous les numéros de colonnes
-    std::cout << "   "; // Alignement initial pour les tirets
+    // Display the bounding line under column numbers
+    std::cout << "   "; // Initial alignment for dashes
     for (std::size_t col = 0; col < grid[0].size(); ++col) {
-        std::cout << "-------"; // Délimitation horizontale
+        std::cout << "-------"; // Horizontal delineation
     }
-    std::cout << "-" << std::endl; // Fin de la délimitation à droite
+    std::cout << "-" << std::endl; // End of the delineation to the right
 
-    // Afficher la grille avec les pièces
+    // Print the grid with the pieces
     for (std::size_t row = 0; row < grid.size(); ++row) {
-        std::cout << row << "  "; // Afficher le numéro de ligne à l'intérieur de la grille
+        std::cout << row << "  "; // Print line's numbers inside the grid
         for (std::size_t col = 0; col < grid[row].size(); ++col) {
             if ((row == 4 && (col == 2 || col == 3 || col == 6 || col == 7)) || (row == 5 && (col == 2 || col == 3 || col == 6 || col == 7))) {
                 std::cout << "|  XX  "; // Lacs
             } else {
                 Pieces* piece = grid[row][col];
                 if (piece == nullptr) {
-                    std::cout << "|      "; // Case vide
+                    std::cout << "|      "; // Empty box
                 } else if (player.belongTo(piece)) {
                     int value = piece->getValue();
                     if (value < 10) {
@@ -60,18 +60,18 @@ void Board::displayBoard(Player &player) {
                         std::cout << "|  " << piece->getValue() << "  ";
                     }
                 } else {
-                    std::cout << "|  ??  "; // Pièce de l'adversaire
+                    std::cout << "|  ??  "; // Enemy's piece
                 }
             }
         }
         std::cout << "|" << std::endl;
 
-        // Afficher la ligne de délimitation sous chaque ligne
-        std::cout << "   "; // Alignement pour les tirets
+        // Display the bounding line under each line
+        std::cout << "   "; // Alignment for dashes
         for (std::size_t col = 0; col < grid[0].size(); ++col) {
-            std::cout << "-------"; // Délimitation horizontale
+            std::cout << "-------"; // Horizontal delineation
         }
-        std::cout << "-" << std::endl; // Fin de la délimitation à droite
+        std::cout << "-" << std::endl; // End of the delineation to the right
     }
 }
 
@@ -81,9 +81,9 @@ Pieces* Board::getPiece(std::pair<int, int> position) {
 
     if (x >= 0 && static_cast<std::size_t>(x) < grid.size() && y >= 0 && static_cast<std::size_t>(y) < grid[0].size()) {
         return grid[x][y];
-    } else {
-        throw std::out_of_range("Invalid position on the board.");
     }
+    throw std::out_of_range("Invalid position on the board.");
+
 }
 
 void Board::setPieceOnBoard(Pieces* piece) {

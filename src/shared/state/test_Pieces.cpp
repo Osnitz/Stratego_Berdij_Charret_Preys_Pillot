@@ -29,29 +29,14 @@ void testConstructor() {
 void testCheckBoard() {
     Pieces piece(1, "Soldat", 0, 0);
     pair<int, int> outOfBoard={-1,10};
-    pair<int, int> inTheLake={2,4};
-    pair<int, int> goodPosition={1,4};
+    pair<int, int> inTheLake={4,2};
+    pair<int, int> goodPosition={4,1};
     if(!piece.CheckBoard(outOfBoard,false)&&!piece.CheckBoard(inTheLake,false)&&piece.CheckBoard(goodPosition,false)) {
         cout << "CheckBoard test passed!" << endl;
     }else {
         cerr << "CheckBoard test failed!" << endl;
     }
 }
-
-/*void testCheckRange() {
-    Pieces piece(1, "Soldat", 0, 0);
-    Pieces miner(2, "miner", 0, 0);
-    Pieces flag(0, "flag", 0, 0);
-    pair<int, int> goodrange={1,0};
-    pair<int, int> othergoodrange={0,1};
-    pair<int, int> minerrange={2,0};
-
-    if(piece.CheckRange(goodrange)&&piece.CheckRange(othergoodrange)&&!piece.CheckRange(minerrange)&&miner.CheckRange(minerrange)&&!flag.CheckRange(goodrange)) {
-        std::cout << "CheckRange test passed!" << std::endl;
-    }else {
-        std::cerr << "CheckRange test failed!" << std::endl;
-    }
-}*/
 
 void testSetPosition() {
     Board *board = Board::getInstance();
