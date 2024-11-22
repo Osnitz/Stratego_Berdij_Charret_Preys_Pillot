@@ -53,8 +53,8 @@ bool Pieces::CheckBoard(pair<int, int> position){
         //std::cout << "Out of bounds" << std::endl;
         return false;
     }
-    if ((NewY == 4) || (NewY == 5)) {
-        if ((NewX == 2) || (NewX == 3) || (NewX == 6) || (NewX == 7)) {
+    if ((NewX == 4) || (NewX == 5)) {
+        if ((NewY == 2) || (NewY == 3) || (NewY == 6) || (NewY == 7)) {
             std::cerr << "You can't cross lakes !\n" << std::endl;
             return false;
         }
