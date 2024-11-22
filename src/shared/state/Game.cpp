@@ -62,14 +62,6 @@ namespace state {
         }
     }
 
-    void Game::checkVictory() {
-        // TODO implement here
-    }
-
-    void Game::endGame() {
-        // TODO implement here
-    }
-
     void Game::setState(State * state) {
         currentState = state;
         currentState->enter(this);

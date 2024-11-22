@@ -86,10 +86,6 @@ Pieces* Board::getPiece(std::pair<int, int> position) {
     }
 }
 
-std::vector<std::vector<Pieces*>> Board::getgrid() {
-    return grid;
-}
-
 void Board::setPieceOnBoard(Pieces* piece) {
     std::pair<int, int> position = piece->getPosition();
     grid[position.first][position.second] = piece;
