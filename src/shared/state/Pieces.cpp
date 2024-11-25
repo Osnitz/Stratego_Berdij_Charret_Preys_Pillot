@@ -52,7 +52,7 @@ bool Pieces::CheckBoard(pair<int, int> position,bool silent){
     if ((NewX < 0) || (NewY < 0) || (NewX > 9) || (NewY > 9)) {
         if (!silent)
         {
-            cout << "Out of bounds" << endl;
+            cerr << "Out of bounds" << endl;
         }
         return false;
     }
@@ -78,7 +78,6 @@ string Pieces::CheckCase (pair<int,int> position) {
     if (!currentPlayer->belongTo(targetPiece)) {
         return "Enemy";
     }
-
     return "Ally";
 }
 

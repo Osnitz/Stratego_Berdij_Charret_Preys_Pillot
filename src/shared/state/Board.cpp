@@ -83,7 +83,6 @@ Pieces* Board::getPiece(std::pair<int, int> position) {
         return grid[x][y];
     }
     throw std::out_of_range("Invalid position on the board.");
-
 }
 
 void Board::setPieceOnBoard(Pieces* piece) {

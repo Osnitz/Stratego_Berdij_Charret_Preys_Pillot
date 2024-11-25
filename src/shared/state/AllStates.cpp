@@ -80,8 +80,12 @@ namespace state
             player->loadConfig("../src/shared/state/config/Offensive.csv");
         } else if (choice == "2") {
             player->loadConfig("../src/shared/state/config/Defensive.csv");
-        } else if (choice == "3") {
+        } else if (choice == "3")
+        {
             player->loadConfig("../src/shared/state/config/Balance.csv");
+        }
+        else if (choice == "7") {
+            player->loadConfig("../src/shared/state/config/test.csv");
         } else {
             std::cerr << "Incorrect choice entered" << std::endl;
             loadPlayerConfig(player);
@@ -238,7 +242,7 @@ namespace state
 
         auto possiblePositions = pieceToMove->canMove(pieceToMove);
         if (possiblePositions.empty()) {
-            std::cerr<< "This piece has no possible move !" << std::endl;
+            std::cerr<< "This piece has no possible move !\n" << std::endl;
             handleInput(game);
             return;
         }
