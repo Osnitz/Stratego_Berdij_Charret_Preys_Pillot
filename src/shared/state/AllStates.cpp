@@ -115,7 +115,7 @@ namespace state
             std::string choice1;
             while(true) {
                 std::cin >> choice1;
-                if (choice1 == "1" || choice1 == "2" || choice1 == "3") {
+                if (choice1 == "1" || choice1 == "2" || choice1 == "3"|| choice1 == "7") {
                     break;
                 }
                 std::cerr << "Incorrect choice entered" << std::endl;
@@ -126,6 +126,9 @@ namespace state
                 player->loadConfig("../src/shared/state/config/Defensive.csv");
             } else if (choice1 == "3") {
                 player->loadConfig("../src/shared/state/config/Balance.csv");
+            }
+            else if (choice1 == "7") {
+                player->loadConfig("../src/shared/state/config/test.csv");
             }
             game->switchTurn();
             player = game->getCurrentPlayer();
@@ -141,6 +144,9 @@ namespace state
                 player->loadConfig("../src/shared/state/config/Defensive.csv");
             } else if (choice2 == "3") {
                 player->loadConfig("../src/shared/state/config/Balance.csv");
+            }
+            else if (choice2 == "7") {
+                player->loadConfig("../src/shared/state/config/test.csv");
             }
             game->switchTurn();
             update(game);
@@ -160,6 +166,9 @@ namespace state
             player->loadConfig("../src/shared/state/config/Defensive.csv");
         } else if (choice2 == "3") {
             player->loadConfig("../src/shared/state/config/Balance.csv");
+        }
+        else if (choice2 == "7") {
+            player->loadConfig("../src/shared/state/config/test.csv");
         }
 
         game->switchTurn();
@@ -182,6 +191,9 @@ namespace state
             player->loadConfig("../src/shared/state/config/Defensive.csv");
         } else if (choice1 == "3") {
             player->loadConfig("../src/shared/state/config/Balance.csv");
+        }
+        else if (choice1 == "7") {
+            player->loadConfig("../src/shared/state/config/test.csv");
         }
         game->switchTurn();
         update(game);
