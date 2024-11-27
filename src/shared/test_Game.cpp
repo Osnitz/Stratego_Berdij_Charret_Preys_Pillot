@@ -3,10 +3,8 @@
 //
 #include <iostream>
 #include <stdexcept>
-#include "Game.h"
-#include "Player.h"
-#include "Board.h"
-#include "InitState.h"
+#include "state.h"
+#include "engine.h"
 
 using namespace state;
 

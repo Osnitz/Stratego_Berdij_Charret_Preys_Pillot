@@ -2,8 +2,8 @@
 // Created by matthieu on 10/11/24.
 //
 #include <iostream>
-#include "Player.h"
-#include "Pieces.h"
+#include "state.h"
+#include "engine.h"
 
 using namespace state;
 

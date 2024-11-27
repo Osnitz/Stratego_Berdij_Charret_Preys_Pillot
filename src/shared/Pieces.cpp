@@ -2,16 +2,16 @@
 // Created by plt on 14/10/24.
 //
 
-#include "Pieces.h"
-#include "Board.h"
-#include "Player.h"
+#include "state.h"
+#include "engine.h"
 #include <iostream>
-#include "Game.h"
+#include <random>
 
 using namespace std;
 using namespace state;
+using namespace engine;
 
-Board *board = Board::getInstance();
+
 auto game = Game::getInstance();
 
 Pieces::Pieces(int value, string name, int x, int y) {
@@ -69,6 +69,7 @@ bool Pieces::CheckBoard(pair<int, int> position,bool silent){
 }
 
 string Pieces::CheckCase (pair<int,int> position) {
+  	Board *board = Board::getInstance();
     Pieces *targetPiece = board->getPiece(position);
     Player* currentPlayer = game->getCurrentPlayer();
 
@@ -78,11 +79,12 @@ string Pieces::CheckCase (pair<int,int> position) {
     if (!currentPlayer->belongTo(targetPiece)) {
         return "Enemy";
     }
+
     return "Ally";
 }
 
 void Pieces::setPosition(const pair<int, int> &position) {
-    Board* board = Board::getInstance();
+  	Board *board = Board::getInstance();
     int newx = position.first;
     int newy = position.second;
     board->removeFromBoard(this);
@@ -93,7 +95,7 @@ void Pieces::setPosition(const pair<int, int> &position) {
 }
 
 void Pieces::attack(pair<int, int> position) {
-
+	Board *board = Board::getInstance();
     Pieces *attackedPiece = board->getPiece(position);
     auto player = game->getCurrentPlayer();
 

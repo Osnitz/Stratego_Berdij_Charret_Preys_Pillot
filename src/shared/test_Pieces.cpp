@@ -3,14 +3,11 @@
 //
 #include <iostream>
 
-#include "Board.h"
-#include "Player.h"
-#include "Pieces.h"
-#include "Game.h"
+#include "state.h"
+#include "engine.h"
 
 using namespace std;
 using namespace state;
-
 
 
 void testConstructor() {
@@ -64,7 +61,7 @@ void testCheckCase() {
     player->addPiece(&miner);
     board->setPieceOnBoard(&piece);
     board->setPieceOnBoard(&miner);
-    if(piece.CheckCase({0,1})=="Empty"&&piece.CheckCase({1,0})=="Ally"&&miner.CheckCase({0,1})=="Enemy") {
+    if(piece.CheckCase({0,1})=="Empty" && piece.CheckCase({1,0})=="Ally" && miner.CheckCase({0,1})=="Enemy") {
         std::cout << "CheckCase test passed!" << std::endl;
     }else {
         std::cerr << "CheckCase test failed!" << std::endl;
