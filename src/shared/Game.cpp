@@ -1,16 +1,14 @@
 //
 // Created by matthieu on 14/10/24.
 //
-#include "Game.h"
-
 #include <stdexcept>
 
-#include "Board.h"
-#include "Player.h"
-#include "InitState.h"
+#include "state.h"
+#include "engine.h"
 #include "random"
+using namespace state;
+using namespace engine;
 
-namespace state {
      Game* Game::instance=nullptr;
 
     Game::Game() {
@@ -62,7 +60,7 @@ namespace state {
         }
     }
 
-    void Game::setState(State * state) {
+    void Game::setState(engine::State * state) {
         currentState = state;
         currentState->enter(this);
     }
@@ -84,4 +82,3 @@ namespace state {
     Player* Game::getPlayer2() {
         return Player2;
     }
-}

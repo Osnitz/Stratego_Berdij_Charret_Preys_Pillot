@@ -1,8 +1,7 @@
 #include <iostream>
 #include <stdexcept>
-#include "Board.h"
-#include "Player.h"
-#include "Pieces.h"
+#include "state.h"
+#include "engine.h"
 
 using namespace state;
 

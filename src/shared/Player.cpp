@@ -2,16 +2,13 @@
 // Created by estelle on 14/10/24.
 //
 
-#include "Player.h"
-#include "Pieces.h"
-#include "Board.h"
+#include "state.h"
+#include "engine.h"
 #include <fstream>
 #include <sstream>
 #include <iostream>
 #include <vector>
 #include <algorithm>
-
-#include "Game.h"
 
 using namespace state;
 using namespace std;

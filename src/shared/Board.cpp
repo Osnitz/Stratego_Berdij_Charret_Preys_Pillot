@@ -1,11 +1,9 @@
 //
 // Created by Souhaila.B on 21/10/2024.
 //
-#include "Board.h"
+#include "state.h"
 #include <iostream>
 #include <map>
-
-#include "Game.h"
 
 using namespace state;
 
