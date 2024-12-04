@@ -1,6 +1,7 @@
 //
 // Created by matthieu on 14/10/24.
 //
+#include <iostream>
 #include <stdexcept>
 
 #include "state.h"
@@ -8,17 +9,18 @@
 #include "random"
 using namespace state;
 using namespace engine;
+using namespace std;
 
-     Game* Game::instance=nullptr;
+Game* Game::instance=nullptr;
 
-    Game::Game() {
-        board = Board::getInstance();
-        Player1 = new Player();
-        Player2 = new Player();
-        currentState = new InitState();
-        currentPlayer = nullptr;
-        againstIA = false;
-    }
+Game::Game() {
+    board = Board::getInstance();
+    Player1 = new Player();
+    Player2 = new Player();
+    currentState = new InitState();
+    currentPlayer = nullptr;
+    againstIA = false;
+}
 
     Game::~Game() {
         delete board;
@@ -81,4 +83,19 @@ using namespace engine;
     }
     Player* Game::getPlayer2() {
         return Player2;
+    }
+
+void Game::removePiece(Pieces* piece) {
+    vector<Pieces*> myPieces=currentPlayer->getMyPieces();
+        if (myPieces.empty()) {
+            cerr<<"No piece left"<<endl;
+            return;
+        }
+        for (size_t i = 0; i < myPieces.size(); i++) {
+            if (myPieces[i] == piece) {
+                myPieces.erase(myPieces.begin() + i);
+                return;
+            }
+        }
+        cerr<<"Can't remove this piece : it doesn't exist!"<<endl;
     }

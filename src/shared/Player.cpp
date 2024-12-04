@@ -64,19 +64,7 @@ void Player::loadConfig(string fileName){
 
 }
 
-void Player::removePiece(Pieces* piece) {
-    if (myPieces.empty()) {
-        cerr<<"No piece left"<<endl;
-        return;
-    }
-    for (size_t i = 0; i < myPieces.size(); i++) {
-        if (myPieces[i] == piece) {
-            myPieces.erase(myPieces.begin() + i);
-            return;
-        }
-    }
-    cerr<<"Can't remove this piece : it doesn't exist!"<<endl;
-}
+
 
 void Player::addPiece(Pieces* piece) {
     myPieces.push_back(piece);

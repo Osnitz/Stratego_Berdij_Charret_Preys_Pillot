@@ -46,7 +46,7 @@ int Pieces::getRange() {
     return range;
 }
 
-bool Pieces::CheckBoard(pair<int, int> position,bool silent){
+bool Pieces::LimitBoard(pair<int, int> position,bool silent){
     int NewX = position.first;
     int NewY = position.second;
     if ((NewX < 0) || (NewY < 0) || (NewX > 9) || (NewY > 9)) {
@@ -68,19 +68,25 @@ bool Pieces::CheckBoard(pair<int, int> position,bool silent){
     return true;
 }
 
-string Pieces::CheckCase (pair<int,int> position) {
-  	Board *board = Board::getInstance();
-    Pieces *targetPiece = board->getPiece(position);
-    Player* currentPlayer = game->getCurrentPlayer();
-
+bool Pieces::isEmpty (Pieces * targetPiece) {
     if (targetPiece == nullptr) {
-        return "Empty";
+        return true;
     }
-    if (!currentPlayer->belongTo(targetPiece)) {
-        return "Enemy";
-    }
+    return false;
+}
 
-    return "Ally";
+bool Pieces::IsAlly(Pieces *targetPiece) {
+    if(color==targetPiece->color) {
+        return true;
+    }
+    return false;
+}
+
+bool Pieces::isEnemy(Pieces *targetPiece) {
+    if(color!=targetPiece->color) {
+        return true;
+    }
+    return false;
 }
 
 void Pieces::setPosition(const pair<int, int> &position) {
@@ -154,71 +160,7 @@ void Pieces::attack(pair<int, int> position) {
     }
 }
 
-vector<pair<int, int>> Pieces::canMove(Pieces* pieceToMove) {
-    vector<pair<int, int>> possiblePositions;
 
-    if (pieceToMove == nullptr) {
-        return possiblePositions;
-    }
-
-    int x = pieceToMove->x;
-    int y = pieceToMove->y;
-    int range = pieceToMove->range;
-
-    for (int i = 1; i <= range; ++i) {
-        pair<int, int> posAbove = {x, y - i};
-        if (CheckBoard(posAbove,true)) {
-            string caseStatus = CheckCase(posAbove);
-            if (caseStatus != "Ally") {
-                possiblePositions.push_back(posAbove);
-            }
-            if (caseStatus != "Empty") {
-                break;
-            }
-        }
-    }
-
-    for (int i = 1; i <= range; ++i) {
-        pair<int, int> posBelow = {x, y + i};
-        if (CheckBoard(posBelow,true)) {
-            string caseStatus = CheckCase(posBelow);
-            if (caseStatus != "Ally") {
-                possiblePositions.push_back(posBelow);
-            }
-            if (caseStatus != "Empty") {
-                break;
-            }
-        }
-    }
-
-    for (int i = 1; i <= range; ++i) {
-        pair<int, int> posLeft = {x - i, y};
-        if (CheckBoard(posLeft,true)) {
-            string caseStatus = CheckCase(posLeft);
-            if (caseStatus != "Ally") {
-                possiblePositions.push_back(posLeft);
-            }
-            if (caseStatus != "Empty") {
-                break;
-            }
-        }
-    }
-
-    for (int i = 1; i <= range; ++i) {
-        pair<int, int> posRight = {x + i, y};
-        if (CheckBoard(posRight,true)) {
-            string caseStatus = CheckCase(posRight);
-            if (caseStatus != "Ally") {
-                possiblePositions.push_back(posRight);
-            }
-            if (caseStatus != "Empty") {
-                break;
-            }
-        }
-    }
-
-    return possiblePositions;
-}
 
 
 
