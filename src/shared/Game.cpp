@@ -82,3 +82,17 @@ using namespace engine;
     Player* Game::getPlayer2() {
         return Player2;
     }
+
+void Game::addCaptured(Pieces *piece, Player * player) {
+        Board::getInstance()->removeFromBoard(piece);
+        auto size=player.capturedPieces.size();
+        int value=piece->getValue();
+        for(std::size_t i=0;i<size;i++) {
+            int myvalue=player.capturedPieces[i]->getValue();
+            if(value<=myvalue) {
+                player.capturedPieces.insert(player.capturedPieces.begin()+i,piece);
+                return;
+            }
+        }
+        player.capturedPieces.push_back(piece);
+    }

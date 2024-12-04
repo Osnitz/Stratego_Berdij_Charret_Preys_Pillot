@@ -82,19 +82,7 @@ void Player::addPiece(Pieces* piece) {
     myPieces.push_back(piece);
 }
 
-void Player::addCaptured(Pieces *piece) {
-    Board::getInstance()->removeFromBoard(piece);
-    auto size=capturedPieces.size();
-    int value=piece->getValue();
-    for(std::size_t i=0;i<size;i++) {
-        int myvalue=capturedPieces[i]->getValue();
-        if(value<=myvalue) {
-            capturedPieces.insert(capturedPieces.begin()+i,piece);
-            return;
-        }
-    }
-    capturedPieces.push_back(piece);
-}
+
 
 vector<Pieces*> Player:: getCaptured() {
     return capturedPieces;
