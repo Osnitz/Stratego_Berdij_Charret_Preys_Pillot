@@ -135,8 +135,6 @@ int main() {
     return 0;
 }*/
 
-#define BOOST_TEST_DYN_LINK
-#define BOOST_TEST_MODULE PiecesTest
 #include <boost/test/unit_test.hpp>
 #include "state.h"
 #include "engine.h"

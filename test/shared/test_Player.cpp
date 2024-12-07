@@ -76,7 +76,6 @@
 //     return 0;
 // }
 
-#define BOOST_TEST_MODULE PlayerTests
 #include <boost/test/included/unit_test.hpp>
 #include "state.h"
 

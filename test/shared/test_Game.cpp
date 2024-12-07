@@ -67,7 +67,6 @@ int main() {
     return 0;
 }*/
 
-#define BOOST_TEST_MODULE GameTest
 #include <boost/test/included/unit_test.hpp>
 #include "state.h"
 #include "engine.h"
