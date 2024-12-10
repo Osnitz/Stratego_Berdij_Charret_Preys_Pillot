@@ -11,7 +11,7 @@ using namespace state;
 using namespace engine;
 using namespace std;
 
-     Game* Game::instance=nullptr;
+    Game* Game::instance=nullptr;
 
     Game::Game() {
         board = Board::getInstance();
@@ -74,6 +74,15 @@ using namespace std;
         return currentPlayer;
     }
 
+    Player* Game::getOpponent() {
+        if (currentPlayer == Player1) {
+            return Player2;
+        } else if (currentPlayer == Player2) {
+            return Player1;
+        }
+        return nullptr;
+    }
+
     void Game::setAI(bool AIvalue) {
         againstIA = AIvalue;
     }
@@ -85,30 +94,38 @@ using namespace std;
         return Player2;
     }
 
-void Game::removePiece(Pieces* piece) {
-    vector<Pieces*> myPieces=currentPlayer->getMyPieces();
+void Game::removePiece(Pieces* piece, Player * player) {
+        // Récupérer une référence au vecteur des pièces du joueur actuel
+        std::vector<Pieces*>& myPieces = player->getMyPieces();
+
+        // Vérifier si le vecteur est vide
         if (myPieces.empty()) {
-            cerr<<"No piece left"<<endl;
+            cerr << "No piece left" << endl;
             return;
         }
+
         for (size_t i = 0; i < myPieces.size(); i++) {
             if (myPieces[i] == piece) {
+                // Supprimer la pièce si elle est trouvée
                 myPieces.erase(myPieces.begin() + i);
                 return;
             }
         }
-        cerr<<"Can't remove this piece : it doesn't exist!"<<endl;
-    }
+
+        // Si la pièce n'existe pas, afficher un message d'erreur
+        cerr << "Can't remove this piece: it doesn't exist!" << endl;
+}
+
 void Game::addCaptured(Pieces *piece, Player * player) {
         Board::getInstance()->removeFromBoard(piece);
-        auto size=player.capturedPieces.size();
+        auto size=player->capturedPieces.size();
         int value=piece->getValue();
         for(std::size_t i=0;i<size;i++) {
-            int myvalue=player.capturedPieces[i]->getValue();
+            int myvalue=player->capturedPieces[i]->getValue();
             if(value<=myvalue) {
-                player.capturedPieces.insert(player.capturedPieces.begin()+i,piece);
+                player->capturedPieces.insert(player->capturedPieces.begin()+i,piece);
                 return;
             }
         }
-        player.capturedPieces.push_back(piece);
-    }
+        player->capturedPieces.push_back(piece);
+}

@@ -64,19 +64,15 @@ void Player::loadConfig(string fileName){
 
 }
 
-
-
 void Player::addPiece(Pieces* piece) {
     myPieces.push_back(piece);
 }
 
-
-
-vector<Pieces*> Player:: getCaptured() {
+std::vector<Pieces *> &Player::getCaptured() {
     return capturedPieces;
 }
 
-vector<Pieces*> Player:: getMyPieces() {
+std::vector<Pieces *> &Player::getMyPieces() {
     return myPieces;
 }
 

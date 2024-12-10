@@ -104,6 +104,7 @@ void Pieces::attack(pair<int, int> position) {
 	Board *board = Board::getInstance();
     Pieces *attackedPiece = board->getPiece(position);
     auto player = game->getCurrentPlayer();
+    auto opponent = game->getOpponent();
 
     if (attackedPiece == nullptr) {
         cerr << "No target found" << endl;
@@ -112,51 +113,50 @@ void Pieces::attack(pair<int, int> position) {
 
     if (attackedPiece->name == "Bomb") {
         if (name == "Miner") {
-
             cout << "Good job ! The bomb is no more.\n" << endl;
-            player->addCaptured(attackedPiece);
+            game->addCaptured(attackedPiece, player);
             setPosition(position);
-            game->Graveyard = attackedPiece;
+            game->removePiece(attackedPiece, opponent);
             return;
-        } else {
-
+        }
+        else {
             cout << "Rest well ! The war is over for you.\n" << endl;
-            player->addCaptured(attackedPiece);
+            game->addCaptured(this, opponent);
             board->removeFromBoard(this);
-            player->removePiece(this);
-            game->Purgatory = this;
-            game->Graveyard = attackedPiece;
+            game->removePiece(this, player);
             return;
         }
     }
 
     if (attackedPiece->name == "Marshal" && name == "Spy") {
         cout << "Well done sir ! Their leader is gone.\n" << endl;
-        player->addCaptured(attackedPiece);
+        game->addCaptured(attackedPiece, player);
         setPosition(position);
-        Game::getInstance()->Graveyard = attackedPiece;
+        game->removePiece(attackedPiece, opponent);
         return;
     }
 
     if (value > attackedPiece->value) {
         cout << "The enemy is down ! It was a " << attackedPiece->name << ".\n" << endl;
-        player->addCaptured(attackedPiece);
+        game->addCaptured(attackedPiece, player);
         setPosition(position);
-        game->Graveyard = attackedPiece;
-
-    } else if (value < attackedPiece->value) {
+        game->removePiece(attackedPiece, opponent);
+    }
+    else if (value < attackedPiece->value) {
         cout << "The enemy is too strong ! It was a " << attackedPiece->name << ".\n" << endl;
         board->removeFromBoard(this);
-        player->removePiece(this);
-        game->Purgatory = this;
-
-    } else {
+        game->removePiece(this, player);
+        game->addCaptured(this, opponent);
+    }
+    else {
         cout << "It's a tie ! It was a " << attackedPiece->name << " too.\n" << endl;
-        player->addCaptured(attackedPiece);
+        game->addCaptured(attackedPiece, player);
+        game->addCaptured(this, opponent);
         board->removeFromBoard(this);
-        player->removePiece(this);
-        game->Purgatory = this;
-        game->Graveyard = attackedPiece;
+        board->removeFromBoard(attackedPiece);
+        game->removePiece(this, player);
+        game->removePiece(attackedPiece, opponent);
+
     }
 }
 
