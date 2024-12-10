@@ -11,16 +11,16 @@ using namespace state;
 using namespace engine;
 using namespace std;
 
-Game* Game::instance=nullptr;
+     Game* Game::instance=nullptr;
 
-Game::Game() {
-    board = Board::getInstance();
-    Player1 = new Player();
-    Player2 = new Player();
-    currentState = new InitState();
-    currentPlayer = nullptr;
-    againstIA = false;
-}
+    Game::Game() {
+        board = Board::getInstance();
+        Player1 = new Player();
+        Player2 = new Player();
+        currentState = new InitState();
+        currentPlayer = nullptr;
+        againstIA = false;
+    }
 
     Game::~Game() {
         delete board;
@@ -98,4 +98,17 @@ void Game::removePiece(Pieces* piece) {
             }
         }
         cerr<<"Can't remove this piece : it doesn't exist!"<<endl;
+    }
+void Game::addCaptured(Pieces *piece, Player * player) {
+        Board::getInstance()->removeFromBoard(piece);
+        auto size=player.capturedPieces.size();
+        int value=piece->getValue();
+        for(std::size_t i=0;i<size;i++) {
+            int myvalue=player.capturedPieces[i]->getValue();
+            if(value<=myvalue) {
+                player.capturedPieces.insert(player.capturedPieces.begin()+i,piece);
+                return;
+            }
+        }
+        player.capturedPieces.push_back(piece);
     }
