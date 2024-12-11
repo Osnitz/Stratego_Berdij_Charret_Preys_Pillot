@@ -94,66 +94,6 @@ void Pieces::setPosition(const pair<int, int> &position) {
     cout << name << " was moved to (" << newx << ", " << newy << ").\n" << endl;
 }
 
-void Pieces::attack(pair<int, int> position) {
-	Board *board = Board::getInstance();
-    Pieces *attackedPiece = board->getPiece(position);
-    auto player = game->getCurrentPlayer();
-
-    if (attackedPiece == nullptr) {
-        cerr << "No target found" << endl;
-        return;
-    }
-
-    if (attackedPiece->name == "Bomb") {
-        if (name == "Miner") {
-
-            cout << "Good job ! The bomb is no more.\n" << endl;
-            player->addCaptured(attackedPiece);
-            setPosition(position);
-            game->Graveyard = attackedPiece;
-            return;
-        } else {
-
-            cout << "Rest well ! The war is over for you.\n" << endl;
-            player->addCaptured(attackedPiece);
-            board->removeFromBoard(this);
-            player->removePiece(this);
-            game->Purgatory = this;
-            game->Graveyard = attackedPiece;
-            return;
-        }
-    }
-
-    if (attackedPiece->name == "Marshal" && name == "Spy") {
-        cout << "Well done sir ! Their leader is gone.\n" << endl;
-        player->addCaptured(attackedPiece);
-        setPosition(position);
-        Game::getInstance()->Graveyard = attackedPiece;
-        return;
-    }
-
-    if (value > attackedPiece->value) {
-        cout << "The enemy is down ! It was a " << attackedPiece->name << ".\n" << endl;
-        player->addCaptured(attackedPiece);
-        setPosition(position);
-        game->Graveyard = attackedPiece;
-
-    } else if (value < attackedPiece->value) {
-        cout << "The enemy is too strong ! It was a " << attackedPiece->name << ".\n" << endl;
-        board->removeFromBoard(this);
-        player->removePiece(this);
-        game->Purgatory = this;
-
-    } else {
-        cout << "It's a tie ! It was a " << attackedPiece->name << " too.\n" << endl;
-        player->addCaptured(attackedPiece);
-        board->removeFromBoard(this);
-        player->removePiece(this);
-        game->Purgatory = this;
-        game->Graveyard = attackedPiece;
-    }
-}
-
 vector<pair<int, int>> Pieces::canMove(Pieces* pieceToMove) {
     vector<pair<int, int>> possiblePositions;
 
