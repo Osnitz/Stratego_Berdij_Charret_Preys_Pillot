@@ -1,6 +1,7 @@
 #include <iostream>
 
 // The following lines are here to check that SFML is installed and working
+#include <client/PlayerController.h>
 #include <SFML/Graphics.hpp>
 
 void testSFML() {
@@ -13,67 +14,60 @@ void testSFML() {
 using namespace std;
 using namespace state;
 
-int main() {
+/*int main() {
     auto game = Game::getInstance();
     game->startGame();
-}
-
-/*int main(int argc,char* argv[])
-{
-    cout << "It works !" << endl;
-    return 0;
 }*/
 
-//
-// Created by matthieu on 19/10/24.
-//
-//#include <iostream>
-/*#include "state/Game.h"
-#include "state/Player.h"
-#include "state/Board.h"
+/*int main() {
+// Initialisation du State
+    // Supposons que vous ayez un Board singleton et des joueurs init
+    state::Board* board = state::Board::getInstance();
+    state::Player* player1 = new state::Player(); // Ajustez selon votre constructeur
+    state::Player* player2 = new state::Player(); // idem
+    std::vector<state::Player*> players = {player1, player2};
 
-using namespace std;
-using namespace state;
-int main() {
-    auto game= Game::getInstance();
-    auto board = Board::getInstance();
-    auto piece1 = new Pieces(6, "Spy", 4, 0);
-    auto piece2 = new Pieces(2, "Marshal", 0, 1);
-    auto piece3 = new Pieces(3, "General", 0, 2);
-    auto piece4 = new Pieces(4, "Colonel", 1, 4);
-    auto piece5 = new Pieces(5, "Major", 0, 4);
+    // Initialisation de l'Engine avec le Board et les Players
+    engine::engine gameEngine(board, players);
 
-    auto piece6 = new Pieces(6, "Captain", 5, 0);
-    auto piece7 = new Pieces(7, "Lieutenant", 9, 1);
-    auto piece8 = new Pieces(8, "Sergeant", 9, 2);
-    auto piece9 = new Pieces(9, "Miner", 9, 3);
-    auto piece10 = new Pieces(10, "Scout", 9, 4);
+    // Création d’un PlayerController pour le joueur 0 (humain)
+    client::PlayerController controller(&gameEngine, 0);
+    controller.switchToHuman();
 
-    auto player1 = game->getPlayer1();
-    auto player2 = game->getPlayer2();
+    // Affichage initial du plateau
+    std::cout << "Initial Board State: \n";
+    board->displayBoard(*player1); // Méthode hypothétique pour afficher le plateau du point de vue du joueur 1
 
-    player1->addPiece(piece1);
-    player1->addPiece(piece2);
-    player1->addPiece(piece3);
-    player1->addPiece(piece4);
-    player1->addPiece(piece5);
+    // Lance un tour
+    std::cout << "Player 0, it's your turn.\n";
+    // Le PlayerController demande à l’utilisateur des coordonnées
+    MoveCoordinates coords = controller.getUserInput();
 
-    player2->addPiece(piece6);
-    player2->addPiece(piece7);
-    player2->addPiece(piece8);
-    player2->addPiece(piece9);
-    player2->addPiece(piece10);
+    // Pour exécuter le mouvement, soit vous construisez une commande, soit l'Engine
+    // a une méthode pour déplacer directement une pièce:
+    // Par exemple :
+    // std::string command = "MOVE " + std::to_string(coords.startX) + " " + std::to_string(coords.startY) + " "
+    //                     + std::to_string(coords.endX) + " " + std::to_string(coords.endY);
+    // controller.executeCmd(command);
 
-    for(auto piece: player1->getMyPieces())
-    {
-        board->setPieceOnBoard(piece);
+    // Ou si l'Engine a une méthode dédiée :
+    bool success = gameEngine.movePiece(player1, coords.startX, coords.startY, coords.endX, coords.endY);
+    if (!success) {
+        std::cout << "Move failed! Try another move.\n";
+    } else {
+        std::cout << "Move succeeded!\n";
     }
 
-    for(auto piece: player2->getMyPieces())
-    {
-        board->setPieceOnBoard(piece);
-    }
-    game->startGame();
-    return 0;
- }*/
+    // Affichage après le mouvement
+    std::cout << "Board State after move:\n";
+    board->displayBoard(*player1);
 
+    // Si vous avez une boucle de jeu, vous pourriez continuer ici.
+    // Par exemple, alterner entre player 0 et player 1, ou demander un autre input.
+
+    // Nettoyage (si nécessaire, selon votre gestion mémoire)
+    delete player1;
+    delete player2;
+    // Si Board est un singleton géré statiquement, pas besoin de delete.
+
+    return 0;}*/

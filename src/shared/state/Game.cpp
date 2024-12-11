@@ -3,8 +3,8 @@
 //
 #include <stdexcept>
 
-#include "state.h"
-#include "engine.h"
+#include "../state.h"
+#include "../engine.h"
 #include "random"
 using namespace state;
 using namespace engine;
@@ -48,11 +48,11 @@ Game* Game::getInstance()
     return instance;
 }
 
-void Game::startGame()
+/*void Game::startGame()
 {
     currentState = new InitState();
     currentState->enter(this);
-}
+}*/
 
 void Game::switchTurn()
 {
@@ -66,7 +66,7 @@ void Game::switchTurn()
     }
 }
 
-void Game::setState(engine::State* state)
+void Game::setState(engine::GameState* state)
 {
     currentState = state;
     currentState->enter(this);
