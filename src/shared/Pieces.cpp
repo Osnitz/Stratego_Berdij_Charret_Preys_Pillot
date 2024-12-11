@@ -6,6 +6,7 @@
 #include "engine.h"
 #include <iostream>
 #include <random>
+#include <utility>
 
 using namespace std;
 using namespace state;
@@ -14,39 +15,37 @@ using namespace engine;
 
 auto game = Game::getInstance();
 
-Pieces::Pieces(int value, string name, int x, int y) {
-    this->value = value;
-    this->name = name;
-    if(value==2) {
-        this->range = 10;
-    }else if(value==11||value==0) {
-        this->range = 0;
+Pieces::Pieces(const int value, const PieceType type, int x, int y, bool color)
+        : color(color), type(type), value(value), x(x), y(y) {
+
+    if (type == PieceType::Scout) {
+        range = 10;
+    } else if (type == PieceType::Bomb || type == PieceType::Flag) {
+        range = 0;
+    } else {
+        range = 1;
     }
-    else{this->range=1;}
-    this->x = x;
-    this->y = y;
 }
 
-Pieces::~Pieces() {
-}
+Pieces::~Pieces() = default;
 
 pair<int, int> Pieces::getPosition() {
     return {x, y};
 }
 
-int Pieces::getValue() {
+int Pieces::getValue() const {
     return value;
 }
 
-string Pieces::getName() {
-    return name;
+PieceType Pieces::getType() {
+    return type;
 }
 
-int Pieces::getRange() {
+int Pieces::getRange() const {
     return range;
 }
 
-bool Pieces::LimitBoard(pair<int, int> position,bool silent){
+bool Pieces::LimitBoard(const pair<int, int> &position, bool silent){
     int NewX = position.first;
     int NewY = position.second;
     if ((NewX < 0) || (NewY < 0) || (NewX > 9) || (NewY > 9)) {
@@ -68,21 +67,21 @@ bool Pieces::LimitBoard(pair<int, int> position,bool silent){
     return true;
 }
 
-bool Pieces::isEmpty (Pieces * targetPiece) {
+bool Pieces::isEmpty (const Pieces * targetPiece) {
     if (targetPiece == nullptr) {
         return true;
     }
     return false;
 }
 
-bool Pieces::IsAlly(Pieces *targetPiece) {
+bool Pieces::IsAlly(const Pieces *targetPiece) const {
     if(color==targetPiece->color) {
         return true;
     }
     return false;
 }
 
-bool Pieces::isEnemy(Pieces *targetPiece) {
+bool Pieces::isEnemy(const Pieces *targetPiece) const {
     if(color!=targetPiece->color) {
         return true;
     }
@@ -100,7 +99,7 @@ void Pieces::setPosition(const pair<int, int> &position) {
     cout << name << " was moved to (" << newx << ", " << newy << ").\n" << endl;
 }
 
-void Pieces::attack(pair<int, int> position) {
+void Pieces::attack(const pair<int, int> &position) {
 	Board *board = Board::getInstance();
     Pieces *attackedPiece = board->getPiece(position);
     auto player = game->getCurrentPlayer();
@@ -111,15 +110,14 @@ void Pieces::attack(pair<int, int> position) {
         return;
     }
 
-    if (attackedPiece->name == "Bomb") {
-        if (name == "Miner") {
+    if (attackedPiece->type == PieceType::Bomb) {
+        if (type == PieceType::Miner) {
             cout << "Good job ! The bomb is no more.\n" << endl;
             game->addCaptured(attackedPiece, player);
             setPosition(position);
             game->removePiece(attackedPiece, opponent);
             return;
-        }
-        else {
+        } else {
             cout << "Rest well ! The war is over for you.\n" << endl;
             game->addCaptured(this, opponent);
             board->removeFromBoard(this);
@@ -128,13 +126,14 @@ void Pieces::attack(pair<int, int> position) {
         }
     }
 
-    if (attackedPiece->name == "Marshal" && name == "Spy") {
+    if (attackedPiece->type == PieceType::Marshal && type == PieceType::Spy) {
         cout << "Well done sir ! Their leader is gone.\n" << endl;
         game->addCaptured(attackedPiece, player);
         setPosition(position);
         game->removePiece(attackedPiece, opponent);
         return;
     }
+
 
     if (value > attackedPiece->value) {
         cout << "The enemy is down ! It was a " << attackedPiece->name << ".\n" << endl;

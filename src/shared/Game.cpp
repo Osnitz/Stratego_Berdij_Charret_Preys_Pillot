@@ -95,10 +95,8 @@ using namespace std;
     }
 
 void Game::removePiece(Pieces* piece, Player * player) {
-        // Récupérer une référence au vecteur des pièces du joueur actuel
         std::vector<Pieces*>& myPieces = player->getMyPieces();
 
-        // Vérifier si le vecteur est vide
         if (myPieces.empty()) {
             cerr << "No piece left" << endl;
             return;
@@ -106,13 +104,11 @@ void Game::removePiece(Pieces* piece, Player * player) {
 
         for (size_t i = 0; i < myPieces.size(); i++) {
             if (myPieces[i] == piece) {
-                // Supprimer la pièce si elle est trouvée
                 myPieces.erase(myPieces.begin() + i);
                 return;
             }
         }
 
-        // Si la pièce n'existe pas, afficher un message d'erreur
         cerr << "Can't remove this piece: it doesn't exist!" << endl;
 }
 
@@ -122,7 +118,7 @@ void Game::addCaptured(Pieces *piece, Player * player) {
         int value=piece->getValue();
         for(std::size_t i=0;i<size;i++) {
             int myvalue=player->capturedPieces[i]->getValue();
-            if(value<=myvalue) {
+            if(value <= myvalue) {
                 player->capturedPieces.insert(player->capturedPieces.begin()+i,piece);
                 return;
             }

@@ -14,9 +14,9 @@ using namespace state;
 using namespace std;
 
 Player :: Player() {
-    vector<Pieces*> myPieces;
-    vector<Pieces*>  capturedPieces= {nullptr};
-    vector<Pieces*>  knownPieces;
+    vector<Pieces *> myPieces;
+    vector<Pieces *> capturedPieces = {nullptr};
+    vector<Pieces *> knownPieces;
 }
 
 Player:: ~Player(){};
@@ -43,25 +43,23 @@ void Player::loadConfig(string fileName){
             dataline.push_back(cell);
         }
 
-        std::string name = dataline.at(0);
+        auto type = static_cast<PieceType>(stoi(dataline.at(0)));
         int value = stoi(dataline.at(1));
         int x = stoi(dataline.at(2));
         int y = stoi(dataline.at(3));
 
-
         if (game->getCurrentPlayer() == game->getPlayer1()) {
-            Pieces* piece = new Pieces(value, name, x, y);
+            auto * piece = new Pieces(value, type, x, y, true);
             myPieces.push_back(piece);
             board->setPieceOnBoard(piece);
         }
         else {
-            Pieces* piece = new Pieces(value, name, 9 - x, y);
+            auto * piece = new Pieces(value, type, 9 - x, y, false);
             myPieces.push_back(piece);
             board->setPieceOnBoard(piece);
         }
     }
     board->displayBoard(*game->getCurrentPlayer());
-
 }
 
 void Player::addPiece(Pieces* piece) {
@@ -92,6 +90,6 @@ void Player:: displayCaptured () {
     }
     auto size=capturedPieces.size();
     for(size_t i=0;i<size;i++) {
-        cout << capturedPieces[i]->getName()<< endl;
+        cout << capturedPieces[i]->getType()<< endl;
     }
 }

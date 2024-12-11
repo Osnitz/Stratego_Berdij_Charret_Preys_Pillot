@@ -112,16 +112,16 @@ vector<pair<int, int>> Board::PossiblePositions(Pieces* pieceToMove) {
                 case 1: posToCheck = {x, y - i};
                     break;
                 case 2: posToCheck = {x, y + i};
-                break;
+                    break;
                 case 3: posToCheck = {x-i, y };
-                break;
+                    break;
                 case 4: posToCheck = {x+i, y};
-                break;
+                    break;
             }
             Pieces *targetPiece=getPiece(posToCheck);
 
             if (pieceToMove->LimitBoard(posToCheck,true)) {
-                if (pieceToMove->IsAlly( targetPiece)){
+                if (pieceToMove->IsAlly(targetPiece)){
                     break;
                 }
                 possiblePositions.push_back(posToCheck);
