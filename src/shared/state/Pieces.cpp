@@ -2,8 +2,8 @@
 // Created by plt on 14/10/24.
 //
 
-#include "state.h"
-#include "engine.h"
+#include "../state.h"
+#include "../engine.h"
 #include <iostream>
 #include <random>
 

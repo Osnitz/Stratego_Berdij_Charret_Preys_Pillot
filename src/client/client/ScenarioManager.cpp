@@ -4,7 +4,7 @@
 #include <memory>
 #include "engine.h"
 #include "client.h"
-#include "../shared/ai.h"
+#include "ai.h"
 #include <utility>
 
 template<class T, class... Args>
@@ -36,8 +36,9 @@ public:
     // Initialise les PlayerControllers en fonction du mode de jeu
     void initializeControllers() {
         // PlayerController prend un pointeur vers Engine et un playerID
-        player1Controller = make_unique<client::PlayerController>(engine, 0);
-        player2Controller = make_unique<client::PlayerController>(engine, 1);
+        player1Controller = std::unique_ptr<client::PlayerController>(new client::PlayerController(engine, 0));
+        player2Controller = std::unique_ptr<client::PlayerController>(new client::PlayerController(engine, 1));
+
 
         switch (mode) {
         case GameMode::PVP:

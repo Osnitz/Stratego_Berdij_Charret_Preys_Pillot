@@ -8,7 +8,7 @@ using namespace state;
 using namespace engine;
 Board* board = Board::getInstance();
 
-void InitState::enter(Game* game)
+/*void InitState::enter(Game* game)
 {
     printf("---InitState ---\n");
     printf("Welcome to the game!\n");
@@ -468,9 +468,10 @@ void WaitingState::handleInput(Game* game)
 void WaitingState::update(Game* game)
 {
     game->setState(new InitState());
-}
+}*/
 
 
-State::~State()
+GameState::~GameState()
 {
+
 }

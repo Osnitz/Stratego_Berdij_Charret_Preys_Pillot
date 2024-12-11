@@ -2,8 +2,8 @@
 // Created by estelle on 14/10/24.
 //
 
-#include "state.h"
-#include "engine.h"
+#include "../state.h"
+#include "../engine.h"
 #include <fstream>
 #include <sstream>
 #include <iostream>
