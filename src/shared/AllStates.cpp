@@ -70,19 +70,19 @@ void PlacementState::loadPlayerConfig(Player* player)
     std::cin >> choice;
     if (choice == "1")
     {
-        player->loadConfig("../src/shared/state/config/Offensive.csv");
+        player->loadConfig(TODO);
     }
     else if (choice == "2")
     {
-        player->loadConfig("../src/shared/state/config/Defensive.csv");
+        player->loadConfig(TODO);
     }
     else if (choice == "3")
     {
-        player->loadConfig("../src/shared/state/config/Balance.csv");
+        player->loadConfig(TODO);
     }
     else if (choice == "7")
     {
-        player->loadConfig("../src/shared/state/config/test.csv");
+        player->loadConfig(TODO);
     }
     else
     {
@@ -130,19 +130,19 @@ void AIPlacementState::handleInput(Game* game)
         }
         if (choice1 == "1")
         {
-            player->loadConfig("../src/shared/state/config/Offensive.csv");
+            player->loadConfig(TODO);
         }
         else if (choice1 == "2")
         {
-            player->loadConfig("../src/shared/state/config/Defensive.csv");
+            player->loadConfig(TODO);
         }
         else if (choice1 == "3")
         {
-            player->loadConfig("../src/shared/state/config/Balance.csv");
+            player->loadConfig(TODO);
         }
         else if (choice1 == "7")
         {
-            player->loadConfig("../src/shared/state/config/test.csv");
+            player->loadConfig(TODO);
         }
         game->switchTurn();
         player = game->getCurrentPlayer();
@@ -154,19 +154,19 @@ void AIPlacementState::handleInput(Game* game)
         std::string choice2 = std::to_string(distr(gen));
         if (choice2 == "1")
         {
-            player->loadConfig("../src/shared/state/config/Offensive.csv");
+            player->loadConfig(TODO);
         }
         else if (choice2 == "2")
         {
-            player->loadConfig("../src/shared/state/config/Defensive.csv");
+            player->loadConfig(TODO);
         }
         else if (choice2 == "3")
         {
-            player->loadConfig("../src/shared/state/config/Balance.csv");
+            player->loadConfig(TODO);
         }
         else if (choice2 == "7")
         {
-            player->loadConfig("../src/shared/state/config/test.csv");
+            player->loadConfig(TODO);
         }
         game->switchTurn();
         update(game);
@@ -182,19 +182,19 @@ void AIPlacementState::handleInput(Game* game)
     std::string choice2 = std::to_string(distr(gen));
     if (choice2 == "1")
     {
-        player->loadConfig("../src/shared/state/config/Offensive.csv");
+        player->loadConfig(TODO);
     }
     else if (choice2 == "2")
     {
-        player->loadConfig("../src/shared/state/config/Defensive.csv");
+        player->loadConfig(TODO);
     }
     else if (choice2 == "3")
     {
-        player->loadConfig("../src/shared/state/config/Balance.csv");
+        player->loadConfig(TODO);
     }
     else if (choice2 == "7")
     {
-        player->loadConfig("../src/shared/state/config/test.csv");
+        player->loadConfig(TODO);
     }
 
     game->switchTurn();
@@ -214,19 +214,19 @@ void AIPlacementState::handleInput(Game* game)
 
     if (choice1 == "1")
     {
-        player->loadConfig("../src/shared/state/config/Offensive.csv");
+        player->loadConfig(TODO);
     }
     else if (choice1 == "2")
     {
-        player->loadConfig("../src/shared/state/config/Defensive.csv");
+        player->loadConfig(TODO);
     }
     else if (choice1 == "3")
     {
-        player->loadConfig("../src/shared/state/config/Balance.csv");
+        player->loadConfig(TODO);
     }
     else if (choice1 == "7")
     {
-        player->loadConfig("../src/shared/state/config/test.csv");
+        player->loadConfig(TODO);
     }
     game->switchTurn();
     update(game);
