@@ -13,16 +13,15 @@
 using namespace state;
 using namespace std;
 
-Player :: Player() {
+Player :: Player(): color(false) {
     vector<Pieces *> myPieces;
     vector<Pieces *> capturedPieces = {nullptr};
     vector<Pieces *> knownPieces;
 }
 
-Player:: ~Player(){};
+Player:: ~Player()= default;
 
-
-void Player::loadConfig(string fileName){
+void Player::loadConfig(const string& fileName){
     Game *game = Game::getInstance();
     Board *board = Board::getInstance();
     ifstream file(fileName);

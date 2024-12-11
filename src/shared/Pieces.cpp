@@ -33,7 +33,7 @@ pair<int, int> Pieces::getPosition() {
     return {x, y};
 }
 
-int Pieces::getValue() const {
+int Pieces::getValue()  {
     return value;
 }
 
@@ -41,11 +41,11 @@ PieceType Pieces::getType() {
     return type;
 }
 
-int Pieces::getRange() const {
+int Pieces::getRange()  {
     return range;
 }
 
-bool Pieces::LimitBoard(const pair<int, int> &position, bool silent){
+bool Pieces::LimitBoard(const pair<int, int>& &position, bool silent){
     int NewX = position.first;
     int NewY = position.second;
     if ((NewX < 0) || (NewY < 0) || (NewX > 9) || (NewY > 9)) {
@@ -67,21 +67,21 @@ bool Pieces::LimitBoard(const pair<int, int> &position, bool silent){
     return true;
 }
 
-bool Pieces::isEmpty (const Pieces * targetPiece) {
+bool Pieces::isEmpty (Pieces * targetPiece) {
     if (targetPiece == nullptr) {
         return true;
     }
     return false;
 }
 
-bool Pieces::IsAlly(const Pieces *targetPiece) const {
+bool Pieces::IsAlly(Pieces *targetPiece) {
     if(color==targetPiece->color) {
         return true;
     }
     return false;
 }
 
-bool Pieces::isEnemy(const Pieces *targetPiece) const {
+bool Pieces::isEnemy(Pieces *targetPiece) {
     if(color!=targetPiece->color) {
         return true;
     }
@@ -96,7 +96,7 @@ void Pieces::setPosition(const pair<int, int> &position) {
     this->x = newx;
     this->y = newy;
     board->setPieceOnBoard(this);
-    cout << name << " was moved to (" << newx << ", " << newy << ").\n" << endl;
+    cout << type << " was moved to (" << newx << ", " << newy << ").\n" << endl;
 }
 
 void Pieces::attack(const pair<int, int> &position) {
@@ -136,19 +136,19 @@ void Pieces::attack(const pair<int, int> &position) {
 
 
     if (value > attackedPiece->value) {
-        cout << "The enemy is down ! It was a " << attackedPiece->name << ".\n" << endl;
+        cout << "The enemy is down ! It was a " << attackedPiece->type << ".\n" << endl;
         game->addCaptured(attackedPiece, player);
         setPosition(position);
         game->removePiece(attackedPiece, opponent);
     }
     else if (value < attackedPiece->value) {
-        cout << "The enemy is too strong ! It was a " << attackedPiece->name << ".\n" << endl;
+        cout << "The enemy is too strong ! It was a " << attackedPiece->type << ".\n" << endl;
         board->removeFromBoard(this);
         game->removePiece(this, player);
         game->addCaptured(this, opponent);
     }
     else {
-        cout << "It's a tie ! It was a " << attackedPiece->name << " too.\n" << endl;
+        cout << "It's a tie ! It was a " << attackedPiece->type << " too.\n" << endl;
         game->addCaptured(attackedPiece, player);
         game->addCaptured(this, opponent);
         board->removeFromBoard(this);

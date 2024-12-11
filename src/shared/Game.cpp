@@ -74,7 +74,7 @@ using namespace std;
         return currentPlayer;
     }
 
-    Player* Game::getOpponent() {
+    Player* Game::getOpponent() const {
         if (currentPlayer == Player1) {
             return Player2;
         } else if (currentPlayer == Player2) {
@@ -94,7 +94,7 @@ using namespace std;
         return Player2;
     }
 
-void Game::removePiece(Pieces* piece, Player * player) {
+void Game::removePiece(const Pieces* piece, Player* player) {
         std::vector<Pieces*>& myPieces = player->getMyPieces();
 
         if (myPieces.empty()) {
@@ -102,24 +102,24 @@ void Game::removePiece(Pieces* piece, Player * player) {
             return;
         }
 
-        for (size_t i = 0; i < myPieces.size(); i++) {
-            if (myPieces[i] == piece) {
-                myPieces.erase(myPieces.begin() + i);
+        for (auto it = myPieces.begin(); it != myPieces.end(); ++it) {
+            if (*it == piece) {
+                myPieces.erase(it);
                 return;
             }
         }
 
         cerr << "Can't remove this piece: it doesn't exist!" << endl;
-}
+    }
 
-void Game::addCaptured(Pieces *piece, Player * player) {
+void Game::addCaptured(Pieces* piece, Player* player) {
         Board::getInstance()->removeFromBoard(piece);
-        auto size=player->capturedPieces.size();
-        int value=piece->getValue();
-        for(std::size_t i=0;i<size;i++) {
-            int myvalue=player->capturedPieces[i]->getValue();
-            if(value <= myvalue) {
-                player->capturedPieces.insert(player->capturedPieces.begin()+i,piece);
+        const int value = piece->getValue();
+
+        for (auto it = player->capturedPieces.begin(); it != player->capturedPieces.end(); ++it) {
+            int myvalue = (*it)->getValue();
+            if (value <= myvalue) {
+                player->capturedPieces.insert(it, piece);
                 return;
             }
         }
