@@ -2954,19 +2954,19 @@
         <dia:point val="6.67201,4.67295"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="6.62201,4.62295;9.22201,6.92295"/>
+        <dia:rectangle val="6.62201,4.62295;11.4195,6.92295"/>
       </dia:attribute>
       <dia:attribute name="elem_corner">
         <dia:point val="6.67201,4.67295"/>
       </dia:attribute>
       <dia:attribute name="elem_width">
-        <dia:real val="2.5"/>
+        <dia:real val="4.6974999999999998"/>
       </dia:attribute>
       <dia:attribute name="elem_height">
         <dia:real val="2.1999999999999997"/>
       </dia:attribute>
       <dia:attribute name="name">
-        <dia:string>#State#</dia:string>
+        <dia:string>#GameState#</dia:string>
       </dia:attribute>
       <dia:attribute name="stereotype">
         <dia:string>##</dia:string>
@@ -3068,7 +3068,7 @@
         <dia:point val="23.6704,8"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="7.47201,2.46295;23.7204,8.05"/>
+        <dia:rectangle val="8.57076,2.46295;23.7204,8.05"/>
       </dia:attribute>
       <dia:attribute name="meta">
         <dia:composite type="dict"/>
@@ -3077,8 +3077,8 @@
         <dia:point val="23.6704,8"/>
         <dia:point val="22.6204,8"/>
         <dia:point val="22.6204,3.22295"/>
-        <dia:point val="7.92201,3.22295"/>
-        <dia:point val="7.92201,4.67295"/>
+        <dia:point val="9.02076,3.22295"/>
+        <dia:point val="9.02076,4.67295"/>
       </dia:attribute>
       <dia:attribute name="orth_orient">
         <dia:enum val="0"/>
