@@ -14,9 +14,9 @@ Game* Game::instance = nullptr;
 Game::Game()
 {
     board = Board::getInstance();
-    Player1 = new Player();
-    Player2 = new Player();
-    currentState = nullptr;
+    Player1 = new Player(0);
+    Player2 = new Player(1);
+    //currentState = nullptr;
     currentPlayer = nullptr;
     againstIA = false;
 
@@ -36,7 +36,7 @@ Game::~Game()
     delete board;
     delete Player1;
     delete Player2;
-    delete currentState;
+    //delete currentState;
 }
 
 Game* Game::getInstance()
@@ -66,11 +66,11 @@ void Game::switchTurn()
     }
 }
 
-void Game::setState(engine::GameState* state)
+/*void Game::setState(engine::GameState* state)
 {
     currentState = state;
     currentState->enter(this);
-}
+}*/
 
 Player* Game::getCurrentPlayer()
 {
@@ -94,4 +94,9 @@ Player* Game::getPlayer1()
 Player* Game::getPlayer2()
 {
     return Player2;
+}
+
+void Game::setCurrentPlayer(Player* player)
+{
+    currentPlayer = player;
 }

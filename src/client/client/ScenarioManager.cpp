@@ -1,3 +1,4 @@
+#include <iostream>
 #ifndef SCENARIOMANAGER_H
 #define SCENARIOMANAGER_H
 
@@ -5,33 +6,23 @@
 #include "client.h"
 #include "ai.h"
 
-enum class GameMode {
-    PVP,   // Joueur vs Joueur
-    PVE,   // Joueur vs IA
-    AIvsAI // IA vs IA
-};
 
-class ScenarioManager {
-private:
-    engine::Engine* engine;
-    std::unique_ptr<client::PlayerController> player1Controller;
-    std::unique_ptr<client::PlayerController> player2Controller;
-    GameMode mode;
-
-public:
-    ScenarioManager(engine::Engine* eng) : engine(eng), mode(GameMode::PVP) {}
+namespace client {
+    ScenarioManager::ScenarioManager(engine::Engine* eng) : engine(eng), mode(GameMode::PVP) {}
 
     // Configure le mode de jeu
-    void setMode(GameMode m) {
+    void ScenarioManager::setMode(GameMode m) {
         mode = m;
     }
 
     // Initialise les PlayerControllers en fonction du mode de jeu
-    void initializeControllers() {
+    void ScenarioManager::initializeControllers() {
         // PlayerController prend un pointeur vers Engine et un playerID
-        player1Controller = std::unique_ptr<client::PlayerController>(new client::PlayerController(engine, 0));
-        player2Controller = std::unique_ptr<client::PlayerController>(new client::PlayerController(engine, 1));
+        auto player1Controller = new client::PlayerController(engine, 0);
+        auto player2Controller = new client::PlayerController(engine, 1);
 
+        playerControllers.push_back(player1Controller);
+        playerControllers.push_back(player2Controller);
 
         switch (mode) {
         case GameMode::PVP:
@@ -58,6 +49,34 @@ public:
         }
         }
     }
+
+    PlayerController* ScenarioManager::getPlayerController(state::Player* player) {
+        if (player->getPlayerID() == 0) {
+            return playerControllers[0];
+        }
+        else {
+            return playerControllers[1];
+        }
+    }
+
+    GameMode ScenarioManager::getScenarioChoice()
+    {
+        int choice = -1;
+
+        std::cout<<"Choose a scenario (1: PvP, 2: PvE): "<<std::endl;
+        std::cin>>choice;
+        while (choice != 1 && choice != 2){
+            std::cerr<<"Invalid choice. Please choose a scenario (1: PvP, 2: PvE): "<<std::endl;
+            std::cin>>choice;}
+        switch(choice)
+        {
+            case 1:
+                return GameMode::PVP;
+            case 2:
+                return GameMode::PVE;
+        }
+    }
+
 };
 
 #endif

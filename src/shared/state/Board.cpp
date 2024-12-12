@@ -80,7 +80,7 @@ Pieces* Board::getPiece(std::pair<int, int> position) {
     if (x >= 0 && static_cast<std::size_t>(x) < grid.size() && y >= 0 && static_cast<std::size_t>(y) < grid[0].size()) {
         return grid[x][y];
     }
-    throw std::out_of_range("Invalid position on the board.");
+    return nullptr;;
 }
 
 void Board::setPieceOnBoard(Pieces* piece) {

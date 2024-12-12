@@ -4,62 +4,59 @@
 
 #include <iostream>
 
-#include "engine.h"
+#include "PlayerController.h"
 #include "client.h"
 #include "state.h"
 
-struct MoveCoordinates {
-    int startX;
-    int startY;
-    int endX;
-    int endY;
-};
+
+using namespace client;
 
 
-class PlayerController {
-private:
-    engine::Engine* engine;
-    ai::AIInterface* ai;
-    int playerId;
+PlayerController::PlayerController(engine::Engine* eng, int id)
+    : engine(eng), playerID(id), aiModule(nullptr)
+{
+}
 
-public:
-    PlayerController(engine::Engine* eng, int id)
-        : engine(eng), ai(nullptr), playerId(id) {}
+void PlayerController::switchToAI(ai::AIInterface* newAI)
+{
+    aiModule = newAI; // pointeur valide vers une IA
+}
 
-    void switchToAI(ai::AIInterface* newAI) {
-        ai = newAI; // pointeur valide vers une IA
-    }
+void PlayerController::switchToHuman()
+{
+    aiModule = nullptr; // plus d'IA
+}
 
-    void switchToHuman() {
-        ai = nullptr; // plus d'IA
-    }
+bool PlayerController::isAI()
+{
+    return (aiModule != nullptr);
+}
 
-    bool isAI() const {
-        return (ai != nullptr);
-    }
+std::vector<int> PlayerController::getUserInput()
+{
+    std::vector<int> coords;
+    int startX, startY, endX, endY;
 
-    MoveCoordinates getUserInput()
-    {
-        MoveCoordinates coords;
+    std::cout << "Player " << playerID << ", enter the coordinates of the piece to move (e.g. '2 3'): \n";
+    std::cin >> startX >> startY;
+    coords.push_back(startX);
+    coords.push_back(startY);
 
-        std::cout << "Player " << playerId << ", enter the coordinates of the piece to move (e.g. '2 3'): \n";
-        std::cin >> coords.startX >> coords.startY;
+    std::cout << "Enter the destination coordinates (e.g. '2 4'): \n";
+    std::cin >> endX >> endY;
+    coords.push_back(endX);
+    coords.push_back(endY);
+    return coords;
+}
 
-        std::cout << "Enter the destination coordinates (e.g. '2 4'): \n";
-        std::cin >> coords.endX >> coords.endY;
+bool PlayerController::executeCmd(std::pair<int, int> from, std::pair<int, int> to, state::Player* currentPlayer)
+{
+    // Transmet la commande à l’Engine
+    bool success = engine->handleCmdMove(from, to);
+    return success;
+}
 
-        return coords;
-    }
-
-    void executeCmd(std::pair<int,int> from, std::pair<int,int> to, state::Player* currentPlayer) {
-        // Transmet la commande à l’Engine
-        bool success = engine->handleCmd(from, to, currentPlayer);
-        if (!success) {
-            // Gérer l'échec, par exemple afficher un message d'erreur
-        }
-    }
-
-    int getPlayerId() const {
-        return playerId;
-    }
-};
+int PlayerController::getPlayerID()
+{
+    return playerID;
+}

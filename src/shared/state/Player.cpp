@@ -13,13 +13,14 @@
 using namespace state;
 using namespace std;
 
-Player :: Player() {
+Player :: Player(int id) {
     vector<Pieces*> myPieces;
     vector<Pieces*>  capturedPieces= {nullptr};
     vector<Pieces*>  knownPieces;
+    playerID = id;
 }
 
-Player:: ~Player(){};
+Player:: ~Player()= default;
 
 
 void Player::loadConfig(string fileName){
@@ -33,7 +34,7 @@ void Player::loadConfig(string fileName){
     string line;
     getline(file, line);
     while (getline(file, line)) {
-        cout << line << endl;
+        //cout << line << endl;
         stringstream ss(line);
         string cell;
         vector<string> dataline;
@@ -122,4 +123,10 @@ void Player:: displayCaptured () {
     for(size_t i=0;i<size;i++) {
         cout << capturedPieces[i]->getName()<< endl;
     }
+
+}
+
+int Player::getPlayerID()
+{
+    return playerID;
 }
