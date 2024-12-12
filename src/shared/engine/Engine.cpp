@@ -147,7 +147,7 @@ void Engine::attack(Pieces* mypiece, pair<int, int>& position)
 bool Engine::isValidMove(Pieces* piece, pair<int, int> to)
 {
     auto possiblePositions = piece->canMove(piece);
-    for (int i = 0; i < possiblePositions.size(); i++)
+    for (size_t i = 0; i < possiblePositions.size(); i++)
     {
         if (possiblePositions[i] == to)
         {

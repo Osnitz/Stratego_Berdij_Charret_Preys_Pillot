@@ -77,6 +77,33 @@ namespace client {
         }
     }
 
+    void ScenarioManager::handlePlacement(state::Game* game) {
+        for (int i=0; i<2; i++) {
+            auto currentPlayer = game->getCurrentPlayer();
+            std::cout<<"Player "<<currentPlayer->getPlayerID()<<", choose your configuration "<<std::endl;
+            std::cout<<"(1: Offensive, 2:Defensive, 3:Balance): "<<std::endl;
+            int choice;
+            std::cin>>choice;
+            std::string filePath;
+            switch(choice) {
+                case 1:
+                    filePath = "../src/shared/state/config/Offensive.csv";
+                    break;
+                case 2:
+                    filePath = "../src/shared/state/config/Defensive.csv";
+                    break;
+                case 3:
+                    filePath = "../src/shared/state/config/Balance.csv";
+                    break;
+                default:
+                    std::cerr<<"Invalid choice. Please choose a configuration (1: Offensive, 2:Defensive, 3:Balance): "<<std::endl;
+                    i--;
+                    continue;
+            }
+            engine->handleCmdPlacement(filePath);
+        }
+    }
+
 };
 
 #endif

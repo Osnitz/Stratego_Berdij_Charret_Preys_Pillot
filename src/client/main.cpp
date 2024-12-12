@@ -29,7 +29,6 @@ int main() {
     Game* game = Game::getInstance();
     std::vector<Player*> players = {game->getPlayer1(), game->getPlayer2()};
 
-
     auto gameEngine = new engine::Engine(game, players);
 
     auto scenarioManager = new client::ScenarioManager(gameEngine);
@@ -41,9 +40,7 @@ int main() {
 
     gameEngine->startGame();
 
-
-    gameEngine->handleCmdPlacement("/home/matthieu/Cours/PLT/Stratego/src/shared/state/config/Balance.csv");
-    gameEngine->handleCmdPlacement("/home/matthieu/Cours/PLT/Stratego/src/shared/state/config/Balance.csv");
+    scenarioManager->handlePlacement(game);
 
 
     int test =0;
