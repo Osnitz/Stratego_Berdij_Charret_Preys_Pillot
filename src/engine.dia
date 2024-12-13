@@ -885,7 +885,7 @@
     </dia:object>
     <dia:object type="UML - Association" version="2" id="O4">
       <dia:attribute name="obj_pos">
-        <dia:point val="17.4201,7.07646"/>
+        <dia:point val="17.4201,7.07647"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
         <dia:rectangle val="17.3701,0.3256;40.5509,10.8517"/>
@@ -894,7 +894,7 @@
         <dia:composite type="dict"/>
       </dia:attribute>
       <dia:attribute name="orth_points">
-        <dia:point val="17.4201,7.07646"/>
+        <dia:point val="17.4201,7.07647"/>
         <dia:point val="17.4201,1.0856"/>
         <dia:point val="40.3509,1.0856"/>
         <dia:point val="40.3509,10.0517"/>
