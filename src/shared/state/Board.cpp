@@ -6,12 +6,13 @@
 #include <map>
 
 using namespace state;
+using namespace std;
 
 Board* Board::instance = nullptr;
 
 Board::Board() {
     // Initialize a 10x10 grid with nullptr (representing empty spaces)
-    grid.resize(10, std::vector<Pieces*>(10, nullptr));
+    grid.resize(10, vector<Pieces*>(10, nullptr));
 }
 
 Board::~Board() {
@@ -27,11 +28,11 @@ Board* Board::getInstance() {
 
 void Board::displayBoard(Player &player) {
     // Print the first line of column's number in the grid
-    std::cout << "    "; // Initial alignment for the first row of the grid
-    for (std::size_t col = 0; col < grid[0].size(); ++col) {
-        std::cout << "   " << col << "   "; // Adjusting the spacing for column numbers
+    cout << "    "; // Initial alignment for the first row of the grid
+    for (size_t col = 0; col < grid[0].size(); ++col) {
+        cout << "   " << col << "   "; // Adjusting the spacing for column numbers
     }
-    std::cout << std::endl;
+    cout << endl;
 
     // Display the bounding line under column numbers
     std::cout << "   "; // Initial alignment for dashes
@@ -91,4 +92,45 @@ void Board::setPieceOnBoard(Pieces* piece) {
 void Board::removeFromBoard(Pieces* piece) {
     std::pair<int, int> position = piece->getPosition();
     grid[position.first][position.second] = nullptr;
+}
+
+vector<pair<int, int>> Board::PossiblePositions(Pieces* pieceToMove) {
+    vector<pair<int, int>> possiblePositions;
+
+    if (pieceToMove == nullptr) {
+        return possiblePositions;
+    }
+
+    int x = pieceToMove->getPosition().first;
+    int y = pieceToMove->getPosition().second;
+    int range = pieceToMove->getRange();
+    pair<int,int> posToCheck;
+
+    for(int j=1; j<=4;j++) {
+        for (int i = 1; i <= range; ++i) {
+            switch (j) {
+                case 1: posToCheck = {x, y - i};
+                    break;
+                case 2: posToCheck = {x, y + i};
+                    break;
+                case 3: posToCheck = {x-i, y };
+                    break;
+                case 4: posToCheck = {x+i, y};
+                    break;
+            }
+            Pieces *targetPiece=getPiece(posToCheck);
+
+            if (pieceToMove->LimitBoard(posToCheck,true)) {
+                if (pieceToMove->IsAlly(targetPiece)){
+                    break;
+                }
+                possiblePositions.push_back(posToCheck);
+                if (pieceToMove->isEnemy(targetPiece)) {
+                    break;
+                }
+            }
+        }
+    }
+
+    return possiblePositions;
 }

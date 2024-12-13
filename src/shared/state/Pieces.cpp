@@ -2,10 +2,11 @@
 // Created by plt on 14/10/24.
 //
 
-#include "../state.h"
-#include "../engine.h"
+#include "state.h"
+#include "engine.h"
 #include <iostream>
 #include <random>
+#include <utility>
 
 using namespace std;
 using namespace state;
@@ -14,39 +15,37 @@ using namespace engine;
 
 auto game = Game::getInstance();
 
-Pieces::Pieces(int value, string name, int x, int y) {
-    this->value = value;
-    this->name = name;
-    if(value==2) {
-        this->range = 10;
-    }else if(value==11||value==0) {
-        this->range = 0;
+Pieces::Pieces(const int value, const PieceType type, int x, int y, bool color)
+        : color(color), type(type), value(value), x(x), y(y) {
+
+    if (type == PieceType::Scout) {
+        range = 10;
+    } else if (type == PieceType::Bomb || type == PieceType::Flag) {
+        range = 0;
+    } else {
+        range = 1;
     }
-    else{this->range=1;}
-    this->x = x;
-    this->y = y;
 }
 
-Pieces::~Pieces() {
-}
+Pieces::~Pieces() = default;
 
 pair<int, int> Pieces::getPosition() {
     return {x, y};
 }
 
-int Pieces::getValue() {
+int Pieces::getValue()  {
     return value;
 }
 
-string Pieces::getName() {
-    return name;
+PieceType Pieces::getType() {
+    return type;
 }
 
-int Pieces::getRange() {
+int Pieces::getRange()  {
     return range;
 }
 
-bool Pieces::CheckBoard(pair<int, int> position,bool silent){
+bool Pieces::LimitBoard(const pair<int, int>& &position, bool silent){
     int NewX = position.first;
     int NewY = position.second;
     if ((NewX < 0) || (NewY < 0) || (NewX > 9) || (NewY > 9)) {
@@ -68,19 +67,25 @@ bool Pieces::CheckBoard(pair<int, int> position,bool silent){
     return true;
 }
 
-string Pieces::CheckCase (pair<int,int> position) {
-  	Board *board = Board::getInstance();
-    Pieces *targetPiece = board->getPiece(position);
-    Player* currentPlayer = game->getCurrentPlayer();
-
+bool Pieces::isEmpty (Pieces * targetPiece) {
     if (targetPiece == nullptr) {
-        return "Empty";
+        return true;
     }
-    if (!currentPlayer->belongTo(targetPiece)) {
-        return "Enemy";
-    }
+    return false;
+}
 
-    return "Ally";
+bool Pieces::IsAlly(Pieces *targetPiece) {
+    if(color==targetPiece->color) {
+        return true;
+    }
+    return false;
+}
+
+bool Pieces::isEnemy(Pieces *targetPiece) {
+    if(color!=targetPiece->color) {
+        return true;
+    }
+    return false;
 }
 
 void Pieces::setPosition(const pair<int, int> &position) {
@@ -91,74 +96,70 @@ void Pieces::setPosition(const pair<int, int> &position) {
     this->x = newx;
     this->y = newy;
     board->setPieceOnBoard(this);
-    cout << name << " was moved to (" << newx << ", " << newy << ").\n" << endl;
+    cout << type << " was moved to (" << newx << ", " << newy << ").\n" << endl;
 }
 
-vector<pair<int, int>> Pieces::canMove(Pieces* pieceToMove) {
-    vector<pair<int, int>> possiblePositions;
+void Pieces::attack(const pair<int, int> &position) {
+	Board *board = Board::getInstance();
+    Pieces *attackedPiece = board->getPiece(position);
+    auto player = game->getCurrentPlayer();
+    auto opponent = game->getOpponent();
 
-    if (pieceToMove == nullptr) {
-        return possiblePositions;
+    if (attackedPiece == nullptr) {
+        cerr << "No target found" << endl;
+        return;
     }
 
-    int x = pieceToMove->x;
-    int y = pieceToMove->y;
-    int range = pieceToMove->range;
-
-    for (int i = 1; i <= range; ++i) {
-        pair<int, int> posAbove = {x, y - i};
-        if (CheckBoard(posAbove,true)) {
-            string caseStatus = CheckCase(posAbove);
-            if (caseStatus != "Ally") {
-                possiblePositions.push_back(posAbove);
-            }
-            if (caseStatus != "Empty") {
-                break;
-            }
+    if (attackedPiece->type == PieceType::Bomb) {
+        if (type == PieceType::Miner) {
+            cout << "Good job ! The bomb is no more.\n" << endl;
+            game->addCaptured(attackedPiece, player);
+            setPosition(position);
+            game->removePiece(attackedPiece, opponent);
+            return;
+        } else {
+            cout << "Rest well ! The war is over for you.\n" << endl;
+            game->addCaptured(this, opponent);
+            board->removeFromBoard(this);
+            game->removePiece(this, player);
+            return;
         }
     }
 
-    for (int i = 1; i <= range; ++i) {
-        pair<int, int> posBelow = {x, y + i};
-        if (CheckBoard(posBelow,true)) {
-            string caseStatus = CheckCase(posBelow);
-            if (caseStatus != "Ally") {
-                possiblePositions.push_back(posBelow);
-            }
-            if (caseStatus != "Empty") {
-                break;
-            }
-        }
+    if (attackedPiece->type == PieceType::Marshal && type == PieceType::Spy) {
+        cout << "Well done sir ! Their leader is gone.\n" << endl;
+        game->addCaptured(attackedPiece, player);
+        setPosition(position);
+        game->removePiece(attackedPiece, opponent);
+        return;
     }
 
-    for (int i = 1; i <= range; ++i) {
-        pair<int, int> posLeft = {x - i, y};
-        if (CheckBoard(posLeft,true)) {
-            string caseStatus = CheckCase(posLeft);
-            if (caseStatus != "Ally") {
-                possiblePositions.push_back(posLeft);
-            }
-            if (caseStatus != "Empty") {
-                break;
-            }
-        }
-    }
 
-    for (int i = 1; i <= range; ++i) {
-        pair<int, int> posRight = {x + i, y};
-        if (CheckBoard(posRight,true)) {
-            string caseStatus = CheckCase(posRight);
-            if (caseStatus != "Ally") {
-                possiblePositions.push_back(posRight);
-            }
-            if (caseStatus != "Empty") {
-                break;
-            }
-        }
+    if (value > attackedPiece->value) {
+        cout << "The enemy is down ! It was a " << attackedPiece->type << ".\n" << endl;
+        game->addCaptured(attackedPiece, player);
+        setPosition(position);
+        game->removePiece(attackedPiece, opponent);
     }
+    else if (value < attackedPiece->value) {
+        cout << "The enemy is too strong ! It was a " << attackedPiece->type << ".\n" << endl;
+        board->removeFromBoard(this);
+        game->removePiece(this, player);
+        game->addCaptured(this, opponent);
+    }
+    else {
+        cout << "It's a tie ! It was a " << attackedPiece->type << " too.\n" << endl;
+        game->addCaptured(attackedPiece, player);
+        game->addCaptured(this, opponent);
+        board->removeFromBoard(this);
+        board->removeFromBoard(attackedPiece);
+        game->removePiece(this, player);
+        game->removePiece(attackedPiece, opponent);
 
-    return possiblePositions;
+    }
 }
+
+
 
 
 

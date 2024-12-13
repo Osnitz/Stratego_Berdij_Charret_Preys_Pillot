@@ -2,8 +2,8 @@
 // Created by estelle on 14/10/24.
 //
 
-#include "../state.h"
-#include "../engine.h"
+#include "state.h"
+#include "engine.h"
 #include <fstream>
 #include <sstream>
 #include <iostream>
@@ -13,17 +13,15 @@
 using namespace state;
 using namespace std;
 
-Player :: Player(int id) {
-    vector<Pieces*> myPieces;
-    vector<Pieces*>  capturedPieces= {nullptr};
-    vector<Pieces*>  knownPieces;
-    playerID = id;
+Player :: Player(): color(false) {
+    vector<Pieces *> myPieces;
+    vector<Pieces *> capturedPieces = {nullptr};
+    vector<Pieces *> knownPieces;
 }
 
 Player:: ~Player()= default;
 
-
-void Player::loadConfig(string fileName){
+void Player::loadConfig(const string& fileName){
     Game *game = Game::getInstance();
     Board *board = Board::getInstance();
     ifstream file(fileName);
@@ -34,7 +32,7 @@ void Player::loadConfig(string fileName){
     string line;
     getline(file, line);
     while (getline(file, line)) {
-        //cout << line << endl;
+        cout << line << endl;
         stringstream ss(line);
         string cell;
         vector<string> dataline;
@@ -44,64 +42,34 @@ void Player::loadConfig(string fileName){
             dataline.push_back(cell);
         }
 
-        std::string name = dataline.at(0);
+        auto type = static_cast<PieceType>(stoi(dataline.at(0)));
         int value = stoi(dataline.at(1));
         int x = stoi(dataline.at(2));
         int y = stoi(dataline.at(3));
 
-
         if (game->getCurrentPlayer() == game->getPlayer1()) {
-            Pieces* piece = new Pieces(value, name, x, y);
+            auto * piece = new Pieces(value, type, x, y, true);
             myPieces.push_back(piece);
             board->setPieceOnBoard(piece);
         }
         else {
-            Pieces* piece = new Pieces(value, name, 9 - x, y);
+            auto * piece = new Pieces(value, type, 9 - x, y, false);
             myPieces.push_back(piece);
             board->setPieceOnBoard(piece);
         }
     }
     board->displayBoard(*game->getCurrentPlayer());
-
-}
-
-void Player::removePiece(Pieces* piece) {
-    if (myPieces.empty()) {
-        cerr<<"No piece left"<<endl;
-        return;
-    }
-    for (size_t i = 0; i < myPieces.size(); i++) {
-        if (myPieces[i] == piece) {
-            myPieces.erase(myPieces.begin() + i);
-            return;
-        }
-    }
-    cerr<<"Can't remove this piece : it doesn't exist!"<<endl;
 }
 
 void Player::addPiece(Pieces* piece) {
     myPieces.push_back(piece);
 }
 
-void Player::addCaptured(Pieces *piece) {
-    Board::getInstance()->removeFromBoard(piece);
-    auto size=capturedPieces.size();
-    int value=piece->getValue();
-    for(std::size_t i=0;i<size;i++) {
-        int myvalue=capturedPieces[i]->getValue();
-        if(value<=myvalue) {
-            capturedPieces.insert(capturedPieces.begin()+i,piece);
-            return;
-        }
-    }
-    capturedPieces.push_back(piece);
-}
-
-vector<Pieces*> Player:: getCaptured() {
+std::vector<Pieces *> &Player::getCaptured() {
     return capturedPieces;
 }
 
-vector<Pieces*> Player:: getMyPieces() {
+std::vector<Pieces *> &Player::getMyPieces() {
     return myPieces;
 }
 
@@ -121,12 +89,6 @@ void Player:: displayCaptured () {
     }
     auto size=capturedPieces.size();
     for(size_t i=0;i<size;i++) {
-        cout << capturedPieces[i]->getName()<< endl;
+        cout << capturedPieces[i]->getType()<< endl;
     }
-
-}
-
-int Player::getPlayerID()
-{
-    return playerID;
 }
