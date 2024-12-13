@@ -3,9 +3,7 @@
 //
 
 #include "state.h"
-#include "engine.h"
 #include <iostream>
-#include <random>
 #include <utility>
 
 using namespace std;
@@ -33,7 +31,7 @@ pair<int, int> Pieces::getPosition() {
     return {x, y};
 }
 
-int Pieces::getValue()  {
+int Pieces::getValue() {
     return value;
 }
 
@@ -41,7 +39,7 @@ PieceType Pieces::getType() {
     return type;
 }
 
-int Pieces::getRange()  {
+int Pieces::getRange() {
     return range;
 }
 
@@ -67,21 +65,21 @@ bool Pieces::LimitBoard(const pair<int, int>& &position, bool silent){
     return true;
 }
 
-bool Pieces::isEmpty (Pieces * targetPiece) {
+bool Pieces::isEmpty (const Pieces * targetPiece) {
     if (targetPiece == nullptr) {
         return true;
     }
     return false;
 }
 
-bool Pieces::IsAlly(Pieces *targetPiece) {
+bool Pieces::IsAlly(const Pieces *targetPiece) {
     if(color==targetPiece->color) {
         return true;
     }
     return false;
 }
 
-bool Pieces::isEnemy(Pieces *targetPiece) {
+bool Pieces::isEnemy(const Pieces *targetPiece) {
     if(color!=targetPiece->color) {
         return true;
     }

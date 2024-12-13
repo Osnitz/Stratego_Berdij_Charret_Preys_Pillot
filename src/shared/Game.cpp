@@ -74,7 +74,7 @@ using namespace std;
         return currentPlayer;
     }
 
-    Player* Game::getOpponent() const {
+    Player* Game::getOpponent() {
         if (currentPlayer == Player1) {
             return Player2;
         } else if (currentPlayer == Player2) {
