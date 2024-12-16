@@ -12,7 +12,6 @@ void testSFML() {
 #include <state.h>
 #include <engine.h>
 #include <client.h>
-#include "client/PlayerController.h"
 
 
 using namespace std;
@@ -25,8 +24,7 @@ using namespace state;
 
 int main() {
 
-    Board* board = Board::getInstance();
-    Game* game = Game::getInstance();
+    Game* game = new Game();
     std::vector<Player*> players = {game->getPlayer1(), game->getPlayer2()};
 
     auto gameEngine = new engine::Engine(game, players);
@@ -48,9 +46,9 @@ int main() {
     {
         test++;
         auto currentPlayer = game->getCurrentPlayer();
-        board->displayBoard(*currentPlayer);
+        game->displayBoard(*currentPlayer);
         auto playerController = scenarioManager->getPlayerController(currentPlayer);
-        auto coords = playerController->getUserInput();
+        auto coords = playerController->getPlayerInput();
         auto from = std::make_pair(coords[0], coords[1]);
         auto to = std::make_pair(coords[2], coords[3]);
         if (!playerController->executeCmd(from, to, game->getCurrentPlayer()))

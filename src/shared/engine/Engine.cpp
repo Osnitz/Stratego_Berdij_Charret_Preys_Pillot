@@ -5,6 +5,7 @@
 #include <state/Pieces.h>
 #include <state/PieceType.h>
 #include <state/Player.h>
+#include <state.h>
 
 #include "../engine.h"
 
@@ -19,7 +20,6 @@ Engine::Engine(Game* game, vector<Player*> players)
 
 void Engine::startGame()
 {
-    currentPlayerIndex = 0; // Commence avec le premier joueur
     game->switchTurn();
     std::cout << "Game started. Entering Placement Phase." << endl;
 }
