@@ -2437,7 +2437,7 @@
             <dia:string>##</dia:string>
           </dia:attribute>
           <dia:attribute name="type">
-            <dia:string>#vector&lt;vector&lt;Pieces *&gt;&gt;#</dia:string>
+            <dia:string>#std::vector&lt;std::vector&lt;Pieces *&gt;&gt;#</dia:string>
           </dia:attribute>
           <dia:attribute name="visibility">
             <dia:enum val="0"/>
