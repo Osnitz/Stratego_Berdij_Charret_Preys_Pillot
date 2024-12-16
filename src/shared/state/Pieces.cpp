@@ -11,8 +11,8 @@ using namespace std;
 using namespace state;
 using namespace engine;
 
-Pieces::Pieces(const int value, const PieceType type, int x, int y, bool color)
-        : color(color), type(type), value(value), x(x), y(y) {
+Pieces::Pieces(const int value, const PieceType type, int x, int y, Player* PlayerID)
+        : PlayerID(PlayerID), type(type), value(value), x(x), y(y) {
 
     if (type == PieceType::Scout) {
         range = 10;
@@ -42,12 +42,10 @@ int Pieces::getRange() {
 }
 
 void Pieces::setCoord(const pair<int, int> &position) {
-  	Board *board = Board::getInstance();
+
     int newx = position.first;
     int newy = position.second;
-    board->removeFromBoard(this);
     this->x = newx;
     this->y = newy;
-    board->setPieceOnBoard(this);
     cout << type << " was moved to (" << newx << ", " << newy << ").\n" << endl;
 }

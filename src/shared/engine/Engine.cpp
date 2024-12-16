@@ -2,6 +2,9 @@
 // Created by plt on 11/12/24.
 //
 #include <iostream>
+#include <state/Pieces.h>
+#include <state/PieceType.h>
+#include <state/Player.h>
 
 #include "../engine.h"
 
@@ -31,7 +34,7 @@ void Engine::endTurn()
 bool Engine::handleCmdPlacement(string filePath)
 {
     auto currentPlayer = game->currentPlayer;
-    currentPlayer->loadConfig(filePath);
+    game->loadConfig(filePath);
     endTurn();
     return true;
 }
@@ -39,10 +42,10 @@ bool Engine::handleCmdPlacement(string filePath)
 
 bool Engine::handleCmdMove(pair<int, int> from, pair<int, int> to)
 {
-    auto board = Board::getInstance();
+    auto board=game->getBoard();
     auto mypiece = board->getPiece(from);
     auto currentplayer = game->currentPlayer;
-    if (!currentplayer->belongTo(mypiece))
+    if (!game->belongTo(mypiece))
     {
         cerr << "This is not your piece !" << endl;
         return false;
@@ -53,9 +56,9 @@ bool Engine::handleCmdMove(pair<int, int> from, pair<int, int> to)
         return false;
     }
     auto targetpiece = board->getPiece(to);
-    if (mypiece->isEmpty(targetpiece))
+    if (game->IsEmpty(targetpiece))
     {
-        mypiece->setPosition(to);
+        game->SetPieceOnBoard(mypiece,to.first,to.second);
         endTurn();
         return true;
     }
@@ -77,21 +80,21 @@ void Engine::attack(Pieces* mypiece, pair<int, int>& position)
         return;
     }
     auto myvalue=mypiece->getValue();
-    auto mytype=mypiece->type;
+    auto mytype=mypiece->getType();
     auto othersvalue=attackedPiece->getValue();
-    auto otherstype=attackedPiece->type;
+    auto otherstype=attackedPiece->getType();
 
     if (otherstype == PieceType::Bomb) {
         if (mytype == PieceType::Miner) {
             cout << "Good job ! The bomb is no more.\n" << endl;
             game->addCaptured(attackedPiece, currentplayer);
-            mypiece->setCoord(position);
+            game->SetPieceOnBoard(mypiece,position.first,position.second);
             game->removePiece(attackedPiece, opponent);
             return;
         } else {
             cout << "Rest well ! The war is over for you.\n" << endl;
             game->addCaptured(mypiece, opponent);
-            board->removeFromBoard(mypiece);
+            game->RemoveFromBoard(mypiece);
             game->removePiece(mypiece, currentplayer);
             return;
         }
@@ -100,7 +103,7 @@ void Engine::attack(Pieces* mypiece, pair<int, int>& position)
     if (otherstype == PieceType::Marshal && mytype == PieceType::Spy) {
         cout << "Well done sir ! Their leader is gone.\n" << endl;
         game->addCaptured(attackedPiece, currentplayer);
-        mypiece->setCoord(position);
+        game->SetPieceOnBoard(mypiece,position.first,position.second);
         game->removePiece(attackedPiece, opponent);
         return;
     }
@@ -109,12 +112,12 @@ void Engine::attack(Pieces* mypiece, pair<int, int>& position)
     if (myvalue > othersvalue) {
         cout << "The enemy is down ! It was a " << otherstype << ".\n" << endl;
         game->addCaptured(attackedPiece, currentplayer);
-        mypiece->setCoord(position);
+        game->SetPieceOnBoard(mypiece,position.first,position.second);
         game->removePiece(attackedPiece, opponent);
     }
     else if (myvalue < othersvalue) {
         cout << "The enemy is too strong ! It was a " << otherstype << ".\n" << endl;
-        board->removeFromBoard(mypiece);
+        game->RemoveFromBoard(mypiece);
         game->removePiece(mypiece, currentplayer);
         game->addCaptured(mypiece, opponent);
     }
@@ -122,8 +125,8 @@ void Engine::attack(Pieces* mypiece, pair<int, int>& position)
         cout << "It's a tie ! It was a " << otherstype << " too.\n" << endl;
         game->addCaptured(attackedPiece, currentplayer);
         game->addCaptured(mypiece, opponent);
-        board->removeFromBoard(mypiece);
-        board->removeFromBoard(attackedPiece);
+        game->RemoveFromBoard(mypiece);
+        game->RemoveFromBoard(attackedPiece);
         game->removePiece(mypiece, currentplayer);
         game->removePiece(attackedPiece, opponent);
 

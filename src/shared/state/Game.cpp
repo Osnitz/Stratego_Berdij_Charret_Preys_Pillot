@@ -5,6 +5,8 @@
 #include <iostream>
 #include <sstream>
 #include <stdexcept>
+#include <vector>
+#include <algorithm>
 
 #include "../state.h"
 #include "../engine.h"
@@ -16,8 +18,8 @@ using namespace std;
 Game::Game()
 {
     board = new Board();
-    Player1 = new Player(0);
-    Player2 = new Player(1);
+    Player1 = new Player();
+    Player2 = new Player();
     currentPlayer = nullptr;
 
     std::random_device rd;  // Obtain a random number from hardware
@@ -71,18 +73,19 @@ Player* Game::getPlayer2()
     return Player2;
 }
 
-void Game::setCurrentPlayer(Player* player)
+void Game::SetCurrentPlayer(Player* player)
 {
     currentPlayer = player;
 }
 
-void Game::setPieceOnBoard(Pieces* piece) {
-    pair<int, int> position = piece->getPosition();
+void Game::SetPieceOnBoard(Pieces* piece, int newX, int newY) {
+    RemoveFromBoard(piece);
+    piece->setCoord({newX,newY});
     auto grid=board->getGrid();
-    *grid[position.first][position.second] = piece;
+    *grid[newX][newY] = piece;
 }
 
-void Game::removeFromBoard(Pieces* piece) {
+void Game::RemoveFromBoard(Pieces* piece) {
     pair<int, int> position = piece->getPosition();
     auto grid=board->getGrid();
     grid[position.first][position.second] = nullptr;
@@ -114,7 +117,7 @@ vector<pair<int, int>> Game::PossiblePositions(Pieces* pieceToMove) {
             }
             Pieces *targetPiece=board->getPiece(posToCheck);
 
-            if (pieceToMove->LimitBoard(posToCheck,true)) {
+            if (LimitBoard(posToCheck,true)) {
                 if (IsAlly(targetPiece)){
                     break;
                 }
@@ -168,14 +171,14 @@ void Game::loadConfig(const string& fileName){
         int y = stoi(dataline.at(3));
 
         if (currentPlayer == Player1) {
-            auto * piece = new Pieces(value, type, x, y, true);
+            auto * piece = new Pieces(value, type, x, y, Player1);
             currentPlayer->getMyPieces().push_back(piece);
-            board->setPieceOnBoard(piece);
+            SetPieceOnBoard(piece);
         }
         else {
-            auto * piece = new Pieces(value, type, 9 - x, y, false);
+            auto * piece = new Pieces(value, type, 9 - x, y, Player2);
             currentPlayer->getMyPieces().push_back(piece);
-            board->setPieceOnBoard(piece);
+            SetPieceOnBoard(piece);
         }
     }
     board->displayBoard(*currentPlayer);
@@ -211,15 +214,64 @@ bool Game::IsEmpty (const Pieces * targetPiece) {
 }
 
 bool Game::IsAlly(const Pieces *targetPiece) {
-    if(currentPlayer==targetPiece->Playerid) {
+    if(currentPlayer==targetPiece->getPlayerID()) {
         return true;
     }
     return false;
 }
 
 bool Game::IsEnemy(const Pieces *targetPiece) {
-    if(currentPlayer!=targetPiece->Playerid) {
+    if(currentPlayer!=targetPiece->getPlayerID()) {
         return true;
     }
     return false;
+}
+
+void Game::displayBoard(Player &player) {
+    auto grid=board->getGrid();
+    // Print the first line of column's number in the grid
+    cout << "    "; // Initial alignment for the first row of the grid
+    for (size_t col = 0; col < grid[0].size(); ++col) {
+        cout << "   " << col << "   "; // Adjusting the spacing for column numbers
+    }
+    cout << endl;
+
+    // Display the bounding line under column numbers
+    std::cout << "   "; // Initial alignment for dashes
+    for (std::size_t col = 0; col < grid[0].size(); ++col) {
+        std::cout << "-------"; // Horizontal delineation
+    }
+    std::cout << "-" << std::endl; // End of the delineation to the right
+
+    // Print the grid with the pieces
+    for (size_t row = 0; row < grid.size(); ++row) {
+        cout << row << "  "; // Print line's numbers inside the grid
+        for (size_t col = 0; col < grid[row].size(); ++col) {
+            if ((row == 4 && (col == 2 || col == 3 || col == 6 || col == 7)) || (row == 5 && (col == 2 || col == 3 || col == 6 || col == 7))) {
+                cout << "|  XX  "; // Lacs
+            } else {
+                Pieces* piece = grid[row][col];
+                if (piece == nullptr) {
+                    cout << "|      "; // Empty box
+                } else if (belongTo(piece,player)) {
+                    int value = piece->getValue();
+                    if (value < 10) {
+                        cout << "|  0" << piece->getValue() << "  ";
+                    } else {
+                        cout << "|  " << piece->getValue() << "  ";
+                    }
+                } else {
+                    cout << "|  ??  "; // Enemy's piece
+                }
+            }
+        }
+        cout << "|" << endl;
+
+        // Display the bounding line under each line
+        cout << "   "; // Alignment for dashes
+        for (size_t col = 0; col < grid[0].size(); ++col) {
+            cout << "-------"; // Horizontal delineation
+        }
+        cout << "-" << endl; // End of the delineation to the right
+    }
 }

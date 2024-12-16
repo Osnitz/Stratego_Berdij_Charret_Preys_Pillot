@@ -4,10 +4,8 @@
 
 #include "state.h"
 #include <fstream>
-#include <sstream>
 #include <iostream>
 #include <vector>
-#include <algorithm>
 
 using namespace state;
 using namespace std;
