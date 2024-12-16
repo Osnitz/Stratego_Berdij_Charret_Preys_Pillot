@@ -2,8 +2,6 @@
 // Created by plt on 11/12/24.
 //
 #include <iostream>
-#include <state/Pieces.h>
-#include <state/PieceType.h>
 
 #include "../engine.h"
 

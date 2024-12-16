@@ -3,15 +3,13 @@
 //
 
 #include "state.h"
+#include "Pieces.h"
 #include <iostream>
 #include <utility>
 
 using namespace std;
 using namespace state;
 using namespace engine;
-
-
-auto game = Game::getInstance();
 
 Pieces::Pieces(const int value, const PieceType type, int x, int y, bool color)
         : color(color), type(type), value(value), x(x), y(y) {
