@@ -74,73 +74,62 @@ Player* Engine::getOpponent()
 }
 
 
-void Engine::attack(Pieces* mypiece, pair<int, int>& position)
-{
-    Board* board = Board::getInstance();
-    Pieces* attackedPiece = board->getPiece(position);
-    auto currentplayer = game->currentPlayer;
-    auto opponent = getOpponent();
+void Engine::attack(const pair<int, int> &position) {
+	Board *board = Board::getInstance();
+    Pieces *attackedPiece = board->getPiece(position);
+    auto player = game->getCurrentPlayer();
+    auto opponent = game->getOpponent();
 
-    if (attackedPiece == nullptr)
-    {
+    if (attackedPiece == nullptr) {
         cerr << "No target found" << endl;
         return;
     }
 
-    auto myname = mypiece->getName();
-    auto othersName = attackedPiece->getName();
-
-    if (othersName == "Bomb")
-    {
-        if (myname == "Miner")
-        {
+    if (attackedPiece->type == PieceType::Bomb) {
+        if (type == PieceType::Miner) {
             cout << "Good job ! The bomb is no more.\n" << endl;
-            currentplayer->addCaptured(attackedPiece);
-            mypiece->setPosition(position);
-            opponent->removePiece(attackedPiece);
+            game->addCaptured(attackedPiece, player);
+            setPosition(position);
+            game->removePiece(attackedPiece, opponent);
+            return;
+        } else {
+            cout << "Rest well ! The war is over for you.\n" << endl;
+            game->addCaptured(this, opponent);
+            board->removeFromBoard(this);
+            game->removePiece(this, player);
             return;
         }
-
-        cout << "Rest well ! The war is over for you.\n" << endl;
-        currentplayer->addCaptured(attackedPiece);
-        board->removeFromBoard(mypiece);
-        currentplayer->removePiece(mypiece);
-        opponent->addPiece(mypiece);
-        opponent->removePiece(attackedPiece);
-        return;
     }
 
-    if (othersName == "Marshal" && myname == "Spy")
-    {
+    if (attackedPiece->type == PieceType::Marshal && type == PieceType::Spy) {
         cout << "Well done sir ! Their leader is gone.\n" << endl;
-        currentplayer->addCaptured(attackedPiece);
-        mypiece->setPosition(position);
-        opponent->removePiece(attackedPiece);
+        game->addCaptured(attackedPiece, player);
+        setPosition(position);
+        game->removePiece(attackedPiece, opponent);
         return;
     }
 
-    if (mypiece->getValue() > attackedPiece->getValue())
-    {
-        cout << "The enemy is down ! It was a " << othersName << ".\n" << endl;
-        currentplayer->addCaptured(attackedPiece);
-        mypiece->setPosition(position);
-        opponent->removePiece(attackedPiece);
+
+    if (value > attackedPiece->value) {
+        cout << "The enemy is down ! It was a " << attackedPiece->type << ".\n" << endl;
+        game->addCaptured(attackedPiece, player);
+        setPosition(position);
+        game->removePiece(attackedPiece, opponent);
     }
-    else if (mypiece->getValue() < attackedPiece->getValue())
-    {
-        cout << "The enemy is too strong ! It was a " << othersName << ".\n" << endl;
-        board->removeFromBoard(mypiece);
-        currentplayer->removePiece(mypiece);
-        opponent->addPiece(mypiece);
+    else if (value < attackedPiece->value) {
+        cout << "The enemy is too strong ! It was a " << attackedPiece->type << ".\n" << endl;
+        board->removeFromBoard(this);
+        game->removePiece(this, player);
+        game->addCaptured(this, opponent);
     }
-    else
-    {
-        cout << "It's a tie ! It was a " << othersName << " too.\n" << endl;
-        currentplayer->addCaptured(attackedPiece);
-        board->removeFromBoard(mypiece);
-        currentplayer->removePiece(mypiece);
-        opponent->addPiece(mypiece);
-        opponent->removePiece(attackedPiece);
+    else {
+        cout << "It's a tie ! It was a " << attackedPiece->type << " too.\n" << endl;
+        game->addCaptured(attackedPiece, player);
+        game->addCaptured(this, opponent);
+        board->removeFromBoard(this);
+        board->removeFromBoard(attackedPiece);
+        game->removePiece(this, player);
+        game->removePiece(attackedPiece, opponent);
     }
 }
 
