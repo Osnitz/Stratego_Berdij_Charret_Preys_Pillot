@@ -41,7 +41,7 @@ int Pieces::getRange() {
     return range;
 }
 
-void Pieces::setCoord(const pair<int, int> &position) {
+void Pieces::setCoord(pair<int, int> &position) {
 
     int newx = position.first;
     int newy = position.second;

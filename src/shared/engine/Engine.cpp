@@ -39,7 +39,6 @@ bool Engine::handleCmdPlacement(string filePath)
     return true;
 }
 
-
 bool Engine::handleCmdMove(pair<int, int> from, pair<int, int> to)
 {
     auto board=game->getBoard();
