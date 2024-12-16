@@ -81,13 +81,13 @@ void Game::setCurrentPlayer(Player *player)
 void Game::SetPieceOnBoard(Pieces* piece, int newX, int newY) {
     RemoveFromBoard(piece);
     piece->setCoord(newX,newY);
-    auto grid=*board->getGrid();
+    auto& grid=*board->getGrid();
     grid[newX][newY] = piece;
 }
 
 void Game::RemoveFromBoard(Pieces* piece) {
     pair<int, int> position = piece->getPosition();
-    auto grid=*board->getGrid();
+    auto& grid=*board->getGrid();
     grid[position.first][position.second] = nullptr;
 }
 
@@ -228,7 +228,7 @@ bool Game::IsEnemy(Pieces *targetPiece) {
 }
 
 void Game::displayBoard(Player &player) {
-    auto grid=*board->getGrid();
+    auto& grid=*board->getGrid();
     // Print the first line of column's number in the grid
     cout << "    "; // Initial alignment for the first row of the grid
     for (size_t col = 0; col < grid[0].size(); ++col) {
