@@ -73,16 +73,17 @@ Player* Game::getPlayer2()
     return Player2;
 }
 
-void Game::SetCurrentPlayer(Player* player)
+void Game::setCurrentPlayer(Player *player)
 {
     currentPlayer = player;
 }
 
 void Game::SetPieceOnBoard(Pieces* piece, int newX, int newY) {
     RemoveFromBoard(piece);
-    piece->setCoord({newX,newY});
+    pair<int,int> newpos={newX,newY};
+    piece->setCoord(newpos);
     auto grid=board->getGrid();
-    *grid[newX][newY] = piece;
+    *grid[newX][newY] = *piece;
 }
 
 void Game::RemoveFromBoard(Pieces* piece) {
@@ -173,15 +174,15 @@ void Game::loadConfig(string& fileName){
         if (currentPlayer == Player1) {
             auto * piece = new Pieces(value, type, x, y, Player1);
             currentPlayer->getMyPieces().push_back(piece);
-            SetPieceOnBoard(piece);
+            SetPieceOnBoard(piece,x,y);
         }
         else {
             auto * piece = new Pieces(value, type, 9 - x, y, Player2);
             currentPlayer->getMyPieces().push_back(piece);
-            SetPieceOnBoard(piece);
+            SetPieceOnBoard(piece,9-x,y);
         }
     }
-    board->displayBoard(*currentPlayer);
+    displayBoard(*currentPlayer);
 }
 
 bool Game::LimitBoard(pair<int, int>& &position, bool silent){
@@ -214,14 +215,14 @@ bool Game::IsEmpty ( Pieces * targetPiece) {
 }
 
 bool Game::IsAlly(Pieces *targetPiece) {
-    if(currentPlayer==targetPiece->getPlayerID()) {
+    if(currentPlayer== targetPiece->getOwner()) {
         return true;
     }
     return false;
 }
 
 bool Game::IsEnemy(Pieces *targetPiece) {
-    if(currentPlayer!=targetPiece->getPlayerID()) {
+    if(currentPlayer!=targetPiece->getOwner()) {
         return true;
     }
     return false;

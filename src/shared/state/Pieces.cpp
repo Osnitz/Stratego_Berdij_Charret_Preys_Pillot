@@ -11,8 +11,8 @@ using namespace std;
 using namespace state;
 using namespace engine;
 
-Pieces::Pieces(const int value, const PieceType type, int x, int y, Player* PlayerID)
-        : PlayerID(PlayerID), type(type), value(value), x(x), y(y) {
+Pieces::Pieces(const int value, const PieceType type, int x, int y, Player* owner)
+        : owner (owner), type(type), value(value), x(x), y(y) {
 
     if (type == PieceType::Scout) {
         range = 10;
@@ -48,4 +48,8 @@ void Pieces::setCoord(pair<int, int> &position) {
     this->x = newx;
     this->y = newy;
     cout << type << " was moved to (" << newx << ", " << newy << ").\n" << endl;
+}
+
+Player *Pieces::getOwner() {
+    return owner;
 }
