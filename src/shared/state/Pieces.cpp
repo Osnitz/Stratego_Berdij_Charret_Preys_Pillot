@@ -41,10 +41,7 @@ int Pieces::getRange() {
     return range;
 }
 
-void Pieces::setCoord(pair<int, int> &position) {
-
-    int newx = position.first;
-    int newy = position.second;
+void Pieces::setCoord(int newx, int newy) {
     this->x = newx;
     this->y = newy;
     cout << type << " was moved to (" << newx << ", " << newy << ").\n" << endl;
