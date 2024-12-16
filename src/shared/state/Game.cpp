@@ -41,7 +41,6 @@ Game::~Game()
     //delete currentState;
 }
 
-
 void Game::switchTurn()
 {
     if (currentPlayer == Player1)
@@ -184,7 +183,7 @@ void Game::loadConfig(string& fileName){
     displayBoard(*currentPlayer);
 }
 
-bool Game::LimitBoard(pair<int, int>& &position, bool silent){
+bool Game::LimitBoard(pair<int, int>& position, bool silent){
     int NewX = position.first;
     int NewY = position.second;
     if ((NewX < 0) || (NewY < 0) || (NewX > 9) || (NewY > 9)) {
@@ -274,4 +273,18 @@ void Game::displayBoard(Player &player) {
         }
         cout << "-" << endl; // End of the delineation to the right
     }
+}
+
+void Game::addCaptured(Pieces *piece, Player * player) {
+    auto& capturedPieces=player->getCaptured();
+    auto size=capturedPieces.size();
+    int value=piece->getValue();
+    for(std::size_t i=0;i<size;i++) {
+        int myvalue=capturedPieces[i]->getValue();
+        if(value<=myvalue) {
+            capturedPieces.insert(capturedPieces.begin()+i,piece);
+            return;
+        }
+    }
+    capturedPieces.push_back(piece);
 }

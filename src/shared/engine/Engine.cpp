@@ -17,14 +17,12 @@ Engine::Engine(Game* game, vector<Player*> players)
 {
 }
 
-
 void Engine::startGame()
 {
     currentPlayerIndex = 0; // Commence avec le premier joueur
     game->switchTurn();
     std::cout << "Game started. Entering Placement Phase." << endl;
 }
-
 
 void Engine::endTurn()
 {
@@ -143,4 +141,8 @@ bool Engine::isValidMove(Pieces* piece, pair<int, int> to)
         }
     }
     return false;
+}
+
+Game * Engine::getGame() {
+    return game;
 }

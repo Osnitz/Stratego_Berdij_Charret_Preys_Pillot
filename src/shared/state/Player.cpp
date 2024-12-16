@@ -36,3 +36,7 @@ void Player:: displayCaptured () {
         cout << capturedPieces[i]->getType()<< endl;
     }
 }
+
+int Player::getPlayerID() {
+    return PlayerID;
+}
