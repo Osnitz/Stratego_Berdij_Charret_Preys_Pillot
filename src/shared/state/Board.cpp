@@ -8,8 +8,6 @@
 using namespace state;
 using namespace std;
 
-Board* Board::instance = nullptr;
-
 Board::Board() {
     // Initialize a 10x10 grid with nullptr (representing empty spaces)
     grid.resize(10, vector<Pieces*>(10, nullptr));
@@ -17,13 +15,6 @@ Board::Board() {
 
 Board::~Board() {
     delete instance;
-}
-
-Board* Board::getInstance() {
-    if (!instance) {
-        instance = new Board();
-    }
-    return instance;
 }
 
 void Board::displayBoard(Player &player) {
@@ -84,53 +75,8 @@ Pieces* Board::getPiece(std::pair<int, int> position) {
     return nullptr;;
 }
 
-void Board::setPieceOnBoard(Pieces* piece) {
-    std::pair<int, int> position = piece->getPosition();
-    grid[position.first][position.second] = piece;
-}
 
-void Board::removeFromBoard(Pieces* piece) {
-    std::pair<int, int> position = piece->getPosition();
-    grid[position.first][position.second] = nullptr;
-}
 
-vector<pair<int, int>> Board::PossiblePositions(Pieces* pieceToMove) {
-    vector<pair<int, int>> possiblePositions;
-
-    if (pieceToMove == nullptr) {
-        return possiblePositions;
-    }
-
-    int x = pieceToMove->getPosition().first;
-    int y = pieceToMove->getPosition().second;
-    int range = pieceToMove->getRange();
-    pair<int,int> posToCheck;
-
-    for(int j=1; j<=4;j++) {
-        for (int i = 1; i <= range; ++i) {
-            switch (j) {
-                case 1: posToCheck = {x, y - i};
-                    break;
-                case 2: posToCheck = {x, y + i};
-                    break;
-                case 3: posToCheck = {x-i, y };
-                    break;
-                case 4: posToCheck = {x+i, y};
-                    break;
-            }
-            Pieces *targetPiece=getPiece(posToCheck);
-
-            if (pieceToMove->LimitBoard(posToCheck,true)) {
-                if (pieceToMove->IsAlly(targetPiece)){
-                    break;
-                }
-                possiblePositions.push_back(posToCheck);
-                if (pieceToMove->isEnemy(targetPiece)) {
-                    break;
-                }
-            }
-        }
-    }
-
-    return possiblePositions;
+vector<vector<Pieces * >>* Board::getGrid() {
+    return &grid;
 }
