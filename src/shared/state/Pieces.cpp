@@ -12,7 +12,7 @@ using namespace state;
 using namespace engine;
 
 Pieces::Pieces(const int value, const PieceType type, int x, int y, Player* PlayerID)
-        : PlayerID(PlayerID), type(type), value(value), x(x), y(y) {
+        : owner(owner), type(type), value(value), x(x), y(y) {
 
     if (type == PieceType::Scout) {
         range = 10;

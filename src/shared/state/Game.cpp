@@ -73,14 +73,14 @@ Player* Game::getPlayer2()
     return Player2;
 }
 
-void Game::SetCurrentPlayer(Player* player)
+void Game::setCurrentPlayer(Player* player)
 {
     currentPlayer = player;
 }
 
 void Game::SetPieceOnBoard(Pieces* piece, int newX, int newY) {
     RemoveFromBoard(piece);
-    piece->setCoord({newX,newY});
+    piece->setCoord(newX,newY);
     auto grid=board->getGrid();
     *grid[newX][newY] = piece;
 }
