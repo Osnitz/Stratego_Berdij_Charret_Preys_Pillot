@@ -146,7 +146,7 @@ void Game::addPiece(Pieces* piece, Player * player) {
     myPieces.push_back(piece);
 }
 
-void Game::loadConfig(const string& fileName){
+void Game::loadConfig(string& fileName){
     ifstream file(fileName);
 
     if (!file.is_open()) {
@@ -184,7 +184,7 @@ void Game::loadConfig(const string& fileName){
     board->displayBoard(*currentPlayer);
 }
 
-bool Game::LimitBoard(const pair<int, int>& &position, bool silent){
+bool Game::LimitBoard(pair<int, int>& &position, bool silent){
     int NewX = position.first;
     int NewY = position.second;
     if ((NewX < 0) || (NewY < 0) || (NewX > 9) || (NewY > 9)) {
@@ -206,21 +206,21 @@ bool Game::LimitBoard(const pair<int, int>& &position, bool silent){
     return true;
 }
 
-bool Game::IsEmpty (const Pieces * targetPiece) {
+bool Game::IsEmpty ( Pieces * targetPiece) {
     if (targetPiece == nullptr) {
         return true;
     }
     return false;
 }
 
-bool Game::IsAlly(const Pieces *targetPiece) {
+bool Game::IsAlly(Pieces *targetPiece) {
     if(currentPlayer==targetPiece->getPlayerID()) {
         return true;
     }
     return false;
 }
 
-bool Game::IsEnemy(const Pieces *targetPiece) {
+bool Game::IsEnemy(Pieces *targetPiece) {
     if(currentPlayer!=targetPiece->getPlayerID()) {
         return true;
     }
@@ -253,7 +253,7 @@ void Game::displayBoard(Player &player) {
                 Pieces* piece = grid[row][col];
                 if (piece == nullptr) {
                     cout << "|      "; // Empty box
-                } else if (belongTo(piece,player)) {
+                } else if (belongTo(piece)) {
                     int value = piece->getValue();
                     if (value < 10) {
                         cout << "|  0" << piece->getValue() << "  ";
