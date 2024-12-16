@@ -72,6 +72,28 @@ Player* Game::getPlayer2()
     return Player2;
 }
 
+Player* Game::getOpponent() {
+    if (currentPlayer==Player1) {
+        return Player2;
+    }
+    return Player1;
+}
+
+void Game::removePiece(Pieces* piece, Player* player) {
+    auto& myPieces=player->getMyPieces();
+    if (myPieces.empty()) {
+        cerr<<"No piece left"<<endl;
+        return;
+    }
+    for (size_t i = 0; i < myPieces.size(); i++) {
+        if (myPieces[i] == piece) {
+            myPieces.erase(myPieces.begin() + i);
+            return;
+        }
+    }
+    cerr<<"Can't remove this piece : it doesn't exist!"<<endl;
+}
+
 void Game::setCurrentPlayer(Player *player)
 {
     currentPlayer = player;
