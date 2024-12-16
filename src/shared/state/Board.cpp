@@ -25,8 +25,6 @@ Pieces* Board::getPiece(std::pair<int, int> position) {
     return nullptr;;
 }
 
-
-
 vector<vector<Pieces * >>* Board::getGrid() {
     return &grid;
 }
