@@ -11,12 +11,12 @@
 using namespace client;
 
 
-HumanController::HumanController(engine::Engine* eng, int id, ai::AIInterface* aiModule)
-    : PlayerController(eng, id, aiModule)
+HumanController::HumanController(engine::Engine* eng, int playerID, ai::AIInterface* aiModule)
+    : PlayerController(eng, aiModule, playerID)
 {
     engine = eng;
-    playerID = id;
     this->aiModule = aiModule;
+    playerIdx = playerID;
 }
 
 
@@ -30,7 +30,7 @@ std::vector<int> HumanController::getPlayerInput()
     std::vector<int> coords;
     int startX, startY, endX, endY;
 
-    std::cout << "Player " << playerID << ", enter the coordinates of the piece to move (e.g. '2 3'): \n";
+    std::cout << "Player " << playerIdx << ", enter the coordinates of the piece to move (e.g. '2 3'): \n";
     std::cin >> startX >> startY;
     coords.push_back(startX);
     coords.push_back(startY);
@@ -51,11 +51,37 @@ bool HumanController::executeCmd(std::pair<int, int> from, std::pair<int, int> t
 
 int HumanController::getPlayerID()
 {
-    return playerID;
+  //  return playerID;
 }
 
 HumanController::~HumanController()
 {
     delete aiModule;
     delete engine;
+}
+
+void HumanController::handlePlacement(state::Game* game)
+{
+    auto currentPlayer = game->getCurrentPlayer();
+    std::cout << "Player " << currentPlayer->getPlayerID() << ", choose your configuration " << std::endl;
+    std::cout << "(1: Offensive, 2:Defensive, 3:Balance): " << std::endl;
+    int choice;
+    std::cin >> choice;
+    std::string filePath;
+    switch (choice)
+    {
+    case 1:
+        filePath = "../src/shared/state/config/Offensive.csv";
+        break;
+    case 2:
+        filePath = "../src/shared/state/config/Defensive.csv";
+        break;
+    case 3:
+        filePath = "../src/shared/state/config/Balance.csv";
+        break;
+    default:
+        std::cerr << "Invalid choice. Please choose a configuration (1: Offensive, 2:Defensive, 3:Balance): " <<
+            std::endl;
+    }
+    engine->handleCmdPlacement(filePath);
 }

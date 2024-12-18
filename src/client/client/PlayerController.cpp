@@ -6,11 +6,11 @@
 
 using namespace client;
 
-PlayerController::PlayerController(engine::Engine * eng , int id, ai::AIInterface* aiModule)
+PlayerController::PlayerController(engine::Engine * eng, ai::AIInterface* aiModule, int playerID)
 {
     engine = eng;
-    playerID = id;
     this->aiModule = aiModule;
+    playerIdx = playerID;
 }
 
 PlayerController::~PlayerController()

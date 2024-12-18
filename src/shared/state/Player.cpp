@@ -10,10 +10,11 @@
 using namespace state;
 using namespace std;
 
-Player :: Player() {
+Player :: Player(int PlayerID):PlayerID(PlayerID) {
     vector<Pieces *> myPieces;
     vector<Pieces *> capturedPieces = {nullptr};
     vector<Pieces *> knownPieces;
+
 }
 
 Player:: ~Player()= default;

@@ -20,8 +20,8 @@ using namespace std;
 Game::Game()
 {
     board = new Board();
-    Player1 = new Player();
-    Player2 = new Player();
+    Player1 = new Player(0);
+    Player2 = new Player(1);
     currentPlayer = nullptr;
 
     std::random_device rd; // Obtain a random number from hardware
@@ -210,7 +210,7 @@ void Game::loadConfig(string& fileName)
     getline(file, line);
     while (getline(file, line))
     {
-        cout << line << endl;
+        //cout << line << endl;
         stringstream ss(line);
         string cell;
         vector<string> dataline;

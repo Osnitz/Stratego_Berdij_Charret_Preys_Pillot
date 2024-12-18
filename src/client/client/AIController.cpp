@@ -2,6 +2,7 @@
 // Created by matthieu on 16/12/24.
 //
 #include <iostream>
+#include <random>
 
 #include "PlayerController.h"
 #include "client.h"
@@ -10,8 +11,13 @@
 using namespace client;
 
 
-AIController::AIController(engine::Engine* eng, int id, ai::AIInterface* aiModule)
-    : PlayerController(eng, id, aiModule){}
+AIController::AIController(engine::Engine* eng, int playerID, ai::AIInterface* aiModule)
+    : PlayerController(eng, aiModule,playerID)
+{
+    engine=eng;
+    this->aiModule = aiModule;
+    playerIdx = playerID;
+}
 
 
 bool AIController::isAI()
@@ -46,7 +52,33 @@ bool AIController::executeCmd(std::pair<int, int> from, std::pair<int, int> to, 
 
 int AIController::getPlayerID()
 {
-    return playerID;
+ //   return playerID;
+}
+
+void AIController::handlePlacement(state::Game* game)
+{
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_int_distribution<> distr(1, 3);
+
+    std::string filePath;
+    int randomConfig= distr(gen);
+    switch (randomConfig)
+    {
+    case 1:
+        filePath = "../src/shared/state/config/Offensive.csv";
+        break;
+    case 2:
+        filePath = "../src/shared/state/config/Defensive.csv";
+        break;
+    case 3:
+        filePath = "../src/shared/state/config/Balance.csv";
+        break;
+    default:
+        std::cerr << "Invalid choice. Please choose a configuration (1: Offensive, 2:Defensive, 3:Balance): " <<
+            std::endl;
+    }
+    engine->handleCmdPlacement(filePath);
 }
 
 AIController::~AIController()

@@ -1,16 +1,16 @@
-#include <iostream>
-
 // The following lines are here to check that SFML is installed and working
+#include <iostream>
 #include <client/PlayerController.h>
 #include <SFML/Graphics.hpp>
 
-void testSFML() {
+void testSFML()
+{
     sf::Texture texture;
 }
+
 // end of test SFML
 
 #include <state.h>
-#include <engine.h>
 #include <client.h>
 
 
@@ -22,13 +22,18 @@ using namespace state;
     game->startGame();
 }*/
 
-int main() {
+int main()
+{
 
     Game* game = new Game();
     std::vector<Player*> players = {game->getPlayer1(), game->getPlayer2()};
+    state::Player* currentPlayer;
+    client::PlayerController* playerController;
+    std::vector<int> coords;
+    std::pair<int, int> from;
+    std::pair<int, int> to;
 
     auto gameEngine = new engine::Engine(game, players);
-
     auto scenarioManager = new client::ScenarioManager(gameEngine);
 
     auto gameMode = scenarioManager->getScenarioChoice();
@@ -38,23 +43,35 @@ int main() {
 
     gameEngine->startGame();
 
-    scenarioManager->handlePlacement(game);
+    for (size_t i = 0; i < players.size(); i++)
+    {
+        currentPlayer = game->currentPlayer;
+        playerController = scenarioManager->getPlayerController(currentPlayer);
+        playerController->handlePlacement(game);
+    }
 
 
-    int test =0;
-    while (test<100)
+    int test = 0;
+    while (test < 100)
     {
         test++;
-        auto currentPlayer = game->getCurrentPlayer();
+        currentPlayer = game->getCurrentPlayer();
         game->displayBoard(*currentPlayer);
-        auto playerController = scenarioManager->getPlayerController(currentPlayer);
-        auto coords = playerController->getPlayerInput();
-        auto from = std::make_pair(coords[0], coords[1]);
-        auto to = std::make_pair(coords[2], coords[3]);
+        playerController = scenarioManager->getPlayerController(currentPlayer);
+        coords = playerController->getPlayerInput();
+        from = std::make_pair(coords[0], coords[1]);
+        to = std::make_pair(coords[2], coords[3]);
         if (!playerController->executeCmd(from, to, game->getCurrentPlayer()))
         {
             continue;
         }
     }
+    std::cout<<"Nb de tours"<<test<<std::endl;
 
-    return 0;}
+    delete currentPlayer;
+    delete playerController;
+    delete gameEngine;
+    delete scenarioManager;
+    delete game;
+    return 0;
+}

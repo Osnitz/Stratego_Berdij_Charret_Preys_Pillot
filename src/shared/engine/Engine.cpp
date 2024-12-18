@@ -31,7 +31,6 @@ void Engine::endTurn()
 
 bool Engine::handleCmdPlacement(string filePath)
 {
-    auto currentPlayer = game->currentPlayer;
     game->loadConfig(filePath);
     endTurn();
     return true;
