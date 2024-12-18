@@ -3,6 +3,7 @@
 #include <client/PlayerController.h>
 #include <SFML/Graphics.hpp>
 
+
 void testSFML()
 {
     sf::Texture texture;
@@ -12,10 +13,12 @@ void testSFML()
 
 #include <state.h>
 #include <client.h>
+#include "engine/WinCondition.h"
 
 
 using namespace std;
 using namespace state;
+using namespace engine;
 
 /*int main() {
     auto game = Game::getInstance();
@@ -24,7 +27,6 @@ using namespace state;
 
 int main()
 {
-
     Game* game = new Game();
     std::vector<Player*> players = {game->getPlayer1(), game->getPlayer2()};
     state::Player* currentPlayer;
@@ -52,17 +54,25 @@ int main()
 
 
     int test = 0;
-    while (!game->isFlagCaptured())
+    while (true)
     {
         test++;
         currentPlayer = game->getCurrentPlayer();
         game->displayBoard(*currentPlayer);
         playerController = scenarioManager->getPlayerController(currentPlayer);
 
-        if (!playerController->hasValidMoves())
+        WinCondition winCondition = gameEngine->checkWin();
+        if (winCondition != None)
         {
-            std::cout << "Player " << currentPlayer->getPlayerID() << " has no valid moves left. Game over." << std::endl;
-            std::cout << "Player " << game->getOpponent()->getPlayerID() << " wins!" << std::endl;
+            if (winCondition == FlagCaptured)
+            {
+                std::cout << "Flag has been captured. Game over." << std::endl;
+            }
+            else if (winCondition == NoValidMoves)
+            {
+                std::cout << "Player " << currentPlayer->getPlayerID() << " has no valid moves left. Game over." << std::endl;
+                std::cout << "Player " << game->getOpponent()->getPlayerID() << " wins!" << std::endl;
+            }
             break;
         }
 
@@ -74,8 +84,11 @@ int main()
             continue;
         }
     }
-    std::cout<<"Nb de tours : "<<test<<std::endl;
 
+    std::cout << "Nb de tours : " << test << std::endl;
+
+    delete scenarioManager;
+    delete gameEngine;
 
     return 0;
 }

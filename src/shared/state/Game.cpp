@@ -430,3 +430,16 @@ bool Game::isFlagCaptured()
     }
     return false;
 }
+
+bool Game::hasValidMoves()
+{
+    auto& myPieces = currentPlayer->getMyPieces();
+    for (const auto& piece : myPieces)
+    {
+        if (!PossiblePositions(piece).empty())
+        {
+            return true;
+        }
+    }
+    return false;
+}
