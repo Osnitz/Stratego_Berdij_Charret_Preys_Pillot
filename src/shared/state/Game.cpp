@@ -161,13 +161,13 @@ vector<pair<int, int>> Game::PossiblePositions(Pieces* pieceToMove)
 
             Pieces* targetPiece = board->getPiece(posToCheck);
 
-            if (targetPiece == nullptr)//empty case
+            if (targetPiece == nullptr) //empty case
             {
                 possiblePositions.push_back(posToCheck);
                 continue;
             }
 
-            if (IsAlly(targetPiece))//Occupied by an Ally
+            if (IsAlly(targetPiece)) //Occupied by an Ally
             {
                 break;
             }
@@ -408,4 +408,25 @@ void Game::addCaptured(Pieces* piece, Player* player)
 Board* Game::getBoard()
 {
     return board;
+}
+
+bool Game::isFlagCaptured()
+{
+    auto checkFlagCaptured = [](const std::vector<Pieces*>& capturedPieces)
+    {
+        for (const auto& piece : capturedPieces)
+        {
+            if (piece->getType() == Flag)
+            {
+                return true;
+            }
+        }
+        return false;
+    };
+
+    if (checkFlagCaptured(Player1->getCaptured()) || checkFlagCaptured(Player2->getCaptured()))
+    {
+        return true;
+    }
+    return false;
 }

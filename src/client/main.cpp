@@ -52,12 +52,20 @@ int main()
 
 
     int test = 0;
-    while (test < 100)
+    while (!game->isFlagCaptured())
     {
         test++;
         currentPlayer = game->getCurrentPlayer();
         game->displayBoard(*currentPlayer);
         playerController = scenarioManager->getPlayerController(currentPlayer);
+
+        if (!playerController->hasValidMoves())
+        {
+            std::cout << "Player " << currentPlayer->getPlayerID() << " has no valid moves left. Game over." << std::endl;
+            std::cout << "Player " << game->getOpponent()->getPlayerID() << " wins!" << std::endl;
+            break;
+        }
+
         coords = playerController->getPlayerInput();
         from = std::make_pair(coords[0], coords[1]);
         to = std::make_pair(coords[2], coords[3]);
@@ -66,12 +74,8 @@ int main()
             continue;
         }
     }
-    std::cout<<"Nb de tours"<<test<<std::endl;
+    std::cout<<"Nb de tours : "<<test<<std::endl;
 
-    delete currentPlayer;
-    delete playerController;
-    delete gameEngine;
-    delete scenarioManager;
-    delete game;
+
     return 0;
 }
