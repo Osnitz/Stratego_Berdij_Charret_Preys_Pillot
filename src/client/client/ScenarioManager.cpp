@@ -148,6 +148,32 @@ namespace client
 
     }
 
+    engine::Engine* ScenarioManager::getEngine()
+    {
+        return engine;
+    }
+
+    GameMode ScenarioManager::getMode()
+    {
+        return mode;
+    }
+
+    std::vector<PlayerController*>* ScenarioManager::getPlayerControllersVector()
+    {
+        return &playerControllers;
+    }
+
+    ai::AIInterface* ScenarioManager::getAiModule0()
+    {
+        return aiModule0;
+    }
+
+    ai::AIInterface* ScenarioManager::getAiModule1()
+    {
+        return aiModule1;
+    }
+
+
 }
 
 #endif
