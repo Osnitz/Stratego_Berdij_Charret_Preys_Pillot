@@ -28,14 +28,13 @@ using namespace engine;
 int main()
 {
     Game* game = new Game();
-    std::vector<Player*> players = {game->getPlayer1(), game->getPlayer2()};
-    state::Player* currentPlayer;
+    Player* currentPlayer;
     client::PlayerController* playerController;
     std::vector<int> coords;
     std::pair<int, int> from;
     std::pair<int, int> to;
 
-    auto gameEngine = new engine::Engine(game, players);
+    auto gameEngine = new engine::Engine(game);
     auto scenarioManager = new client::ScenarioManager(gameEngine);
 
     auto gameMode = scenarioManager->getScenarioChoice();
@@ -43,9 +42,9 @@ int main()
 
     scenarioManager->initializeControllers();
 
-    gameEngine->startGame();
+    std::cout << "Game started. Entering Placement Phase." << endl;
 
-    for (size_t i = 0; i < players.size(); i++)
+    for (size_t i = 0; i < 2; i++)
     {
         currentPlayer = game->currentPlayer;
         playerController = scenarioManager->getPlayerController(currentPlayer);
@@ -89,6 +88,7 @@ int main()
 
     delete scenarioManager;
     delete gameEngine;
+    delete game;
 
     return 0;
 }

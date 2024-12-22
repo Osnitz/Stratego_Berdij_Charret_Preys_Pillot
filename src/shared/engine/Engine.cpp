@@ -13,16 +13,10 @@ using namespace engine;
 using namespace state;
 using namespace std;
 
-Engine::Engine(Game* game, vector<Player*> players)
-    : game(game), players(players)
+Engine::Engine(Game* game): game(game)
 {
 }
 
-void Engine::startGame()
-{
-    game->switchTurn();
-    std::cout << "Game started. Entering Placement Phase." << endl;
-}
 
 void Engine::endTurn()
 {
@@ -62,7 +56,7 @@ bool Engine::handleCmdMove(pair<int, int> from, pair<int, int> to)
     return true;
 }
 
-void Engine::attack(Pieces* mypiece, pair<int, int>& position)
+void Engine::attack(Pieces* mypiece, pair<int, int> position)
 {
     auto board = game->getBoard();
     Pieces* attackedPiece = board->getPiece(position);

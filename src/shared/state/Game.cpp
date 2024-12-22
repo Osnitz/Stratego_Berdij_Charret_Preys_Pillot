@@ -194,8 +194,7 @@ bool Game::belongTo(Pieces* piece)
 
 void Game::addPiece(Pieces* piece, Player* player)
 {
-    auto myPieces = player->getMyPieces();
-    myPieces.push_back(piece);
+    player->getMyPieces().push_back(piece);
 }
 
 void Game::loadConfig(string& fileName)
@@ -434,11 +433,14 @@ bool Game::isFlagCaptured()
 bool Game::hasValidMoves()
 {
     auto& myPieces = currentPlayer->getMyPieces();
-    for (const auto& piece : myPieces)
+    if (!myPieces.empty())
     {
-        if (!PossiblePositions(piece).empty())
+        for (const auto& piece : myPieces)
         {
-            return true;
+            if (!PossiblePositions(piece).empty())
+            {
+                return true;
+            }
         }
     }
     return false;

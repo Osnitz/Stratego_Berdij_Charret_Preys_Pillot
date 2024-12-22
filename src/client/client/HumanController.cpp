@@ -11,26 +11,20 @@
 using namespace client;
 
 
-HumanController::HumanController(engine::Engine* eng, int playerID, ai::AIInterface* aiModule)
-    : PlayerController(eng, aiModule, playerID)
+HumanController::HumanController(engine::Engine* eng, ai::AIInterface* aiModule)
+    : PlayerController(eng, aiModule)
 {
     engine = eng;
     this->aiModule = aiModule;
-    playerIdx = playerID;
 }
 
-
-bool HumanController::isAI()
-{
-    return (aiModule != nullptr);
-}
 
 std::vector<int> HumanController::getPlayerInput()
 {
     std::vector<int> coords;
     int startX, startY, endX, endY;
 
-    std::cout << "Player " << playerIdx << ", enter the coordinates of the piece to move (e.g. '2 3'): \n";
+    std::cout << "Player " << engine->getGame()->currentPlayer->getPlayerID() << ", enter the coordinates of the piece to move (e.g. '2 3'): \n";
     std::cin >> startX >> startY;
     coords.push_back(startX);
     coords.push_back(startY);
@@ -49,10 +43,6 @@ bool HumanController::executeCmd(std::pair<int, int> from, std::pair<int, int> t
     return success;
 }
 
-int HumanController::getPlayerID()
-{
-  //  return playerID;
-}
 
 HumanController::~HumanController()
 {

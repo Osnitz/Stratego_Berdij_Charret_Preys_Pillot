@@ -28,16 +28,16 @@ namespace client
         {
         case GameMode::PVP:
             // PvP : Les deux joueurs sont humains
-            player1Controller = new client::HumanController(engine, 0, nullptr);
-            player2Controller = new client::HumanController(engine, 1, nullptr);
+            player1Controller = new client::HumanController(engine, nullptr);
+            player2Controller = new client::HumanController(engine, nullptr);
             break;
 
         case GameMode::PVE:
             {
                 // PvE : Joueur 1 humain, Joueur 2 IA
 
-                player1Controller = new HumanController(engine, 0, nullptr);
-                player2Controller = new AIController(engine, 1, aiModule0);
+                player1Controller = new HumanController(engine, nullptr);
+                player2Controller = new AIController(engine, aiModule0);
 
                 break;
             }
@@ -45,8 +45,8 @@ namespace client
         case GameMode::AIvsAI:
             {
                 // AI vs AI : Les deux joueurs sont des IA
-                player1Controller = new client::AIController(engine, 0, aiModule0);
-                player2Controller = new client::AIController(engine, 1, aiModule1);
+                player1Controller = new client::AIController(engine, aiModule0);
+                player2Controller = new client::AIController(engine, aiModule1);
                 break;
             }
         }
@@ -142,6 +142,12 @@ namespace client
             return GameMode::AIvsAI;
         }
     }
+
+    ScenarioManager::~ScenarioManager()
+    {
+
+    }
+
 }
 
 #endif

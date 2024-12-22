@@ -11,19 +11,13 @@
 using namespace client;
 
 
-AIController::AIController(engine::Engine* eng, int playerID, ai::AIInterface* aiModule)
-    : PlayerController(eng, aiModule,playerID)
+AIController::AIController(engine::Engine* eng, ai::AIInterface* aiModule)
+    : PlayerController(eng, aiModule)
 {
     engine=eng;
     this->aiModule = aiModule;
-    playerIdx = playerID;
 }
 
-
-bool AIController::isAI()
-{
-    return (aiModule != nullptr);
-}
 
 std::vector<int> AIController::getPlayerInput()
 {
@@ -50,10 +44,6 @@ bool AIController::executeCmd(std::pair<int, int> from, std::pair<int, int> to, 
     return success;
 }
 
-int AIController::getPlayerID()
-{
- //   return playerID;
-}
 
 void AIController::handlePlacement(state::Game* game)
 {
