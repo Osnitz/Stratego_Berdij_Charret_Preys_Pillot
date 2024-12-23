@@ -47,7 +47,7 @@ BOOST_AUTO_TEST_SUITE(HumanControllerTestSuite)
         auto mypiece = new Pieces(2, Scout, 0, 0, game->getPlayer1());
         game->currentPlayer = game->getPlayer1();
         game->addPiece(mypiece, game->currentPlayer);
-        game->SetPieceOnBoard(mypiece, 0, 0);
+        game->setPieceOnBoard(mypiece, 0, 0);
 
 
         auto humanController = new client::HumanController(mockEngine, nullptr);

@@ -837,7 +837,7 @@
         </dia:composite>
         <dia:composite type="umloperation">
           <dia:attribute name="name">
-            <dia:string>#LimitBoard#</dia:string>
+            <dia:string>#limitBoard#</dia:string>
           </dia:attribute>
           <dia:attribute name="stereotype">
             <dia:string>##</dia:string>
@@ -902,7 +902,7 @@
         </dia:composite>
         <dia:composite type="umloperation">
           <dia:attribute name="name">
-            <dia:string>#IsAlly#</dia:string>
+            <dia:string>#isAlly#</dia:string>
           </dia:attribute>
           <dia:attribute name="stereotype">
             <dia:string>##</dia:string>
@@ -950,7 +950,7 @@
         </dia:composite>
         <dia:composite type="umloperation">
           <dia:attribute name="name">
-            <dia:string>#IsEnemy#</dia:string>
+            <dia:string>#isEnemy#</dia:string>
           </dia:attribute>
           <dia:attribute name="stereotype">
             <dia:string>##</dia:string>
@@ -998,7 +998,7 @@
         </dia:composite>
         <dia:composite type="umloperation">
           <dia:attribute name="name">
-            <dia:string>#IsEmpty#</dia:string>
+            <dia:string>#isEmpty#</dia:string>
           </dia:attribute>
           <dia:attribute name="stereotype">
             <dia:string>##</dia:string>
@@ -1046,7 +1046,7 @@
         </dia:composite>
         <dia:composite type="umloperation">
           <dia:attribute name="name">
-            <dia:string>#SetPieceOnBoard#</dia:string>
+            <dia:string>#setPieceOnBoard#</dia:string>
           </dia:attribute>
           <dia:attribute name="stereotype">
             <dia:string>##</dia:string>
@@ -1128,7 +1128,7 @@
         </dia:composite>
         <dia:composite type="umloperation">
           <dia:attribute name="name">
-            <dia:string>#RemoveFromBoard#</dia:string>
+            <dia:string>#removeFromBoard#</dia:string>
           </dia:attribute>
           <dia:attribute name="stereotype">
             <dia:string>##</dia:string>
@@ -1176,7 +1176,7 @@
         </dia:composite>
         <dia:composite type="umloperation">
           <dia:attribute name="name">
-            <dia:string>#PossiblePositions#</dia:string>
+            <dia:string>#possiblePositions#</dia:string>
           </dia:attribute>
           <dia:attribute name="stereotype">
             <dia:string>##</dia:string>
@@ -3359,16 +3359,16 @@
     </dia:object>
     <dia:object type="Standard - ZigZagLine" version="1" id="O15">
       <dia:attribute name="obj_pos">
-        <dia:point val="141.339,88.8159"/>
+        <dia:point val="141.34,88.8159"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="141.289,88.7659;172.38,95.8018"/>
+        <dia:rectangle val="141.29,88.7659;172.38,95.8018"/>
       </dia:attribute>
       <dia:attribute name="orth_points">
-        <dia:point val="141.339,88.8159"/>
-        <dia:point val="141.339,92.2839"/>
-        <dia:point val="172.018,92.2839"/>
-        <dia:point val="172.018,95.7518"/>
+        <dia:point val="141.34,88.8159"/>
+        <dia:point val="141.34,92.2839"/>
+        <dia:point val="172.019,92.2839"/>
+        <dia:point val="172.019,95.7518"/>
       </dia:attribute>
       <dia:attribute name="orth_orient">
         <dia:enum val="1"/>

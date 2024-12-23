@@ -110,22 +110,22 @@ void Game::setCurrentPlayer(Player* player)
     currentPlayer = player;
 }
 
-void Game::SetPieceOnBoard(Pieces* piece, int newX, int newY)
+void Game::setPieceOnBoard(Pieces* piece, int newX, int newY)
 {
-    RemoveFromBoard(piece);
+    removeFromBoard(piece);
     piece->setCoord(newX, newY);
     auto& grid = *board->getGrid();
     grid[newX][newY] = piece;
 }
 
-void Game::RemoveFromBoard(Pieces* piece)
+void Game::removeFromBoard(Pieces* piece)
 {
     pair<int, int> position = piece->getPosition();
     auto& grid = *board->getGrid();
     grid[position.first][position.second] = nullptr;
 }
 
-vector<pair<int, int>> Game::PossiblePositions(Pieces* pieceToMove)
+vector<pair<int, int>> Game::possiblePositions(Pieces* pieceToMove)
 {
     vector<pair<int, int>> possiblePositions;
 
@@ -154,7 +154,7 @@ vector<pair<int, int>> Game::PossiblePositions(Pieces* pieceToMove)
             case 4: posToCheck = {x + i, y};
                 break;
             }
-            if (!LimitBoard(posToCheck, true))
+            if (!limitBoard(posToCheck, true))
             {
                 break; // Si hors limites, arrêter cette direction
             }
@@ -167,7 +167,7 @@ vector<pair<int, int>> Game::PossiblePositions(Pieces* pieceToMove)
                 continue;
             }
 
-            if (IsAlly(targetPiece)) //Occupied by an Ally
+            if (isAlly(targetPiece)) //Occupied by an Ally
             {
                 break;
             }
@@ -255,19 +255,19 @@ void Game::loadConfig(string& fileName)
         {
             auto* piece = new Pieces(value, type, x, y, Player1);
             currentPlayer->getMyPieces().push_back(piece);
-            SetPieceOnBoard(piece, x, y);
+            setPieceOnBoard(piece, x, y);
         }
         else
         {
             auto* piece = new Pieces(value, type, 9 - x, y, Player2);
             currentPlayer->getMyPieces().push_back(piece);
-            SetPieceOnBoard(piece, 9 - x, y);
+            setPieceOnBoard(piece, 9 - x, y);
         }
     }
     displayBoard(*currentPlayer);
 }
 
-bool Game::LimitBoard(pair<int, int>& position, bool silent)
+bool Game::limitBoard(pair<int, int>& position, bool silent)
 {
     int NewX = position.first;
     int NewY = position.second;
@@ -293,7 +293,7 @@ bool Game::LimitBoard(pair<int, int>& position, bool silent)
     return true;
 }
 
-bool Game::IsEmpty(Pieces* targetPiece)
+bool Game::isEmpty(Pieces* targetPiece)
 {
     if (targetPiece == nullptr)
     {
@@ -302,7 +302,7 @@ bool Game::IsEmpty(Pieces* targetPiece)
     return false;
 }
 
-bool Game::IsAlly(Pieces* targetPiece)
+bool Game::isAlly(Pieces* targetPiece)
 {
     if (currentPlayer == targetPiece->getOwner())
     {
@@ -311,7 +311,7 @@ bool Game::IsAlly(Pieces* targetPiece)
     return false;
 }
 
-bool Game::IsEnemy(Pieces* targetPiece)
+bool Game::isEnemy(Pieces* targetPiece)
 {
     if (currentPlayer != targetPiece->getOwner())
     {
@@ -437,7 +437,7 @@ bool Game::hasValidMoves()
     {
         for (const auto& piece : myPieces)
         {
-            if (!PossiblePositions(piece).empty())
+            if (!possiblePositions(piece).empty())
             {
                 return true;
             }

@@ -80,11 +80,11 @@ BOOST_AUTO_TEST_CASE(TestHandleCmdMove)
     // Create two pieces: one for the current player, one for the opponent
     auto myPiece = new Pieces(2, PieceType::Scout, 4, 0, game->getPlayer1());
     game->addPiece(myPiece, game->getPlayer1());
-    game->SetPieceOnBoard(myPiece, 4, 0);
+    game->setPieceOnBoard(myPiece, 4, 0);
 
     auto opponentPiece = new Pieces(1, PieceType::Spy, 5, 0, game->getPlayer2());
     game->addPiece(opponentPiece, game->getPlayer2());
-    game->SetPieceOnBoard(opponentPiece, 5, 0);
+    game->setPieceOnBoard(opponentPiece, 5, 0);
 
     // Case 1: The piece does not belong to the current player
     BOOST_CHECK_MESSAGE(!engine->handleCmdMove({5, 0}, {5, 1}), "The piece should not belong to the current player.");
@@ -100,8 +100,8 @@ BOOST_AUTO_TEST_CASE(TestHandleCmdMove)
 
     // Reset the board state
     game->currentPlayer = game->getPlayer1();
-    game->RemoveFromBoard(myPiece);
-    game->SetPieceOnBoard(myPiece, 4, 0);
+    game->removeFromBoard(myPiece);
+    game->setPieceOnBoard(myPiece, 4, 0);
 
     // Case 4: The destination contains an opponent's piece -> Attack
     BOOST_CHECK_MESSAGE(engine->handleCmdMove({4, 0}, {5, 0}), "The attack should succeed.");
@@ -110,12 +110,12 @@ BOOST_AUTO_TEST_CASE(TestHandleCmdMove)
     // Case 5: The destination contains an allied piece
     auto alliedPiece = new Pieces(3, PieceType::Scout, 4, 1, game->getPlayer1());
     game->addPiece(alliedPiece, game->getPlayer1());
-    game->SetPieceOnBoard(alliedPiece, 4, 1);
+    game->setPieceOnBoard(alliedPiece, 4, 1);
 
     BOOST_CHECK_MESSAGE(!engine->handleCmdMove({4, 0}, {4, 1}), "A piece cannot move to a tile containing an allied piece.");
 
     // Cleanup for allied piece
-    game->RemoveFromBoard(alliedPiece);
+    game->removeFromBoard(alliedPiece);
     delete alliedPiece;
 
     // Cleanup for game objects
@@ -137,7 +137,7 @@ BOOST_AUTO_TEST_CASE(TestAttack)
     // Case 1: No target at the position
     auto myPiece = new Pieces(3, PieceType::Scout, 4, 0, game->getPlayer1());
     game->addPiece(myPiece, game->getPlayer1());
-    game->SetPieceOnBoard(myPiece, 4, 0);
+    game->setPieceOnBoard(myPiece, 4, 0);
 
     std::pair<int, int> emptyPosition = {5, 5};
     BOOST_CHECK_NO_THROW(engine->attack(myPiece, emptyPosition));
@@ -146,70 +146,70 @@ BOOST_AUTO_TEST_CASE(TestAttack)
     // Case 2: Attack a Bomb with a Miner
     auto bombPiece = new Pieces(0, PieceType::Bomb, 5, 0, game->getPlayer2());
     game->addPiece(bombPiece, game->getPlayer2());
-    game->SetPieceOnBoard(bombPiece, 5, 0);
+    game->setPieceOnBoard(bombPiece, 5, 0);
 
     auto minerPiece = new Pieces(1, PieceType::Miner, 4, 0, game->getPlayer1());
     game->addPiece(minerPiece, game->getPlayer1());
-    game->SetPieceOnBoard(minerPiece, 4, 0);
+    game->setPieceOnBoard(minerPiece, 4, 0);
 
     engine->attack(minerPiece, {5, 0});
     BOOST_CHECK_MESSAGE(game->getPlayer1()->getCaptured().size() == 1, "Miner should capture the Bomb.");
     BOOST_CHECK_MESSAGE(board->getPiece({5, 0}) == minerPiece, "Miner should occupy the Bomb's position.");
 
     // Reset the board
-    game->RemoveFromBoard(minerPiece);
-    game->SetPieceOnBoard(myPiece, 4, 0);
+    game->removeFromBoard(minerPiece);
+    game->setPieceOnBoard(myPiece, 4, 0);
 
     // Case 3: Attack Marshal with a Spy
     auto marshalPiece = new Pieces(10, PieceType::Marshal, 5, 0, game->getPlayer2());
     game->addPiece(marshalPiece, game->getPlayer2());
-    game->SetPieceOnBoard(marshalPiece, 5, 0);
+    game->setPieceOnBoard(marshalPiece, 5, 0);
 
     auto spyPiece = new Pieces(1, PieceType::Spy, 4, 0, game->getPlayer1());
     game->addPiece(spyPiece, game->getPlayer1());
-    game->SetPieceOnBoard(spyPiece, 4, 0);
+    game->setPieceOnBoard(spyPiece, 4, 0);
 
     engine->attack(spyPiece, {5, 0});
     BOOST_CHECK_MESSAGE(game->getPlayer1()->getCaptured().size() == 2, "Spy should capture the Marshal.");
     BOOST_CHECK_MESSAGE(board->getPiece({5, 0}) == spyPiece, "Spy should occupy the Marshal's position.");
 
     // Reset the board
-    game->RemoveFromBoard(spyPiece);
-    game->SetPieceOnBoard(myPiece, 4, 0);
+    game->removeFromBoard(spyPiece);
+    game->setPieceOnBoard(myPiece, 4, 0);
 
     // Case 4: Attack a weaker opponent
     auto weakOpponent = new Pieces(2, PieceType::Scout, 5, 0, game->getPlayer2());
     game->addPiece(weakOpponent, game->getPlayer2());
-    game->SetPieceOnBoard(weakOpponent, 5, 0);
+    game->setPieceOnBoard(weakOpponent, 5, 0);
 
     engine->attack(myPiece, {5, 0});
     BOOST_CHECK_MESSAGE(game->getPlayer1()->getCaptured().size() == 3, "Player should capture the weaker opponent.");
     BOOST_CHECK_MESSAGE(board->getPiece({5, 0}) == myPiece, "Attacker should occupy the opponent's position.");
 
     // Reset the board
-    game->RemoveFromBoard(myPiece);
-    game->SetPieceOnBoard(myPiece, 4, 0);
+    game->removeFromBoard(myPiece);
+    game->setPieceOnBoard(myPiece, 4, 0);
 
     // Case 5: Attack a stronger opponent
     auto strongOpponent = new Pieces(4, PieceType::Sergeant, 5, 0, game->getPlayer2());
     game->addPiece(strongOpponent, game->getPlayer2());
-    game->SetPieceOnBoard(strongOpponent, 5, 0);
+    game->setPieceOnBoard(strongOpponent, 5, 0);
 
     engine->attack(myPiece, {5, 0});
     BOOST_CHECK_MESSAGE(game->getPlayer2()->getCaptured().size() == 1, "Stronger opponent should capture the attacking piece.");
     BOOST_CHECK_MESSAGE(board->getPiece({5, 0}) == strongOpponent, "Opponent should remain at their position.");
 
     // Reset the board
-    game->RemoveFromBoard(myPiece);
+    game->removeFromBoard(myPiece);
 
     // Case 6: Tie (both pieces of the same value)
     auto tiedPiece = new Pieces(3, PieceType::Scout, 5, 0, game->getPlayer2());
     game->addPiece(tiedPiece, game->getPlayer2());
-    game->SetPieceOnBoard(tiedPiece, 5, 0);
+    game->setPieceOnBoard(tiedPiece, 5, 0);
 
     auto tiedAttacker = new Pieces(3, PieceType::Scout, 4, 0, game->getPlayer1());
     game->addPiece(tiedAttacker, game->getPlayer1());
-    game->SetPieceOnBoard(tiedAttacker, 4, 0);
+    game->setPieceOnBoard(tiedAttacker, 4, 0);
 
     engine->attack(tiedAttacker, {5, 0});
     BOOST_CHECK_MESSAGE(board->getPiece({5, 0}) == nullptr, "Both pieces should be removed after a tie.");
@@ -237,7 +237,7 @@ BOOST_AUTO_TEST_CASE(TestIsValidMove)
     // Create a piece for the current player
     Pieces* myPiece = new Pieces(10, PieceType::Marshal, 4, 0, game->getPlayer1());
     game->addPiece(myPiece, game->getPlayer1());
-    game->SetPieceOnBoard(myPiece, 4, 0);
+    game->setPieceOnBoard(myPiece, 4, 0);
 
 
     // Mock the possible positions for the piece
@@ -290,7 +290,7 @@ BOOST_AUTO_TEST_CASE(TestCheckWin)
     game->currentPlayer = game->getPlayer1();
     auto scout = new Pieces(2,Scout,1,1,game->getPlayer1());
     game->addPiece(scout,game->getPlayer1());
-    game->SetPieceOnBoard(scout,1,1);
+    game->setPieceOnBoard(scout,1,1);
 
     // Case 3: No win condition
     BOOST_CHECK(!game->isFlagCaptured());

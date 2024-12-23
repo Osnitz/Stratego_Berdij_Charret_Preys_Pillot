@@ -30,7 +30,7 @@ BOOST_AUTO_TEST_SUITE(AIControllerTestSuite)
         auto aiController = new client::AIController(mockEngine, new ai::RandomAI());
         auto mypiece = new Pieces(2, Scout, 0, 0, game->getPlayer1());
         game->addPiece(mypiece, game->currentPlayer);
-        game->SetPieceOnBoard(mypiece, 0, 0);
+        game->setPieceOnBoard(mypiece, 0, 0);
         game->displayBoard(*game->currentPlayer);
         std::vector<int> coords = aiController->getPlayerInput();
 
@@ -49,7 +49,7 @@ BOOST_AUTO_TEST_SUITE(AIControllerTestSuite)
         auto mypiece = new Pieces(2, Scout, 0, 0, game->getPlayer1());
         game->currentPlayer = game->getPlayer1();
         game->addPiece(mypiece, game->currentPlayer);
-        game->SetPieceOnBoard(mypiece, 0, 0);
+        game->setPieceOnBoard(mypiece, 0, 0);
 
         //Case 1 : Valid move
         std::pair<int, int> from = std::make_pair(0, 0);
