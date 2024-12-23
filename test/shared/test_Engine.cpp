@@ -319,7 +319,4 @@ BOOST_AUTO_TEST_CASE(TestCheckWin)
     delete flag;
 }
 
-
-
-
 BOOST_AUTO_TEST_SUITE_END()

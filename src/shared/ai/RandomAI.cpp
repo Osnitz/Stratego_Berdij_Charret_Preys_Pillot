@@ -11,9 +11,7 @@
 
 using namespace ai;
 using namespace state;
-RandomAI::RandomAI()
-{
-}
+RandomAI::RandomAI():AIInterface(){}
 
 
 std::vector<int> RandomAI::calculateMove(state::Game* game)
