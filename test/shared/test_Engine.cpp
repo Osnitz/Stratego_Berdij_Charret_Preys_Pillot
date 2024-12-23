@@ -160,6 +160,21 @@ BOOST_AUTO_TEST_CASE(TestAttack)
     game->removeFromBoard(minerPiece);
     game->setPieceOnBoard(myPiece, 4, 0);
 
+    //Case 2bis: Attack a Bomb with a non Miner
+    auto bombPiece2 = new Pieces(0, PieceType::Bomb, 5, 0, game->getPlayer2());
+    game->addPiece(bombPiece2, game->getPlayer2());
+    game->setPieceOnBoard(bombPiece2, 5, 0);
+     auto nonMinerPiece = new Pieces(2, PieceType::Scout, 4, 0, game->getPlayer1());
+    game->addPiece(nonMinerPiece, game->getPlayer1());
+    game->setPieceOnBoard(nonMinerPiece, 4, 0);
+    engine->attack(nonMinerPiece, {5, 0});
+
+    BOOST_CHECK_MESSAGE(game->getPlayer2()->getCaptured().size() == 1, "Bomb should capture the non Miner.");
+
+    // Reset the board
+    game->removeFromBoard(minerPiece);
+    game->setPieceOnBoard(myPiece, 4, 0);
+
     // Case 3: Attack Marshal with a Spy
     auto marshalPiece = new Pieces(10, PieceType::Marshal, 5, 0, game->getPlayer2());
     game->addPiece(marshalPiece, game->getPlayer2());
