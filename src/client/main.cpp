@@ -85,14 +85,3 @@ int main()
 
     return 0;
 }
-
-/*int main() {
-    try {
-        // Example usage
-        std::string configPath = constructPath("src/shared/state/config/Balance.csv");
-        std::cout << "Config Path: " << configPath << std::endl;
-    } catch (const std::exception& e) {
-        std::cerr << "Error: " << e.what() << std::endl;
-    }
-    return 0;
-}*/

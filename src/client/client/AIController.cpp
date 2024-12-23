@@ -56,17 +56,14 @@ void AIController::handlePlacement(state::Game* game)
     switch (randomConfig)
     {
     case 1:
-        filePath = "../src/shared/state/config/Offensive.csv";
+        filePath = constructPath("src/shared/state/config/Offensive.csv");
         break;
     case 2:
-        filePath = "../src/shared/state/config/Defensive.csv";
+        filePath = constructPath("src/shared/state/config/Defensive.csv");
         break;
     case 3:
-        filePath = "../src/shared/state/config/Balance.csv";
+        filePath = constructPath("src/shared/state/config/Balance.csv");
         break;
-    default:
-        std::cerr << "Invalid choice. Please choose a configuration (1: Offensive, 2:Defensive, 3:Balance): " <<
-            std::endl;
     }
     engine->handleCmdPlacement(filePath);
 }
@@ -81,8 +78,4 @@ ai::AIInterface* AIController::getAiModule()
     return aiModule;
 }
 
-AIController::~AIController()
-{
-    delete aiModule;
-    delete engine;
-}
+AIController::~AIController(){}

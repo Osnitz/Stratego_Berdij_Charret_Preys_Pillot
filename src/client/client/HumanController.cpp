@@ -10,23 +10,7 @@
 
 using namespace client;
 
-std::string getProjectRootDirectory() {
-    // Full path to the current file
-    std::string filePath = __FILE__;
 
-    // Find the "Stratego" directory in the path
-    std::size_t pos = filePath.find("Stratego");
-    if (pos == std::string::npos) {
-        throw std::runtime_error("Unable to find 'Stratego' in the path");
-    }
-
-    // Extract the path up to and including "Stratego"
-    return filePath.substr(0, pos + std::string("Stratego").length());
-}
-
-std::string constructPath(const std::string& relativePath) {
-    return getProjectRootDirectory() + "/" + relativePath;
-}
 
 HumanController::HumanController(engine::Engine* eng, ai::AIInterface* aiModule)
     : PlayerController(eng, aiModule)
