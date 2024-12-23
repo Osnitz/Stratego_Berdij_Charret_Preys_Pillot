@@ -125,7 +125,7 @@ BOOST_AUTO_TEST_CASE(TestHandleCmdMove)
     delete opponentPiece;
 }
 
-BOOST_AUTO_TEST_CASE(TestAttack)
+BOOST_AUTO_TEST_CASE(TestAttackAllCases)
 {
     // Initialize the game and engine
     auto game = new Game();
@@ -135,113 +135,114 @@ BOOST_AUTO_TEST_CASE(TestAttack)
     game->currentPlayer = game->getPlayer1();
 
     // Case 1: No target at the position
-    auto myPiece = new Pieces(3, PieceType::Scout, 4, 0, game->getPlayer1());
-    game->addPiece(myPiece, game->getPlayer1());
-    game->setPieceOnBoard(myPiece, 4, 0);
+    auto scoutPiece1 = new Pieces(2, PieceType::Scout, 4, 0, game->getPlayer1());
+    game->addPiece(scoutPiece1, game->getPlayer1());
+    game->setPieceOnBoard(scoutPiece1, 4, 0);
 
-    std::pair<int, int> emptyPosition = {5, 5};
-    BOOST_CHECK_NO_THROW(engine->attack(myPiece, emptyPosition));
-    BOOST_CHECK_MESSAGE(board->getPiece(emptyPosition) == nullptr, "No target should be found at the empty position.");
+    std::pair<int, int> emptyPosition = {5, 0};
+    BOOST_CHECK_NO_THROW(engine->attack(scoutPiece1, emptyPosition));
+    BOOST_CHECK(board->getPiece(emptyPosition) == nullptr);
+
+    // Reset board state
+    game->removeFromBoard(scoutPiece1);
 
     // Case 2: Attack a Bomb with a Miner
-    auto bombPiece = new Pieces(0, PieceType::Bomb, 5, 0, game->getPlayer2());
+    auto bombPiece = new Pieces(11, PieceType::Bomb, 5, 0, game->getPlayer2());
+    auto minerPiece = new Pieces(3, PieceType::Miner, 4, 0, game->getPlayer1());
     game->addPiece(bombPiece, game->getPlayer2());
-    game->setPieceOnBoard(bombPiece, 5, 0);
-
-    auto minerPiece = new Pieces(1, PieceType::Miner, 4, 0, game->getPlayer1());
     game->addPiece(minerPiece, game->getPlayer1());
+    game->setPieceOnBoard(bombPiece, 5, 0);
     game->setPieceOnBoard(minerPiece, 4, 0);
 
     engine->attack(minerPiece, {5, 0});
-    BOOST_CHECK_MESSAGE(game->getPlayer1()->getCaptured().size() == 1, "Miner should capture the Bomb.");
-    BOOST_CHECK_MESSAGE(board->getPiece({5, 0}) == minerPiece, "Miner should occupy the Bomb's position.");
+    BOOST_CHECK(game->getPlayer1()->getCaptured().size() == 1);
+    BOOST_CHECK(board->getPiece({5, 0}) == minerPiece);
 
-    // Reset the board
     game->removeFromBoard(minerPiece);
-    game->setPieceOnBoard(myPiece, 4, 0);
+    game->removeFromBoard(bombPiece);
 
-    //Case 2bis: Attack a Bomb with a non Miner
-    auto bombPiece2 = new Pieces(0, PieceType::Bomb, 5, 0, game->getPlayer2());
+    // Case 2bis: Attack a Bomb with a non-Miner
+    auto bombPiece2 = new Pieces(11, PieceType::Bomb, 5, 0, game->getPlayer2());
+    auto scoutPiece2 = new Pieces(2, PieceType::Scout, 4, 0, game->getPlayer1());
     game->addPiece(bombPiece2, game->getPlayer2());
+    game->addPiece(scoutPiece2, game->getPlayer1());
     game->setPieceOnBoard(bombPiece2, 5, 0);
-     auto nonMinerPiece = new Pieces(2, PieceType::Scout, 4, 0, game->getPlayer1());
-    game->addPiece(nonMinerPiece, game->getPlayer1());
-    game->setPieceOnBoard(nonMinerPiece, 4, 0);
-    engine->attack(nonMinerPiece, {5, 0});
+    game->setPieceOnBoard(scoutPiece2, 4, 0);
 
-    BOOST_CHECK_MESSAGE(game->getPlayer2()->getCaptured().size() == 1, "Bomb should capture the non Miner.");
+    engine->attack(scoutPiece2, {5, 0});
+    BOOST_CHECK(game->getPlayer2()->getCaptured().size() == 1);
 
-    // Reset the board
-    game->removeFromBoard(minerPiece);
-    game->setPieceOnBoard(myPiece, 4, 0);
+    game->removeFromBoard(scoutPiece2);
+    game->removeFromBoard(bombPiece2);
 
     // Case 3: Attack Marshal with a Spy
     auto marshalPiece = new Pieces(10, PieceType::Marshal, 5, 0, game->getPlayer2());
-    game->addPiece(marshalPiece, game->getPlayer2());
-    game->setPieceOnBoard(marshalPiece, 5, 0);
-
     auto spyPiece = new Pieces(1, PieceType::Spy, 4, 0, game->getPlayer1());
+    game->addPiece(marshalPiece, game->getPlayer2());
     game->addPiece(spyPiece, game->getPlayer1());
+    game->setPieceOnBoard(marshalPiece, 5, 0);
     game->setPieceOnBoard(spyPiece, 4, 0);
 
     engine->attack(spyPiece, {5, 0});
-    BOOST_CHECK_MESSAGE(game->getPlayer1()->getCaptured().size() == 2, "Spy should capture the Marshal.");
-    BOOST_CHECK_MESSAGE(board->getPiece({5, 0}) == spyPiece, "Spy should occupy the Marshal's position.");
+    BOOST_CHECK(game->getPlayer1()->getCaptured().size() == 2);
+    BOOST_CHECK(board->getPiece({5, 0}) == spyPiece);
 
-    // Reset the board
     game->removeFromBoard(spyPiece);
-    game->setPieceOnBoard(myPiece, 4, 0);
+    game->removeFromBoard(marshalPiece);
 
     // Case 4: Attack a weaker opponent
-    auto weakOpponent = new Pieces(2, PieceType::Scout, 5, 0, game->getPlayer2());
+    auto weakOpponent = new Pieces(1, PieceType::Spy, 5, 0, game->getPlayer2());
+    auto scoutPiece3 = new Pieces(2, PieceType::Scout, 4, 0, game->getPlayer1());
     game->addPiece(weakOpponent, game->getPlayer2());
+    game->addPiece(scoutPiece3, game->getPlayer1());
     game->setPieceOnBoard(weakOpponent, 5, 0);
+    game->setPieceOnBoard(scoutPiece3, 4, 0);
 
-    engine->attack(myPiece, {5, 0});
-    BOOST_CHECK_MESSAGE(game->getPlayer1()->getCaptured().size() == 3, "Player should capture the weaker opponent.");
-    BOOST_CHECK_MESSAGE(board->getPiece({5, 0}) == myPiece, "Attacker should occupy the opponent's position.");
+    engine->attack(scoutPiece3, {5, 0});
+    BOOST_CHECK(game->getPlayer1()->getCaptured().size() == 3);
+    BOOST_CHECK(board->getPiece({5, 0}) == scoutPiece3);
 
-    // Reset the board
-    game->removeFromBoard(myPiece);
-    game->setPieceOnBoard(myPiece, 4, 0);
+    game->removeFromBoard(scoutPiece3);
+    game->removeFromBoard(weakOpponent);
 
     // Case 5: Attack a stronger opponent
     auto strongOpponent = new Pieces(4, PieceType::Sergeant, 5, 0, game->getPlayer2());
+    auto scoutPiece4 = new Pieces(2, PieceType::Scout, 4, 0, game->getPlayer1());
     game->addPiece(strongOpponent, game->getPlayer2());
+    game->addPiece(scoutPiece4, game->getPlayer1());
     game->setPieceOnBoard(strongOpponent, 5, 0);
+    game->setPieceOnBoard(scoutPiece4, 4, 0);
 
-    engine->attack(myPiece, {5, 0});
-    BOOST_CHECK_MESSAGE(game->getPlayer2()->getCaptured().size() == 1, "Stronger opponent should capture the attacking piece.");
-    BOOST_CHECK_MESSAGE(board->getPiece({5, 0}) == strongOpponent, "Opponent should remain at their position.");
+    engine->attack(scoutPiece4, {5, 0});
+    BOOST_CHECK(game->getPlayer2()->getCaptured().size() ==2);
+    BOOST_CHECK(board->getPiece({5, 0}) == strongOpponent);
 
-    // Reset the board
-    game->removeFromBoard(myPiece);
+    game->removeFromBoard(scoutPiece4);
+    game->removeFromBoard(strongOpponent);
 
     // Case 6: Tie (both pieces of the same value)
-    auto tiedPiece = new Pieces(3, PieceType::Scout, 5, 0, game->getPlayer2());
+    auto tiedPiece = new Pieces(2, PieceType::Scout, 5, 0, game->getPlayer2());
+    auto tiedAttacker = new Pieces(2, PieceType::Scout, 4, 0, game->getPlayer1());
     game->addPiece(tiedPiece, game->getPlayer2());
-    game->setPieceOnBoard(tiedPiece, 5, 0);
-
-    auto tiedAttacker = new Pieces(3, PieceType::Scout, 4, 0, game->getPlayer1());
     game->addPiece(tiedAttacker, game->getPlayer1());
+    game->setPieceOnBoard(tiedPiece, 5, 0);
     game->setPieceOnBoard(tiedAttacker, 4, 0);
 
     engine->attack(tiedAttacker, {5, 0});
-    BOOST_CHECK_MESSAGE(board->getPiece({5, 0}) == nullptr, "Both pieces should be removed after a tie.");
-    BOOST_CHECK_MESSAGE(game->getPlayer1()->getCaptured().size() == 4, "Attacker should capture the opponent in a tie.");
-    BOOST_CHECK_MESSAGE(game->getPlayer2()->getCaptured().size() == 2, "Opponent should capture the attacker in a tie.");
+    BOOST_CHECK(board->getPiece({5, 0}) == nullptr);
+    BOOST_CHECK(board->getPiece({4, 0}) == nullptr);
+    BOOST_CHECK(game->getPlayer1()->getCaptured().size() == 4);
+    BOOST_CHECK(game->getPlayer2()->getCaptured().size() == 3);
+
+    game->removeFromBoard(tiedPiece);
+    game->removeFromBoard(tiedAttacker);
 
     // Cleanup
     delete engine;
     delete game;
-    delete myPiece;
-    delete minerPiece;
-    delete marshalPiece;
-    delete weakOpponent;
-    delete strongOpponent;
-    delete tiedPiece;
-    delete tiedAttacker;
 }
+
+
 
 BOOST_AUTO_TEST_CASE(TestIsValidMove)
 {
