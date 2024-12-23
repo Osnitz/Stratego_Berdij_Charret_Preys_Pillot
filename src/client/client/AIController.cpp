@@ -71,6 +71,16 @@ void AIController::handlePlacement(state::Game* game)
     engine->handleCmdPlacement(filePath);
 }
 
+engine::Engine* AIController::getEngine()
+{
+    return engine;
+}
+
+ai::AIInterface* AIController::getAiModule()
+{
+    return aiModule;
+}
+
 AIController::~AIController()
 {
     delete aiModule;

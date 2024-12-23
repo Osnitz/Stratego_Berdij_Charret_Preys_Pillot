@@ -75,3 +75,14 @@ void HumanController::handlePlacement(state::Game* game)
     }
     engine->handleCmdPlacement(filePath);
 }
+
+engine::Engine* HumanController::getEngine()
+{
+    return engine;
+}
+
+ai::AIInterface* HumanController::getAiModule()
+{
+    return aiModule;
+}
+

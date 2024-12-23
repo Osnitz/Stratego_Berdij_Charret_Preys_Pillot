@@ -9,7 +9,8 @@
 
 namespace client
 {
-    ScenarioManager::ScenarioManager(engine::Engine* eng) : engine(eng), mode(GameMode::PVP)
+    ScenarioManager::ScenarioManager(engine::Engine* eng) : engine(eng), mode(GameMode::PVP), aiModule0(nullptr),
+    aiModule1(nullptr)
     {
     }
 
@@ -60,10 +61,7 @@ namespace client
         {
             return playerControllers[0];
         }
-        else
-        {
             return playerControllers[1];
-        }
     }
 
     GameMode ScenarioManager::getScenarioChoice()
@@ -83,7 +81,6 @@ namespace client
             return GameMode::PVP;
         case 2:
             std::cout << "Choose the difficulty of the AI (1: Easy, 2: Medium, 3: Hard): " << std::endl;
-            int choice;
             std::cin >> choice;
             while (choice != 1 && choice != 2 && choice != 3)
             {
@@ -98,6 +95,10 @@ namespace client
                 break;
             case 2:
                 this->aiModule0 = new ai::RandomAI();
+                break;
+            case 3:
+                this->aiModule0 = new ai::RandomAI();
+                break;
             }
             return GameMode::PVE;
         case 3:
@@ -117,6 +118,10 @@ namespace client
                 break;
             case 2:
                 this->aiModule0 = new ai::RandomAI();
+                break;
+            case 3:
+                this->aiModule0 = new ai::RandomAI();
+                break;
             }
             std::cout << "Choose the difficulty of the AI 1 (1: Easy, 2: Medium, 3: Hard): " << std::endl;
             int choiceAI2;
@@ -125,7 +130,7 @@ namespace client
             {
                 std::cerr << "Invalid choice. Please choose the difficulty of the AI (1: Easy, 2: Medium, 3: Hard): " <<
                     std::endl;
-                std::cin >> choice;
+                std::cin >> choiceAI2;
             }
             switch (choiceAI2)
             {
@@ -172,7 +177,6 @@ namespace client
     {
         return aiModule1;
     }
-
 
 }
 
