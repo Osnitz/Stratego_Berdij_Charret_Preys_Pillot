@@ -1,7 +1,7 @@
 //
 // Created by matthieu on 22/12/24.
 //
-#define BOOST_TEST_MODULE BoardTest
+
 #include <ai/RandomAI.h>
 #include <boost/test/included/unit_test.hpp>
 #include "state.h"

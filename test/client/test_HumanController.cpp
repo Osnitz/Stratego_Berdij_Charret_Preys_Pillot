@@ -2,7 +2,6 @@
 // Created by matthieu on 23/12/24.
 //
 
-#define BOOST_TEST_MODULE BoardTest
 #include <boost/test/included/unit_test.hpp>
 #include "client.h"
 using namespace state;

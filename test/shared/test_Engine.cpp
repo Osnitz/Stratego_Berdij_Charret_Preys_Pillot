@@ -2,7 +2,7 @@
 // Created by matthieu on 20/12/24.
 //
 
-#define BOOST_TEST_MODULE BoardTest
+
 #include <boost/test/included/unit_test.hpp>
 #include "state.h"
 #include "engine.h"
