@@ -10,6 +10,23 @@
 
 using namespace client;
 
+std::string getProjectRootDirectory() {
+    // Full path to the current file
+    std::string filePath = __FILE__;
+
+    // Find the "Stratego" directory in the path
+    std::size_t pos = filePath.find("Stratego");
+    if (pos == std::string::npos) {
+        throw std::runtime_error("Unable to find 'Stratego' in the path");
+    }
+
+    // Extract the path up to and including "Stratego"
+    return filePath.substr(0, pos + std::string("Stratego").length());
+}
+
+std::string constructPath(const std::string& relativePath) {
+    return getProjectRootDirectory() + "/" + relativePath;
+}
 
 HumanController::HumanController(engine::Engine* eng, ai::AIInterface* aiModule)
     : PlayerController(eng, aiModule)
@@ -47,7 +64,6 @@ bool HumanController::executeCmd(std::pair<int, int> from, std::pair<int, int> t
 HumanController::~HumanController()
 {
     delete aiModule;
-    delete engine;
 }
 
 void HumanController::handlePlacement(state::Game* game)
@@ -58,20 +74,23 @@ void HumanController::handlePlacement(state::Game* game)
     int choice;
     std::cin >> choice;
     std::string filePath;
+
+    while (choice < 1 || choice > 3)
+    {
+        std::cerr << "Invalid choice. Please choose a configuration (1: Offensive, 2:Defensive, 3:Balance): " <<std::endl;
+        std::cin >> choice;
+    }
     switch (choice)
     {
     case 1:
-        filePath = "../src/shared/state/config/Offensive.csv";
+        filePath = constructPath("src/shared/state/config/Offensive.csv");
         break;
     case 2:
-        filePath = "../src/shared/state/config/Defensive.csv";
+        filePath = constructPath("src/shared/state/config/Defensive.csv");
         break;
     case 3:
-        filePath = "../src/shared/state/config/Balance.csv";
+        filePath = constructPath("src/shared/state/config/Balance.csv");
         break;
-    default:
-        std::cerr << "Invalid choice. Please choose a configuration (1: Offensive, 2:Defensive, 3:Balance): " <<
-            std::endl;
     }
     engine->handleCmdPlacement(filePath);
 }

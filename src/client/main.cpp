@@ -3,7 +3,6 @@
 #include <client/PlayerController.h>
 #include <SFML/Graphics.hpp>
 
-
 void testSFML()
 {
     sf::Texture texture;
@@ -15,15 +14,9 @@ void testSFML()
 #include <client.h>
 #include "engine/WinCondition.h"
 
-
 using namespace std;
 using namespace state;
 using namespace engine;
-
-/*int main() {
-    auto game = Game::getInstance();
-    game->startGame();
-}*/
 
 int main()
 {
@@ -92,3 +85,14 @@ int main()
 
     return 0;
 }
+
+/*int main() {
+    try {
+        // Example usage
+        std::string configPath = constructPath("src/shared/state/config/Balance.csv");
+        std::cout << "Config Path: " << configPath << std::endl;
+    } catch (const std::exception& e) {
+        std::cerr << "Error: " << e.what() << std::endl;
+    }
+    return 0;
+}*/
