@@ -13,23 +13,23 @@ list(REMOVE_ITEM client_sources "${CMAKE_CURRENT_SOURCE_DIR}/main.cpp")
 add_library(${lib_client_target} STATIC ${client_sources} ${jsoncpp_sources})
 add_dependencies(${lib_client_target} generate-headers)
 target_include_directories(${lib_client_target} PUBLIC
-  ${CMAKE_CURRENT_SOURCE_DIR}
-  ${SFML_INCLUDE_DIR}
-  ${jsoncpp_include_dir}
-  )
+        ${CMAKE_CURRENT_SOURCE_DIR}
+        ${SFML_INCLUDE_DIR}
+        ${jsoncpp_include_dir}
+)
 target_link_libraries(${lib_client_target} PUBLIC
-  ${SFML_LIBRARIES}
-  $<TARGET_NAME:shared_static>
-  )
+        ${SFML_LIBRARIES}
+        $<TARGET_NAME:shared_static>
+)
 
 # Compile "client" executable
 set(client_target client)
 add_executable(${client_target} main.cpp
         ../../render.cpp)
 target_link_libraries(${client_target} ${lib_client_target})
-if(BUILD_CODE_COVERAGE)
-  add_dependencies(code-coverage ${client_target})
-endif()
+if (BUILD_CODE_COVERAGE)
+    add_dependencies(code-coverage ${client_target})
+endif ()
 
 # vim: set sw=2 sts=2 et:
 
