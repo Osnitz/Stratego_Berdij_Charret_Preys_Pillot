@@ -38,7 +38,7 @@ std::map<PieceType, int> pieceLimits = {
 };
 
 
-int main() {
+/*int main() {
     sf::RenderWindow window(sf::VideoMode(gridSize * cellSize, gridSize * cellSize), "Stratego - Interface");
 
     sf::Texture boardTexture;
@@ -158,4 +158,4 @@ int main() {
     }
 
     return 0;
-}
+}*/
