@@ -60,10 +60,6 @@ void Game::switchTurn()
 
 Player* Game::getCurrentPlayer()
 {
-    if (currentPlayer == nullptr)
-    {
-        throw std::invalid_argument("No current player");
-    }
     return currentPlayer;
 }
 
@@ -77,13 +73,21 @@ Player* Game::getPlayer2()
     return Player2;
 }
 
-Player* Game::getOpponent()
+void Game::addCaptured(Pieces* piece, Player* player)
 {
-    if (currentPlayer == Player1)
+    auto& capturedPieces = player->getCaptured();
+    auto size = capturedPieces.size();
+    int value = piece->getValue();
+    for (std::size_t i = 0; i < size; i++)
     {
-        return Player2;
+        int myvalue = capturedPieces[i]->getValue();
+        if (value <= myvalue)
+        {
+            capturedPieces.insert(capturedPieces.begin() + i, piece);
+            return;
+        }
     }
-    return Player1;
+    capturedPieces.push_back(piece);
 }
 
 void Game::removePiece(Pieces* piece, Player* player)
@@ -105,78 +109,13 @@ void Game::removePiece(Pieces* piece, Player* player)
     cerr << "Can't remove this piece : it doesn't exist!" << endl;
 }
 
-void Game::setCurrentPlayer(Player* player)
+Player* Game::getOpponent()
 {
-    currentPlayer = player;
-}
-
-void Game::setPieceOnBoard(Pieces* piece, int newX, int newY)
-{
-    removeFromBoard(piece);
-    piece->setCoord(newX, newY);
-    auto& grid = *board->getGrid();
-    grid[newX][newY] = piece;
-}
-
-void Game::removeFromBoard(Pieces* piece)
-{
-    pair<int, int> position = piece->getPosition();
-    auto& grid = *board->getGrid();
-    grid[position.first][position.second] = nullptr;
-}
-
-vector<pair<int, int>> Game::possiblePositions(Pieces* pieceToMove)
-{
-    vector<pair<int, int>> possiblePositions;
-
-    if (pieceToMove == nullptr)
+    if (currentPlayer == Player1)
     {
-        return possiblePositions;
+        return Player2;
     }
-
-    int x = pieceToMove->getPosition().first;
-    int y = pieceToMove->getPosition().second;
-    int range = pieceToMove->getRange();
-    pair<int, int> posToCheck;
-
-    for (int j = 1; j <= 4; j++)
-    {
-        for (int i = 1; i <= range; ++i)
-        {
-            switch (j)
-            {
-            case 1: posToCheck = {x, y - i};
-                break;
-            case 2: posToCheck = {x, y + i};
-                break;
-            case 3: posToCheck = {x - i, y};
-                break;
-            case 4: posToCheck = {x + i, y};
-                break;
-            }
-            if (!limitBoard(posToCheck, true))
-            {
-                break; // Si hors limites, arrêter cette direction
-            }
-
-            Pieces* targetPiece = board->getPiece(posToCheck);
-
-            if (targetPiece == nullptr) //empty case
-            {
-                possiblePositions.push_back(posToCheck);
-                continue;
-            }
-
-            if (isAlly(targetPiece)) //Occupied by an Ally
-            {
-                break;
-            }
-
-            possiblePositions.push_back(posToCheck); //Occupied by an Enemy
-            break;
-        }
-    }
-    return possiblePositions;
+    return Player1;
 }
 
 bool Game::belongTo(Pieces* piece)
@@ -293,15 +232,6 @@ bool Game::limitBoard(pair<int, int>& position, bool silent)
     return true;
 }
 
-bool Game::isEmpty(Pieces* targetPiece)
-{
-    if (targetPiece == nullptr)
-    {
-        return true;
-    }
-    return false;
-}
-
 bool Game::isAlly(Pieces* targetPiece)
 {
     if (currentPlayer == targetPiece->getOwner())
@@ -318,6 +248,89 @@ bool Game::isEnemy(Pieces* targetPiece)
         return true;
     }
     return false;
+}
+
+bool Game::isEmpty(Pieces* targetPiece)
+{
+    if (targetPiece == nullptr)
+    {
+        return true;
+    }
+    return false;
+}
+
+void Game::setPieceOnBoard(Pieces* piece, int newX, int newY)
+{
+    removeFromBoard(piece);
+    piece->setCoord(newX, newY);
+    auto& grid = *board->getGrid();
+    grid[newX][newY] = piece;
+}
+
+void Game::removeFromBoard(Pieces* piece)
+{
+    pair<int, int> position = piece->getPosition();
+    auto& grid = *board->getGrid();
+    grid[position.first][position.second] = nullptr;
+}
+
+vector<pair<int, int>> Game::possiblePositions(Pieces* pieceToMove)
+{
+    vector<pair<int, int>> possiblePositions;
+
+    if (pieceToMove == nullptr)
+    {
+        return possiblePositions;
+    }
+
+    int x = pieceToMove->getPosition().first;
+    int y = pieceToMove->getPosition().second;
+    int range = pieceToMove->getRange();
+    pair<int, int> posToCheck;
+
+    for (int j = 1; j <= 4; j++)
+    {
+        for (int i = 1; i <= range; ++i)
+        {
+            switch (j)
+            {
+                case 1: posToCheck = {x, y - i};
+                break;
+                case 2: posToCheck = {x, y + i};
+                break;
+                case 3: posToCheck = {x - i, y};
+                break;
+                case 4: posToCheck = {x + i, y};
+                break;
+            }
+            if (!limitBoard(posToCheck, true))
+            {
+                break; // Si hors limites, arrêter cette direction
+            }
+
+            Pieces* targetPiece = board->getPiece(posToCheck);
+
+            if (targetPiece == nullptr) //empty case
+            {
+                possiblePositions.push_back(posToCheck);
+                continue;
+            }
+
+            if (isAlly(targetPiece)) //Occupied by an Ally
+            {
+                break;
+            }
+
+            possiblePositions.push_back(posToCheck); //Occupied by an Enemy
+            break;
+        }
+    }
+    return possiblePositions;
+}
+
+Board* Game::getBoard()
+{
+    return board;
 }
 
 void Game::displayBoard(Player& player)
@@ -387,26 +400,9 @@ void Game::displayBoard(Player& player)
     }
 }
 
-void Game::addCaptured(Pieces* piece, Player* player)
+void Game::setCurrentPlayer(Player* player)
 {
-    auto& capturedPieces = player->getCaptured();
-    auto size = capturedPieces.size();
-    int value = piece->getValue();
-    for (std::size_t i = 0; i < size; i++)
-    {
-        int myvalue = capturedPieces[i]->getValue();
-        if (value <= myvalue)
-        {
-            capturedPieces.insert(capturedPieces.begin() + i, piece);
-            return;
-        }
-    }
-    capturedPieces.push_back(piece);
-}
-
-Board* Game::getBoard()
-{
-    return board;
+    currentPlayer = player;
 }
 
 bool Game::isFlagCaptured()

@@ -60,7 +60,7 @@ void Engine::attack(Pieces* mypiece, pair<int, int> position)
 {
     auto board = game->getBoard();
     Pieces* attackedPiece = board->getPiece(position);
-    auto currentplayer = game->currentPlayer;
+    auto currentplayer = game->getCurrentPlayer();
     auto opponent = game->getOpponent();
 
     if (attackedPiece == nullptr)

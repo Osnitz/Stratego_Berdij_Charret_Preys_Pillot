@@ -29,9 +29,9 @@ BOOST_AUTO_TEST_SUITE(AIControllerTestSuite)
 
         auto aiController = new client::AIController(mockEngine, new ai::RandomAI());
         auto mypiece = new Pieces(2, Scout, 0, 0, game->getPlayer1());
-        game->addPiece(mypiece, game->currentPlayer);
+        game->addPiece(mypiece, game->getCurrentPlayer());
         game->setPieceOnBoard(mypiece, 0, 0);
-        game->displayBoard(*game->currentPlayer);
+        game->displayBoard(*game->getCurrentPlayer());
         std::vector<int> coords = aiController->getPlayerInput();
 
         BOOST_CHECK(coords.size() == 4);
@@ -47,20 +47,20 @@ BOOST_AUTO_TEST_SUITE(AIControllerTestSuite)
         auto mockEngine = new engine::Engine(game);
         auto aiController = new client::AIController(mockEngine, new ai::RandomAI());
         auto mypiece = new Pieces(2, Scout, 0, 0, game->getPlayer1());
-        game->currentPlayer = game->getPlayer1();
-        game->addPiece(mypiece, game->currentPlayer);
+        game->setCurrentPlayer(game->getPlayer1());
+        game->addPiece(mypiece, game->getCurrentPlayer());
         game->setPieceOnBoard(mypiece, 0, 0);
 
         //Case 1 : Valid move
         std::pair<int, int> from = std::make_pair(0, 0);
         std::pair<int, int> to = std::make_pair(0, 2);
-        BOOST_CHECK(aiController->executeCmd(from, to, game->currentPlayer)==true);
+        BOOST_CHECK(aiController->executeCmd(from, to, game->getCurrentPlayer())==true);
 
         //Case 2 : Invalid move
-        game->currentPlayer = game->getPlayer1();
+        game->setCurrentPlayer(game->getPlayer1());
         from = std::make_pair(0, 2);
         to = std::make_pair(1, 1);
-        BOOST_CHECK(aiController->executeCmd(from, to, game->currentPlayer)==false);
+        BOOST_CHECK(aiController->executeCmd(from, to, game->getCurrentPlayer())==false);
     }
 
     BOOST_AUTO_TEST_CASE(TestHandlePlacement)
@@ -69,7 +69,7 @@ BOOST_AUTO_TEST_SUITE(AIControllerTestSuite)
         auto mockEngine = new engine::Engine(game);
         auto aiController = new client::AIController(mockEngine, new ai::RandomAI());
         aiController->handlePlacement(game);
-        game->displayBoard(*game->currentPlayer);
+        game->displayBoard(*game->getCurrentPlayer());
         delete game;
         delete mockEngine;
     }
