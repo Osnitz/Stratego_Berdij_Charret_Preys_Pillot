@@ -125,7 +125,7 @@ void Game::RemoveFromBoard(Pieces* piece)
     grid[position.first][position.second] = nullptr;
 }
 
-vector<pair<int, int>> Game::PossiblePositions(Pieces* pieceToMove)
+vector<pair<int, int>> Game::possiblePositions(Pieces* pieceToMove)
 {
     vector<pair<int, int>> possiblePositions;
 
