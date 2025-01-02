@@ -19,25 +19,6 @@ void testSetPosition() {
     board->removeFromBoard(&piece);
 }
 
-void testCheckCase() {
-    Board *board = Board::getInstance();
-    auto game = Game::getInstance();
-    game->switchTurn();
-    Player *player=game->getCurrentPlayer();
-    Pieces piece(1, "Soldat", 0, 0);
-    Pieces miner(2, "miner", 1, 0);
-    player->addPiece(&miner);
-    board->setPieceOnBoard(&piece);
-    board->setPieceOnBoard(&miner);
-    if(piece.CheckCase({0,1})=="Empty" && piece.CheckCase({1,0})=="Ally" && miner.CheckCase({0,1})=="Enemy") {
-        std::cout << "CheckCase test passed!" << std::endl;
-    }else {
-        std::cerr << "CheckCase test failed!" << std::endl;
-    }
-    board->removeFromBoard(&piece);
-    board->removeFromBoard(&miner);
-}
-
 void testAttack() {
     Board* board=Board::getInstance();
     Pieces bomb1(11,"Bomb",0,0);

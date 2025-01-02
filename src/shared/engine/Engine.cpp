@@ -153,4 +153,3 @@ WinCondition Engine::checkWin()
 
     return WinCondition::None;
 }
-
