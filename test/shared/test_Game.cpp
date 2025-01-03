@@ -11,14 +11,25 @@ using namespace engine;
 
 BOOST_AUTO_TEST_SUITE(GameTestSuite)
 
-// Test de l'initialisation des membres
+// Test constructor and getters
 BOOST_AUTO_TEST_CASE(testConstructor) {
     Game* game=new Game() ;
+    auto firstplayer=game->getCurrentPlayer();
     BOOST_CHECK(game->getPlayer1() != nullptr);
     BOOST_CHECK(game->getPlayer2() != nullptr);
-    BOOST_CHECK(game->getCurrentPlayer() != nullptr);
+    BOOST_CHECK(firstplayer != nullptr);
     BOOST_CHECK(game->getCurrentPlayer() == game->getPlayer1()||game->getCurrentPlayer()== game->getPlayer2());
     BOOST_CHECK(game->getBoard() != nullptr);
+
+    //test both possibilities for the first player
+    bool test=false;
+    while (!test) {
+        Game* game2=new Game();
+        if (game2->getCurrentPlayer()!=firstplayer) {
+            test=true;
+        }
+    }
+    BOOST_CHECK(test);
 }
 
 // Test de la méthode switchTurn
@@ -190,7 +201,6 @@ BOOST_AUTO_TEST_CASE(testPossiblePosition) {
     game->setPieceOnBoard(&flag,1,6);
     game->setPieceOnBoard(&miner,3,2);
 
-
     BOOST_CHECK(game->possiblePositions(empty).empty());
     BOOST_CHECK(game->possiblePositions(&flag).empty());
 
@@ -198,18 +208,56 @@ BOOST_AUTO_TEST_CASE(testPossiblePosition) {
     BOOST_CHECK(pos.size()==8);
 
     std::vector<std::pair<int,int>> result;
-    result.push_back({1,1});
-    result.push_back({1,0});
-    result.push_back({1,3});
-    result.push_back({1,4});
-    result.push_back({1,5});
-    result.push_back({0,2});
-    result.push_back({2,2});
-    result.push_back({3,2});
+    result.emplace_back(1,1);
+    result.emplace_back(1,0);
+    result.emplace_back(1,3);
+    result.emplace_back(1,4);
+    result.emplace_back(1,5);
+    result.emplace_back(0,2);
+    result.emplace_back(2,2);
+    result.emplace_back(3,2);
     for (int i=0; i<pos.size();i++) {
         BOOST_CHECK(pos[i]==result[i]);
-        std::cout<<pos[i].first<<","<<pos[i].second<<std::endl;
     }
     }
+
+BOOST_AUTO_TEST_CASE(testSetCurrentPlayer) {
+    Game* game=new Game() ;
+    auto player1=game->getPlayer1();
+    auto player2=game->getPlayer2();
+
+    game->setCurrentPlayer(player1);
+    BOOST_CHECK(game->getCurrentPlayer()==player1);
+
+    game->setCurrentPlayer(player2);
+    BOOST_CHECK(game->getCurrentPlayer()==player2);
+}
+
+BOOST_AUTO_TEST_CASE(testIsFlagCaptured) {
+    Game* game=new Game();
+    auto player=game->getCurrentPlayer();
+    auto opponent=game->getOpponent();
+    Pieces piece(1, Scout, 0, 0,player);
+    Pieces flag(0, Flag, 1, 6,opponent);
+
+    state::Game::addCaptured(&piece,player);
+    BOOST_CHECK(!game->isFlagCaptured());
+
+    game->addCaptured(&flag,opponent);
+    BOOST_CHECK(game->isFlagCaptured());
+}
+
+BOOST_AUTO_TEST_CASE(testHasValidMove) {
+    Game* game=new Game() ;
+    auto player=game->getCurrentPlayer();
+    Pieces piece(1, Scout, 1, 2,player);
+    Pieces flag(0, Flag, 1, 6,player);
+
+    game->addPiece(&flag,player);
+    BOOST_CHECK(!game->hasValidMoves());
+
+    game->addPiece(&piece,player);
+    BOOST_CHECK(game->hasValidMoves());
+}
 
 BOOST_AUTO_TEST_SUITE_END()

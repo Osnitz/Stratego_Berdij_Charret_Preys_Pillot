@@ -7,16 +7,6 @@ using namespace state;
 
 BOOST_AUTO_TEST_SUITE(BoardTestSuite)
 
-/*BOOST_AUTO_TEST_CASE(testGetGrid) {
-    Board* board=new Board();
-    auto& grid = *board->getGrid();
-    for (int i=0;i<10;i++) {
-        for (int j=0;j<10;i++) {
-            BOOST_CHECK(grid[i][j]==nullptr);
-        }
-    }
-}*/
-
 BOOST_AUTO_TEST_CASE(testBoard) {
     Board board;
     auto grid=board.getGrid();
@@ -31,7 +21,8 @@ BOOST_AUTO_TEST_CASE(testgetPiece) {
     game->setPieceOnBoard(&piece,0,0);
 
     BOOST_CHECK(board->getPiece({0,0})==&piece);
-    BOOST_CHECK(board->getPiece({1,0})!=&piece);
+    BOOST_CHECK(board->getPiece({1,0})==nullptr);
+    BOOST_CHECK(board->getPiece({10,10})==nullptr);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

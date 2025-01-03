@@ -409,12 +409,12 @@ bool Game::isFlagCaptured()
 {
     auto checkFlagCaptured = [](const std::vector<Pieces*>& capturedPieces)
     {
-        for (const auto& piece : capturedPieces)
-        {
-            if (piece->getType() == Flag)
-            {
-                return true;
-            }
+        if(capturedPieces.empty()){
+            return false;
+        }
+
+        if(capturedPieces[0]->getType()==Flag){
+            return true;
         }
         return false;
     };

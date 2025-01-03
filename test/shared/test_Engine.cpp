@@ -40,9 +40,9 @@ BOOST_AUTO_TEST_CASE(TestEndTurn)
 {
     auto game = new Game();
     auto* engine = new engine::Engine(game);
-    auto* previousPlayer = game->currentPlayer;
+    auto* previousPlayer = game->getCurrentPlayer();
     engine->endTurn();
-    auto newPlayer = game->currentPlayer;
+    auto newPlayer = game->getCurrentPlayer();
     BOOST_CHECK(previousPlayer!=newPlayer);
 
     delete engine;
@@ -54,11 +54,11 @@ BOOST_AUTO_TEST_CASE(TestHandleCmdPlacement)
     auto game = new Game();
     auto engine = new engine::Engine(game);
 
-    auto currentPlayer = game->currentPlayer;
-    std::string filePath = "/home/matthieu/Cours/PLT/Stratego/src/shared/state/config/Balance.csv";
+    auto currentPlayer = game->getCurrentPlayer();
+    std::string filePath = "src/shared/state/config/Balance.csv";
     engine->handleCmdPlacement(filePath);
     auto myPieces = currentPlayer->getMyPieces();
-    auto nextPlayer = game->currentPlayer;
+    auto nextPlayer = game->getCurrentPlayer();
 
     BOOST_CHECK(currentPlayer!=nextPlayer);
     BOOST_CHECK(!myPieces.empty());
@@ -75,7 +75,7 @@ BOOST_AUTO_TEST_CASE(TestHandleCmdMove)
     auto engine = new engine::Engine(game);
     auto board = game->getBoard();
 
-    game->currentPlayer = game->getPlayer1();
+    game->setCurrentPlayer(game->getPlayer1());
 
     // Create two pieces: one for the current player, one for the opponent
     auto myPiece = new Pieces(2, PieceType::Scout, 4, 0, game->getPlayer1());
@@ -88,18 +88,18 @@ BOOST_AUTO_TEST_CASE(TestHandleCmdMove)
 
     // Case 1: The piece does not belong to the current player
     BOOST_CHECK_MESSAGE(!engine->handleCmdMove({5, 0}, {5, 1}), "The piece should not belong to the current player.");
-    game->currentPlayer = game->getPlayer1();
+    game->setCurrentPlayer(game->getPlayer1());
 
     // Case 2: The destination is invalid
     BOOST_CHECK_MESSAGE(!engine->handleCmdMove({4, 0}, {4, -1}), "The destination is out of bounds.");
-    game->currentPlayer = game->getPlayer1();
+    game->setCurrentPlayer(game->getPlayer1());
 
     // Case 3: The destination is empty
     BOOST_CHECK_MESSAGE(engine->handleCmdMove({4, 0}, {4, 1}), "The move should be valid.");
     BOOST_CHECK_MESSAGE(board->getPiece({4, 1}) == myPiece, "The piece should have been moved.");
 
     // Reset the board state
-    game->currentPlayer = game->getPlayer1();
+    game->setCurrentPlayer(game->getPlayer1());
     game->removeFromBoard(myPiece);
     game->setPieceOnBoard(myPiece, 4, 0);
 
@@ -132,7 +132,7 @@ BOOST_AUTO_TEST_CASE(TestAttackAllCases)
     auto engine = new engine::Engine(game);
     auto board = game->getBoard();
 
-    game->currentPlayer = game->getPlayer1();
+    game->setCurrentPlayer(game->getPlayer1());
 
     // Case 1: No target at the position
     auto scoutPiece1 = new Pieces(2, PieceType::Scout, 4, 0, game->getPlayer1());
@@ -251,7 +251,7 @@ BOOST_AUTO_TEST_CASE(TestIsValidMove)
     auto engine = new engine::Engine(game);
 
     // Create a piece for the current player
-    Pieces* myPiece = new Pieces(10, PieceType::Marshal, 4, 0, game->getPlayer1());
+    auto myPiece = new Pieces(10, PieceType::Marshal, 4, 0, game->getPlayer1());
     game->addPiece(myPiece, game->getPlayer1());
     game->setPieceOnBoard(myPiece, 4, 0);
 
@@ -295,15 +295,15 @@ BOOST_AUTO_TEST_CASE(TestCheckWin)
     // Reset the game state
     game = new Game();
     engine = new engine::Engine(game);
-    game->currentPlayer = game->getPlayer1();
+    game->setCurrentPlayer(game->getPlayer1());
 
     // Case 2: No valid moves for the opponent
-    game->currentPlayer = game->getPlayer2();
+    game->setCurrentPlayer(game->getPlayer2());
     BOOST_CHECK(!game->hasValidMoves());
     BOOST_CHECK(engine->checkWin() == engine::WinCondition::NoValidMoves);
 
     // Reset the game state
-    game->currentPlayer = game->getPlayer1();
+    game->setCurrentPlayer(game->getPlayer1());
     auto scout = new Pieces(2,Scout,1,1,game->getPlayer1());
     game->addPiece(scout,game->getPlayer1());
     game->setPieceOnBoard(scout,1,1);
