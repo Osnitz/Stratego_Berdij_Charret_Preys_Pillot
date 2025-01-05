@@ -25,7 +25,7 @@ std::vector<int> HumanController::getPlayerInput()
     std::vector<int> coords;
     int startX, startY, endX, endY;
 
-    std::cout << "Player " << engine->getGame()->currentPlayer->getPlayerID() << ", enter the coordinates of the piece to move (e.g. '2 3'): \n";
+    std::cout << "Player " << engine->getGame()->getCurrentPlayer()->getPlayerID() << ", enter the coordinates of the piece to move (e.g. '2 3'): \n";
     std::cin >> startX >> startY;
     coords.push_back(startX);
     coords.push_back(startY);

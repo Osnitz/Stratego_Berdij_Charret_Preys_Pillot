@@ -39,7 +39,7 @@ int main()
 
     for (size_t i = 0; i < 2; i++)
     {
-        currentPlayer = game->currentPlayer;
+        currentPlayer = game->getCurrentPlayer();
         playerController = scenarioManager->getPlayerController(currentPlayer);
         playerController->handlePlacement(game);
     }

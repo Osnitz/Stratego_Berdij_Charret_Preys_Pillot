@@ -44,8 +44,8 @@ BOOST_AUTO_TEST_SUITE(HumanControllerTestSuite)
         auto game = new Game();
         auto mockEngine = new engine::Engine(game);
         auto mypiece = new Pieces(2, Scout, 0, 0, game->getPlayer1());
-        game->currentPlayer = game->getPlayer1();
-        game->addPiece(mypiece, game->currentPlayer);
+        game->setCurrentPlayer(game->getPlayer1());
+        game->addPiece(mypiece, game->getCurrentPlayer());
         game->setPieceOnBoard(mypiece, 0, 0);
 
 
@@ -54,12 +54,12 @@ BOOST_AUTO_TEST_SUITE(HumanControllerTestSuite)
         std::pair<int, int> from = std::make_pair(0, 0);
         std::pair<int, int> to = std::make_pair(0, 2);
 
-        BOOST_CHECK(humanController->executeCmd(from, to, game->currentPlayer) == true);
+        BOOST_CHECK(humanController->executeCmd(from, to, game->getCurrentPlayer()) == true);
 
         //Case 2 : Invalid move
         from = std::make_pair(0, 2);
         to = std::make_pair(1, 1);
-        BOOST_CHECK(humanController->executeCmd(from, to, game->currentPlayer) == false);
+        BOOST_CHECK(humanController->executeCmd(from, to, game->getCurrentPlayer()) == false);
 
         delete game;
         delete mockEngine;
@@ -74,30 +74,30 @@ BOOST_AUTO_TEST_SUITE(HumanControllerTestSuite)
 
         auto humanController = new client::HumanController(mockEngine, nullptr);
         // Case 1 : Offensive
-        game->currentPlayer = game->getPlayer1();
+        game->setCurrentPlayer(game->getPlayer1());
         std::istringstream input("1\n");
         std::cin.rdbuf(input.rdbuf()); // Redirect std::cin to use input stream
         humanController->handlePlacement(mockEngine->getGame());
-        game->currentPlayer = game->getPlayer1(); // after placement, currentPlayer is switched
+        game->setCurrentPlayer(game->getPlayer1());// after placement, currentPlayer is switched
         BOOST_CHECK(mockEngine->getGame()->getPlayer1()->getMyPieces().size() == 40);
         game->getPlayer1()->getMyPieces().clear();
 
         // Case 2 : Defensive
-        game->currentPlayer = game->getPlayer1();
+        game->setCurrentPlayer(game->getPlayer1());
         std::istringstream input2("2\n");
         std::cin.rdbuf(input2.rdbuf()); // Redirect std::cin to use input stream
         humanController->handlePlacement(mockEngine->getGame());
-        game->currentPlayer = game->getPlayer1(); // after placement, currentPlayer is switched
+        game->setCurrentPlayer(game->getPlayer1()); // after placement, currentPlayer is switched
 
         BOOST_CHECK(mockEngine->getGame()->getPlayer1()->getMyPieces().size() == 40);
         game->getPlayer1()->getMyPieces().clear();
 
         // Case 3 : Balance
-        game->currentPlayer = game->getPlayer1();
+        game->setCurrentPlayer(game->getPlayer1());
         std::istringstream input3("0\n3\n"); //0 is invalid, 3 is valid
         std::cin.rdbuf(input3.rdbuf()); // Redirect std::cin to use input stream
         humanController->handlePlacement(mockEngine->getGame());
-        game->currentPlayer = game->getPlayer1(); // after placement, currentPlayer is switched
+        game->setCurrentPlayer(game->getPlayer1());// after placement, currentPlayer is switched
 
         BOOST_CHECK(mockEngine->getGame()->getPlayer1()->getMyPieces().size() == 40);
 

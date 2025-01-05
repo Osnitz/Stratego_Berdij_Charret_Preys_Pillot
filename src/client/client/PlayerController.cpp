@@ -25,13 +25,13 @@ std::string PlayerController::getProjectRootDirectory() {
     std::string filePath = __FILE__;
 
     // Find the "Stratego" directory in the path
-    std::size_t pos = filePath.find("Stratego");
+    std::size_t pos = filePath.find("Stratego_Berdij_Charret_Preys_Pillot");
     if (pos == std::string::npos) {
-        throw std::runtime_error("Unable to find 'Stratego' in the path");
+        throw std::runtime_error("Unable to find 'Stratego_Berdij_Charret_Preys_Pillot' in the path");
     }
 
     // Extract the path up to and including "Stratego"
-    return filePath.substr(0, pos + std::string("Stratego").length());
+    return filePath.substr(0, pos + std::string("Stratego_Berdij_Charret_Preys_Pillot").length());
 }
 
 std::string PlayerController::constructPath(const std::string& relativePath) {
