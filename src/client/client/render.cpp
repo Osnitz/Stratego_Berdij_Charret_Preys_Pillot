@@ -1,161 +1,87 @@
-//
-// Created by Souhaila.B on 29/12/2024.
-//
+#include "Render.h"
 #include <SFML/Graphics.hpp>
-#include <vector>
 #include <iostream>
-#include <map>
 
-const int gridSize = 10;
-const int cellSize = 60;
+using namespace client;
 
-enum class PieceType {
-    EMPTY = -1, BOMB = 11, SPY = 1, SCOUT = 2, MINER = 3,
-    SERGEANT = 4, LIEUTENANT = 5, CAPTAIN = 6,
-    MAJOR = 7, COLONEL = 8, GENERAL = 9, MARSHAL = 10, FLAG = 0
-};
-
-
-
-struct Piece {
-    PieceType type;
-    sf::Sprite sprite;
-};
-
-std::map<PieceType, int> pieceLimits = {
-        {PieceType::MARSHAL, 1},
-        {PieceType::GENERAL, 1},
-        {PieceType::COLONEL, 2},
-        {PieceType::MAJOR, 3},
-        {PieceType::CAPTAIN, 4},
-        {PieceType::LIEUTENANT, 4},
-        {PieceType::SERGEANT, 4},
-        {PieceType::MINER, 5},
-        {PieceType::SCOUT, 8},
-        {PieceType::SPY, 1},
-        {PieceType::FLAG, 1},
-        {PieceType::BOMB, 6}
-};
-
-
-/*int main() {
-    sf::RenderWindow window(sf::VideoMode(gridSize * cellSize, gridSize * cellSize), "Stratego - Interface");
-
+Render::Render(engine::Engine* engine, ScenarioManager* scenarioManager)
+        : engine(engine), scenarioManager(scenarioManager), window(sf::VideoMode(800, 600), "Stratego - Interface") {
+    // Charger les textures
     sf::Texture boardTexture;
-    if (!boardTexture.loadFromFile("/Users/Souhaila.B/Desktop/COURS/ENSEA 3A/SFML/assets/board.png")) {
-        std::cerr << "Erreur de chargement de l'image du plateau." << std::endl;
-        return -1;
+    if (!boardTexture.loadFromFile("src/client/img_pieces/board.png")) {
+        std::cerr << "Erreur : Impossible de charger board.png" << std::endl;
     }
-    sf::Sprite boardSprite(boardTexture);
-    boardSprite.setScale(
-            static_cast<float>(gridSize * cellSize) / boardTexture.getSize().x,
-            static_cast<float>(gridSize * cellSize) / boardTexture.getSize().y
-    );
+    boardSprite.setTexture(boardTexture);
 
-    std::map<PieceType, sf::Texture> textures;
-    std::vector<std::string> pieceNames = {
-            "bomb", "spy", "scout", "miner", "sergeant", "lieutenant", "captain",
-            "major", "colonel", "general", "marshal", "flag"
-    };
-
-    for (int i = 0; i <= 11; ++i) {
+    // Charger les textures des pièces
+    for (auto type : {state::PieceType::Scout, state::PieceType::Miner, state::PieceType::Flag}) {
         sf::Texture texture;
-        if (!texture.loadFromFile("/Users/Souhaila.B/Desktop/COURS/ENSEA 3A/SFML/assets/" + pieceNames[i] + ".png")) {
-            std::cerr << "Erreur de chargement de l'image : " << pieceNames[i] << ".png" << std::endl;
-            return -1;
+        std::string filename = "src/client/img_pieces/" + std::to_string(type) + ".png";
+        if (!texture.loadFromFile(filename)) {
+            std::cerr << "Erreur : Impossible de charger " << filename << std::endl;
         }
-        textures[static_cast<PieceType>(i)] = texture;
+        textures[type] = texture;
     }
+}
 
-    std::vector<std::vector<Piece>> board(gridSize, std::vector<Piece>(gridSize, {PieceType::EMPTY, sf::Sprite()}));
-
-    int currentPieceIndex = 0;  // Index de la pièce à placer (0 à 10)
-    bool isPlacementPhase = true;  // Phase de placement active
-    PieceType currentPieceType = static_cast<PieceType>(currentPieceIndex);
-
-    Piece* selectedPiece = nullptr;
-    sf::Vector2i selectedCell(-1, -1);
-    bool isPieceSelected = false;
-
-    sf::RectangleShape highlightRect(sf::Vector2f(cellSize, cellSize));
-    highlightRect.setFillColor(sf::Color(255, 255, 0, 100));
-
+void Render::run() {
     while (window.isOpen()) {
-        sf::Event event;
-        while (window.pollEvent(event)) {
-            if (event.type == sf::Event::Closed) {
-                window.close();
-            }
-
-            if (isPlacementPhase && event.type == sf::Event::MouseButtonPressed) {
-                sf::Vector2i mousePos = sf::Mouse::getPosition(window);
-                sf::Vector2f scaledPos = window.mapPixelToCoords(mousePos);
-
-                int x = static_cast<int>(scaledPos.x) / cellSize;
-                int y = static_cast<int>(scaledPos.y) / cellSize;
-
-                if (board[y][x].type == PieceType::EMPTY) {
-                    board[y][x].type = currentPieceType;
-                    board[y][x].sprite.setTexture(textures[currentPieceType]);
-                    board[y][x].sprite.setPosition(x * cellSize, y * cellSize);
-                    board[y][x].sprite.setScale(
-                            static_cast<float>(cellSize) / textures[currentPieceType].getSize().x,
-                            static_cast<float>(cellSize) / textures[currentPieceType].getSize().y
-                    );
-
-                    currentPieceIndex++;
-                    if (currentPieceIndex > 11) {
-                        isPlacementPhase = false;  // Passer à la phase de jeu
-                    } else {
-                        currentPieceType = static_cast<PieceType>(currentPieceIndex);
-                    }
-                }
-            } else if (!isPlacementPhase && event.type == sf::Event::MouseButtonPressed) {
-                sf::Vector2i mousePos = sf::Mouse::getPosition(window);
-                sf::Vector2f scaledPos = window.mapPixelToCoords(mousePos);
-
-                int x = static_cast<int>(scaledPos.x) / cellSize;
-                int y = static_cast<int>(scaledPos.y) / cellSize;
-
-                if (isPieceSelected && selectedPiece != nullptr) {
-                    if (selectedCell == sf::Vector2i(x, y)) {
-                        isPieceSelected = false;
-                        selectedPiece = nullptr;
-                    } else if (board[y][x].type == PieceType::EMPTY) {
-                        board[y][x].type = selectedPiece->type;
-                        board[y][x].sprite = selectedPiece->sprite;
-                        board[y][x].sprite.setPosition(x * cellSize, y * cellSize);
-
-                        board[selectedCell.y][selectedCell.x].type = PieceType::EMPTY;
-                        isPieceSelected = false;
-                        selectedPiece = nullptr;
-                    }
-                } else if (board[y][x].type != PieceType::EMPTY) {
-                    selectedPiece = &board[y][x];
-                    selectedCell = sf::Vector2i(x, y);
-                    isPieceSelected = true;
-                }
-            }
-        }
-
+        handleEvents();
         window.clear();
-        window.draw(boardSprite);
-
-        if (isPieceSelected) {
-            highlightRect.setPosition(selectedCell.x * cellSize, selectedCell.y * cellSize);
-            window.draw(highlightRect);
-        }
-
-        for (int i = 0; i < gridSize; ++i) {
-            for (int j = 0; j < gridSize; ++j) {
-                if (board[i][j].type != PieceType::EMPTY) {
-                    window.draw(board[i][j].sprite);
-                }
-            }
-        }
-
+        drawBoard();
+        drawPieces();
         window.display();
     }
+}
 
-    return 0;
-}*/
+void Render::handleEvents() {
+    sf::Event event;  // Initialisation correcte sans arguments
+    while (window.pollEvent(event)) {
+        if (event.type == sf::Event::Closed) {
+            window.close();
+        }
+        if (event.type == sf::Event::MouseButtonPressed) {
+            auto mousePos = sf::Mouse::getPosition(window); // Utilisation correcte de getPosition
+            int row = mousePos.y / 60; // Exemple d'échelle
+            int col = mousePos.x / 60;
+            std::cout << "Clic détecté sur la case (" << row << ", " << col << ")" << std::endl;
+        }
+    }
+}
+
+void Render::drawBoard() {
+    window.draw(boardSprite);
+}
+
+void Render::drawPieces() {
+    if (!engine) {
+        std::cerr << "Erreur : Engine non initialisé" << std::endl;
+        return;
+    }
+
+    auto game = engine->getGame(); // Récupérer le jeu via Engine
+    if (!game) {
+        std::cerr << "Erreur : Game non initialisé" << std::endl;
+        return;
+    }
+
+    auto grid = game->getBoard()->getGrid(); // Récupérer la grille
+    if (!grid) {
+        std::cerr << "Erreur : Grid non disponible" << std::endl;
+        return;
+    }
+
+    // Parcourir la grille
+    for (size_t i = 0; i < grid->size(); ++i) { // Utilisation de '->' car 'grid' est un pointeur
+        auto& row = (*grid)[i]; // Récupération de la ligne
+        for (size_t j = 0; j < row.size(); ++j) {
+            auto piece = row[j]; // Accès à une pièce spécifique
+            if (piece) { // Vérifier si une pièce est présente
+                sf::Sprite sprite;
+                sprite.setTexture(textures[piece->getType()]); // Appeler 'getType()' sur l'objet pièce
+                sprite.setPosition(j * 60, i * 60); // Exemple d'échelle
+                window.draw(sprite);
+            }
+        }
+    }
+}
