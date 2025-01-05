@@ -4,6 +4,9 @@
 
 
 #include <boost/test/included/unit_test.hpp>
+#include <client/HumanController.h>
+#include <client/PlayerController.h>
+
 #include "state.h"
 #include "engine.h"
 
@@ -55,7 +58,8 @@ BOOST_AUTO_TEST_CASE(TestHandleCmdPlacement)
     auto engine = new engine::Engine(game);
 
     auto currentPlayer = game->getCurrentPlayer();
-    std::string filePath = "src/shared/state/config/Balance.csv";
+    auto controller = new client::HumanController(engine, nullptr);//used to correctly construct the path to the file
+    std::string filePath = controller->constructPath("src/shared/state/config/Balance.csv");
     engine->handleCmdPlacement(filePath);
     auto myPieces = currentPlayer->getMyPieces();
     auto nextPlayer = game->getCurrentPlayer();

@@ -18,7 +18,7 @@ BOOST_AUTO_TEST_CASE(TestCalculateMove)
 
     auto ai = new ai::RandomAI();
     auto player = game->getPlayer1();
-    game->currentPlayer = player;
+    game->setCurrentPlayer(player);
 
     // Case 1: No pieces available
     auto move = ai->calculateMove(game);
