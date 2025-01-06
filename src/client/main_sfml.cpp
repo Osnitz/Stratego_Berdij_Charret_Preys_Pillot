@@ -3,6 +3,9 @@
 //
 #include <iostream>
 #include <SFML/Graphics.hpp>
+#include "client.h"
+
+using namespace client;
 
 int display_test() {
     // Création d'une fenêtre SFML
@@ -35,6 +38,8 @@ int display_test() {
 int main(void)
 {
     printf("hello\n");
-    display_test();
+    Render render(60); // Fenêtre 800x600, cases de 60 pixels
+    render.run();
+    return 0;
 
 }
