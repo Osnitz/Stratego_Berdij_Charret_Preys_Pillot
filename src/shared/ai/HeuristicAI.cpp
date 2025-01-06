@@ -111,11 +111,13 @@ std::vector<int> ai::HeuristicAI::calculateMove(state::Game* game) {
         auto currentY = currentPosition.second;
         auto newX = bestPosition.first;
         auto newY = bestPosition.second;
+
         positions.push_back(currentX);
         positions.push_back(currentY);
         positions.push_back(newX);
         positions.push_back(newY);
 
+        clearCache();
         return positions;
     }
 
