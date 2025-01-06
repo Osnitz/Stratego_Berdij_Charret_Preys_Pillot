@@ -4327,7 +4327,7 @@
                 <dia:string>#piece#</dia:string>
               </dia:attribute>
               <dia:attribute name="type">
-                <dia:string>#Pieces*#</dia:string>
+                <dia:string>#state::Pieces*#</dia:string>
               </dia:attribute>
               <dia:attribute name="value">
                 <dia:string>##</dia:string>
@@ -4375,7 +4375,7 @@
                 <dia:string>#piece#</dia:string>
               </dia:attribute>
               <dia:attribute name="type">
-                <dia:string>#Pieces*#</dia:string>
+                <dia:string>#state::Pieces*#</dia:string>
               </dia:attribute>
               <dia:attribute name="value">
                 <dia:string>##</dia:string>
