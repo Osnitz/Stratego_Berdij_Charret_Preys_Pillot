@@ -108,10 +108,7 @@ void Render::drawCoordinates() {
 }
 
 sf::Vector2i Render::pixelToCell(const sf::Vector2i& pixelPos) {
-    // Si on une vue SFML personnalisée (zoom/décalage),
-    // convertis d'abord pixelPos en coordonnées "monde" :
      sf::Vector2f worldPos = window.mapPixelToCoords(pixelPos);
-    // Sinon, si la vue est par défaut et que cellSize n’est pas modifié par un zoom :
     int gridX = (int)worldPos.x / cellSize;
     int gridY = (int)worldPos.y / cellSize;
     return sf::Vector2i(gridX, gridY);
