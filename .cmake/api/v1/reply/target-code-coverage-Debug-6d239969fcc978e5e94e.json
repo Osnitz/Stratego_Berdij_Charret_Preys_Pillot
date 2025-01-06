@@ -1,0 +1,192 @@
+{
+	"backtrace" : 2,
+	"backtraceGraph" : 
+	{
+		"commands" : 
+		[
+			"add_custom_target",
+			"SETUP_TARGET_FOR_COVERAGE_LCOV",
+			"add_dependencies",
+			"add_custom_test"
+		],
+		"files" : 
+		[
+			"cmake/CodeCoverage.cmake",
+			"CMakeLists.txt",
+			"src/client/CMakeLists.txt",
+			"test/CMakeLists.txt",
+			"test/shared/CMakeLists.txt",
+			"test/client/CMakeLists.txt"
+		],
+		"nodes" : 
+		[
+			{
+				"file" : 1
+			},
+			{
+				"command" : 1,
+				"file" : 1,
+				"line" : 66,
+				"parent" : 0
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 159,
+				"parent" : 1
+			},
+			{
+				"file" : 2
+			},
+			{
+				"command" : 2,
+				"file" : 2,
+				"line" : 31,
+				"parent" : 3
+			},
+			{
+				"command" : 2,
+				"file" : 2,
+				"line" : 40,
+				"parent" : 3
+			},
+			{
+				"file" : 4
+			},
+			{
+				"command" : 3,
+				"file" : 4,
+				"line" : 7,
+				"parent" : 6
+			},
+			{
+				"command" : 2,
+				"file" : 3,
+				"line" : 83,
+				"parent" : 7
+			},
+			{
+				"command" : 3,
+				"file" : 4,
+				"line" : 8,
+				"parent" : 6
+			},
+			{
+				"command" : 2,
+				"file" : 3,
+				"line" : 83,
+				"parent" : 9
+			},
+			{
+				"file" : 5
+			},
+			{
+				"command" : 3,
+				"file" : 5,
+				"line" : 3,
+				"parent" : 11
+			},
+			{
+				"command" : 2,
+				"file" : 3,
+				"line" : 83,
+				"parent" : 12
+			},
+			{
+				"command" : 3,
+				"file" : 5,
+				"line" : 4,
+				"parent" : 11
+			},
+			{
+				"command" : 2,
+				"file" : 3,
+				"line" : 83,
+				"parent" : 14
+			},
+			{
+				"command" : 3,
+				"file" : 5,
+				"line" : 5,
+				"parent" : 11
+			},
+			{
+				"command" : 2,
+				"file" : 3,
+				"line" : 83,
+				"parent" : 16
+			}
+		]
+	},
+	"dependencies" : 
+	[
+		{
+			"backtrace" : 4,
+			"id" : "client::@8ca63c80a879d0067daa"
+		},
+		{
+			"backtrace" : 5,
+			"id" : "client_sfml::@8ca63c80a879d0067daa"
+		},
+		{
+			"backtrace" : 8,
+			"id" : "test_Engine::@9e1e2a59b6770e8465e5"
+		},
+		{
+			"backtrace" : 10,
+			"id" : "test_RandomAI::@9e1e2a59b6770e8465e5"
+		},
+		{
+			"backtrace" : 13,
+			"id" : "test_ScenarioManager::@72fa32a39d54abdb8e25"
+		},
+		{
+			"backtrace" : 15,
+			"id" : "test_HumanController::@72fa32a39d54abdb8e25"
+		},
+		{
+			"backtrace" : 17,
+			"id" : "test_AIController::@72fa32a39d54abdb8e25"
+		}
+	],
+	"id" : "code-coverage::@6890427a1f51a3e7e1df",
+	"name" : "code-coverage",
+	"paths" : 
+	{
+		"build" : ".",
+		"source" : "."
+	},
+	"sourceGroups" : 
+	[
+		{
+			"name" : "",
+			"sourceIndexes" : 
+			[
+				0
+			]
+		},
+		{
+			"name" : "CMake Rules",
+			"sourceIndexes" : 
+			[
+				1
+			]
+		}
+	],
+	"sources" : 
+	[
+		{
+			"backtrace" : 2,
+			"isGenerated" : true,
+			"path" : "CMakeFiles/code-coverage",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 0,
+			"isGenerated" : true,
+			"path" : "CMakeFiles/code-coverage.rule",
+			"sourceGroupIndex" : 1
+		}
+	],
+	"type" : "UTILITY"
+}
