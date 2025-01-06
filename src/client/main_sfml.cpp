@@ -4,7 +4,7 @@
 #include <iostream>
 #include <SFML/Graphics.hpp>
 
-int display() {
+int display_test() {
     // Création d'une fenêtre SFML
     sf::RenderWindow window(sf::VideoMode(800, 600), "Fenêtre SFML");
 
@@ -35,6 +35,6 @@ int display() {
 int main(void)
 {
     printf("hello\n");
-    display();
+    display_test();
 
 }
