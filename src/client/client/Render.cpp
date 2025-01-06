@@ -44,8 +44,19 @@ void Render::handleEvents() {
         if (event.type == sf::Event::Closed) {
             window.close();
         }
+        else if (event.type == sf::Event::MouseButtonPressed) {
+            if (event.mouseButton.button == sf::Mouse::Left) {
+                sf::Vector2i pixelPos(event.mouseButton.x, event.mouseButton.y);
+                sf::Vector2i cellPos = pixelToCell(pixelPos);
+
+
+                std::cout << "Clic sur la case : "
+                          << cellPos.x << ", " << cellPos.y << std::endl;
+            }
+        }
     }
 }
+
 
 void Render::drawBoard() {
     window.draw(boardSprite); // Afficher l'image de fond
@@ -94,6 +105,33 @@ void Render::drawCoordinates() {
         text.setPosition(j * cellSize + 5, 5); // Décalage pour la lisibilité
         window.draw(text);
     }
+}
+
+sf::Vector2i Render::pixelToCell(const sf::Vector2i& pixelPos) {
+    // Si on une vue SFML personnalisée (zoom/décalage),
+    // convertis d'abord pixelPos en coordonnées "monde" :
+     sf::Vector2f worldPos = window.mapPixelToCoords(pixelPos);
+    // Sinon, si la vue est par défaut et que cellSize n’est pas modifié par un zoom :
+    int gridX = (int)worldPos.x / cellSize;
+    int gridY = (int)worldPos.y / cellSize;
+    return sf::Vector2i(gridX, gridY);
+}
+
+sf::Vector2i Render::cellToPixel(const sf::Vector2i& cellPos) {
+    int px = cellPos.x * cellSize;
+    int py = cellPos.y * cellSize;
+    return sf::Vector2i(px, py);
+}
+
+
+void Render::drawHighlight(const sf::Vector2i& cellPos) {
+    sf::RectangleShape highlight(sf::Vector2f(cellSize, cellSize));
+    highlight.setFillColor(sf::Color(255, 255, 0, 100)); // Jaune semi-transparent
+    sf::Vector2i pixelPos = cellToPixel(cellPos);
+    highlight.setPosition((float)pixelPos.x, (float)pixelPos.y);
+
+
+    window.draw(highlight);
 }
 
 void Render::run() {
