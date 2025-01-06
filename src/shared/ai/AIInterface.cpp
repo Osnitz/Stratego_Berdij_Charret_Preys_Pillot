@@ -5,6 +5,7 @@
 using namespace ai;
 AIInterface::AIInterface()
 {
+
 }
 
 AIInterface::~AIInterface()
