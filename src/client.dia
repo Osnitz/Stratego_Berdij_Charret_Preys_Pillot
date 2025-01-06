@@ -4406,19 +4406,19 @@
     </dia:object>
     <dia:object type="UML - Dependency" version="1" id="O24">
       <dia:attribute name="obj_pos">
-        <dia:point val="51.3232,30.1679"/>
+        <dia:point val="51.3232,30.1694"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="37.9361,6.90173;51.3732,30.2179"/>
+        <dia:rectangle val="30.1912,9.55632;51.3732,30.2194"/>
       </dia:attribute>
       <dia:attribute name="meta">
         <dia:composite type="dict"/>
       </dia:attribute>
       <dia:attribute name="orth_points">
-        <dia:point val="51.3232,30.1679"/>
-        <dia:point val="51.3232,18.9598"/>
-        <dia:point val="38.3861,18.9598"/>
-        <dia:point val="38.3861,7.35173"/>
+        <dia:point val="51.3232,30.1694"/>
+        <dia:point val="51.3232,16.7596"/>
+        <dia:point val="30.6412,16.7596"/>
+        <dia:point val="30.6412,10.0063"/>
       </dia:attribute>
       <dia:attribute name="orth_orient">
         <dia:enum val="1"/>
@@ -4426,7 +4426,7 @@
         <dia:enum val="1"/>
       </dia:attribute>
       <dia:attribute name="orth_autoroute">
-        <dia:boolean val="true"/>
+        <dia:boolean val="false"/>
       </dia:attribute>
       <dia:attribute name="name">
         <dia:string>##</dia:string>
@@ -4454,7 +4454,7 @@
       </dia:attribute>
       <dia:connections>
         <dia:connection handle="0" to="O22" connection="44"/>
-        <dia:connection handle="1" to="O23" connection="8"/>
+        <dia:connection handle="1" to="O10" connection="8"/>
       </dia:connections>
     </dia:object>
   </dia:layer>
