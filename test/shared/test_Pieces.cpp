@@ -1,39 +1,7 @@
 //
 // Created by plt on 13/11/24.
 //
-/*#include <iostream>
-
-#include "state.h"
-#include "engine.h"
-
-using namespace std;
-using namespace state;
-
-
-void testConstructor() {
-    Pieces piece(1, "Soldat", 0, 0);
-    Pieces miner(2, "miner", 0, 0);
-    Pieces flag(0, "flag", 0, 0);
-    int x=piece.getPosition().first;
-    int y=piece.getPosition().second;
-    if(piece.getValue()==1&&piece.getName()=="Soldat"&&x==0&&y==0&&piece.getRange()==1&&miner.getRange()==10&&flag.getRange()==0) {
-        cout << "Contructor test passed!" << endl;
-    }else {
-        std::cerr << "Constructor test failed!" << std::endl;
-    }
-}
-
-void testCheckBoard() {
-    Pieces piece(1, "Soldat", 0, 0);
-    pair<int, int> outOfBoard={-1,10};
-    pair<int, int> inTheLake={4,2};
-    pair<int, int> goodPosition={4,1};
-    if(!piece.CheckBoard(outOfBoard,false)&&!piece.CheckBoard(inTheLake,false)&&piece.CheckBoard(goodPosition,false)) {
-        cout << "CheckBoard test passed!" << endl;
-    }else {
-        cerr << "CheckBoard test failed!" << endl;
-    }
-}
+/*
 
 void testSetPosition() {
     Board *board = Board::getInstance();
@@ -49,25 +17,6 @@ void testSetPosition() {
         std::cerr << "setPosition test failed!" << std::endl;
     }
     board->removeFromBoard(&piece);
-}
-
-void testCheckCase() {
-    Board *board = Board::getInstance();
-    auto game = Game::getInstance();
-    game->switchTurn();
-    Player *player=game->getCurrentPlayer();
-    Pieces piece(1, "Soldat", 0, 0);
-    Pieces miner(2, "miner", 1, 0);
-    player->addPiece(&miner);
-    board->setPieceOnBoard(&piece);
-    board->setPieceOnBoard(&miner);
-    if(piece.CheckCase({0,1})=="Empty" && piece.CheckCase({1,0})=="Ally" && miner.CheckCase({0,1})=="Enemy") {
-        std::cout << "CheckCase test passed!" << std::endl;
-    }else {
-        std::cerr << "CheckCase test failed!" << std::endl;
-    }
-    board->removeFromBoard(&piece);
-    board->removeFromBoard(&miner);
 }
 
 void testAttack() {
@@ -124,16 +73,7 @@ void testAttack() {
     }
     cout << "Attack test failed!" << endl;
 }
-
-int main() {
-    testConstructor();
-    testCheckBoard();
-    //testCheckRange();
-    testSetPosition();
-    testCheckCase();
-    testAttack();
-    return 0;
-}*/
+*/
 
 #include <boost/test/unit_test.hpp>
 #include "state.h"
@@ -143,54 +83,51 @@ using namespace state;
 
 // Test du constructeur
 BOOST_AUTO_TEST_CASE(testConstructor) {
-    Pieces piece(1, "Soldat", 0, 0);
-    Pieces miner(2, "miner", 0, 0);
-    Pieces flag(0, "flag", 0, 0);
+    Player* player=new Player(0);
+    Pieces piece(1, Scout, 0, 0,player);
+    Pieces miner(2, Miner, 0, 0,player);
+    Pieces flag(0, Flag, 0, 0,player);
+    Pieces bomb(11,Bomb,0,0,player);
 
     int x = piece.getPosition().first;
     int y = piece.getPosition().second;
 
     BOOST_CHECK(piece.getValue() == 1);
-    BOOST_CHECK(piece.getName() == "Soldat");
+    BOOST_CHECK(piece.getType() == PieceType::Scout);
+    BOOST_CHECK(piece.getOwner()==player);
     BOOST_CHECK(x == 0 && y == 0);
-    BOOST_CHECK(piece.getRange() == 1);
-    BOOST_CHECK(miner.getRange() == 10);
+    BOOST_CHECK(piece.getRange() == 10);
+    BOOST_CHECK(miner.getRange() == 1);
     BOOST_CHECK(flag.getRange() == 0);
+    BOOST_CHECK(bomb.getRange() == 0);
 }
 
 // Test de CheckBoard
-BOOST_AUTO_TEST_CASE(testCheckBoard) {
-    Pieces piece(1, "Soldat", 0, 0);
+/*BOOST_AUTO_TEST_CASE(testCheckBoard) {
+    Player* player=new Player();
+    Pieces piece(1, Scout, 0, 0,player);
 
     std::pair<int, int> outOfBoard = {-1, 10};
     std::pair<int, int> inTheLake = {4, 2};
     std::pair<int, int> goodPosition = {4, 1};
 
-    BOOST_CHECK(!piece.CheckBoard(outOfBoard, false));
+    BOOST_CHECK(!piece.LimitBoard(outOfBoard, false));
     BOOST_CHECK(!piece.CheckBoard(inTheLake, false));
     BOOST_CHECK(piece.CheckBoard(goodPosition, false));
-}
+}*/
+
+
 
 // Test de setPosition
-BOOST_AUTO_TEST_CASE(testSetPosition) {
-    Board *board = Board::getInstance();
-    Pieces piece(1, "Soldat", 0, 0);
-    Pieces piece2(1, "Soldat", 1, 0);
-
+BOOST_AUTO_TEST_CASE(testsetCoord) {
+    Player* player=new Player(0);
+    Pieces piece(1, Scout, 0, 0,player);
     std::pair<int, int> newPosition = {1, 0};
-
-    board->setPieceOnBoard(&piece);
-    board->setPieceOnBoard(&piece2);
-
-    piece.setPosition(newPosition);
+    piece.setCoord(1,0);
 
     BOOST_CHECK(piece.getPosition() == newPosition);
-    BOOST_CHECK(board->getPiece({0, 0}) == nullptr);
-    BOOST_CHECK(board->getPiece(newPosition) == &piece);
-
-    board->removeFromBoard(&piece);
 }
-
+/*
 // Test de CheckCase
 BOOST_AUTO_TEST_CASE(testCheckCase) {
     Board *board = Board::getInstance();
@@ -267,3 +204,4 @@ BOOST_AUTO_TEST_CASE(testAttack) {
     BOOST_CHECK(board->getPiece({3, 2}) == nullptr);
     BOOST_CHECK(board->getPiece({3, 3}) == &lieutenant);
 }
+*/

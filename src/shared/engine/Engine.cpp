@@ -13,16 +13,10 @@ using namespace engine;
 using namespace state;
 using namespace std;
 
-Engine::Engine(Game* game, vector<Player*> players)
-    : game(game), players(players)
+Engine::Engine(Game* game): game(game)
 {
 }
 
-void Engine::startGame()
-{
-    game->switchTurn();
-    std::cout << "Game started. Entering Placement Phase." << endl;
-}
 
 void Engine::endTurn()
 {
@@ -31,7 +25,6 @@ void Engine::endTurn()
 
 bool Engine::handleCmdPlacement(string filePath)
 {
-    auto currentPlayer = game->currentPlayer;
     game->loadConfig(filePath);
     endTurn();
     return true;
@@ -41,7 +34,6 @@ bool Engine::handleCmdMove(pair<int, int> from, pair<int, int> to)
 {
     auto board=game->getBoard();
     auto mypiece = board->getPiece(from);
-    auto currentplayer = game->currentPlayer;
     if (!game->belongTo(mypiece))
     {
         cerr << "This is not your piece !" << endl;
@@ -53,9 +45,9 @@ bool Engine::handleCmdMove(pair<int, int> from, pair<int, int> to)
         return false;
     }
     auto targetpiece = board->getPiece(to);
-    if (game->IsEmpty(targetpiece))
+    if (game->isEmpty(targetpiece))
     {
-        game->SetPieceOnBoard(mypiece,to.first,to.second);
+        game->setPieceOnBoard(mypiece,to.first,to.second);
         endTurn();
         return true;
     }
@@ -64,11 +56,11 @@ bool Engine::handleCmdMove(pair<int, int> from, pair<int, int> to)
     return true;
 }
 
-void Engine::attack(Pieces* mypiece, pair<int, int>& position)
+void Engine::attack(Pieces* mypiece, pair<int, int> position)
 {
     auto board = game->getBoard();
     Pieces* attackedPiece = board->getPiece(position);
-    auto currentplayer = game->currentPlayer;
+    auto currentplayer = game->getCurrentPlayer();
     auto opponent = game->getOpponent();
 
     if (attackedPiece == nullptr)
@@ -85,13 +77,13 @@ void Engine::attack(Pieces* mypiece, pair<int, int>& position)
         if (mytype == PieceType::Miner) {
             cout << "Good job ! The bomb is no more.\n" << endl;
             game->addCaptured(attackedPiece, currentplayer);
-            game->SetPieceOnBoard(mypiece,position.first,position.second);
+            game->setPieceOnBoard(mypiece,position.first,position.second);
             game->removePiece(attackedPiece, opponent);
             return;
         } else {
             cout << "Rest well ! The war is over for you.\n" << endl;
             game->addCaptured(mypiece, opponent);
-            game->RemoveFromBoard(mypiece);
+            game->removeFromBoard(mypiece);
             game->removePiece(mypiece, currentplayer);
             return;
         }
@@ -100,7 +92,7 @@ void Engine::attack(Pieces* mypiece, pair<int, int>& position)
     if (otherstype == PieceType::Marshal && mytype == PieceType::Spy) {
         cout << "Well done sir ! Their leader is gone.\n" << endl;
         game->addCaptured(attackedPiece, currentplayer);
-        game->SetPieceOnBoard(mypiece,position.first,position.second);
+        game->setPieceOnBoard(mypiece,position.first,position.second);
         game->removePiece(attackedPiece, opponent);
         return;
     }
@@ -109,12 +101,12 @@ void Engine::attack(Pieces* mypiece, pair<int, int>& position)
     if (myvalue > othersvalue) {
         cout << "The enemy is down ! It was a " << otherstype << ".\n" << endl;
         game->addCaptured(attackedPiece, currentplayer);
-        game->SetPieceOnBoard(mypiece,position.first,position.second);
+        game->setPieceOnBoard(mypiece,position.first,position.second);
         game->removePiece(attackedPiece, opponent);
     }
     else if (myvalue < othersvalue) {
         cout << "The enemy is too strong ! It was a " << otherstype << ".\n" << endl;
-        game->RemoveFromBoard(mypiece);
+        game->removeFromBoard(mypiece);
         game->removePiece(mypiece, currentplayer);
         game->addCaptured(mypiece, opponent);
     }
@@ -122,8 +114,8 @@ void Engine::attack(Pieces* mypiece, pair<int, int>& position)
         cout << "It's a tie ! It was a " << otherstype << " too.\n" << endl;
         game->addCaptured(attackedPiece, currentplayer);
         game->addCaptured(mypiece, opponent);
-        game->RemoveFromBoard(mypiece);
-        game->RemoveFromBoard(attackedPiece);
+        game->removeFromBoard(mypiece);
+        game->removeFromBoard(attackedPiece);
         game->removePiece(mypiece, currentplayer);
         game->removePiece(attackedPiece, opponent);
 
@@ -132,7 +124,7 @@ void Engine::attack(Pieces* mypiece, pair<int, int>& position)
 
 bool Engine::isValidMove(Pieces* piece, pair<int, int> to)
 {
-    auto possiblePositions = game->PossiblePositions(piece);
+    auto possiblePositions = game->possiblePositions(piece);
     for (size_t i = 0; i < possiblePositions.size(); i++)
     {
         if (possiblePositions[i] == to)
@@ -145,4 +137,19 @@ bool Engine::isValidMove(Pieces* piece, pair<int, int> to)
 
 Game * Engine::getGame() {
     return game;
+}
+
+WinCondition Engine::checkWin()
+{
+    if (game->isFlagCaptured())
+    {
+        return WinCondition::FlagCaptured;
+    }
+
+    if (!game->hasValidMoves())
+    {
+        return WinCondition::NoValidMoves;
+    }
+
+    return WinCondition::None;
 }

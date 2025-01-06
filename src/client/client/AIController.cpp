@@ -2,6 +2,7 @@
 // Created by matthieu on 16/12/24.
 //
 #include <iostream>
+#include <random>
 
 #include "PlayerController.h"
 #include "client.h"
@@ -10,14 +11,13 @@
 using namespace client;
 
 
-AIController::AIController(engine::Engine* eng, int id, ai::AIInterface* aiModule)
-    : PlayerController(eng, id, aiModule){}
-
-
-bool AIController::isAI()
+AIController::AIController(engine::Engine* eng, ai::AIInterface* aiModule)
+    : PlayerController(eng, aiModule)
 {
-    return (aiModule != nullptr);
+    engine=eng;
+    this->aiModule = aiModule;
 }
+
 
 std::vector<int> AIController::getPlayerInput()
 {
@@ -44,13 +44,38 @@ bool AIController::executeCmd(std::pair<int, int> from, std::pair<int, int> to, 
     return success;
 }
 
-int AIController::getPlayerID()
+
+void AIController::handlePlacement(state::Game* game)
 {
-    return playerID;
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_int_distribution<> distr(1, 3);
+
+    std::string filePath;
+    int randomConfig= distr(gen);
+    switch (randomConfig)
+    {
+    case 1:
+        filePath = constructPath("src/shared/state/config/Offensive.csv");
+        break;
+    case 2:
+        filePath = constructPath("src/shared/state/config/Defensive.csv");
+        break;
+    case 3:
+        filePath = constructPath("src/shared/state/config/Balance.csv");
+        break;
+    }
+    engine->handleCmdPlacement(filePath);
 }
 
-AIController::~AIController()
+engine::Engine* AIController::getEngine()
 {
-    delete aiModule;
-    delete engine;
+    return engine;
 }
+
+ai::AIInterface* AIController::getAiModule()
+{
+    return aiModule;
+}
+
+AIController::~AIController(){}

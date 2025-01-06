@@ -11,26 +11,21 @@
 using namespace client;
 
 
-HumanController::HumanController(engine::Engine* eng, int id, ai::AIInterface* aiModule)
-    : PlayerController(eng, id, aiModule)
+
+HumanController::HumanController(engine::Engine* eng, ai::AIInterface* aiModule)
+    : PlayerController(eng, aiModule)
 {
     engine = eng;
-    playerID = id;
     this->aiModule = aiModule;
 }
 
-
-bool HumanController::isAI()
-{
-    return (aiModule != nullptr);
-}
 
 std::vector<int> HumanController::getPlayerInput()
 {
     std::vector<int> coords;
     int startX, startY, endX, endY;
 
-    std::cout << "Player " << playerID << ", enter the coordinates of the piece to move (e.g. '2 3'): \n";
+    std::cout << "Player " << engine->getGame()->getCurrentPlayer()->getPlayerID() << ", enter the coordinates of the piece to move (e.g. '2 3'): \n";
     std::cin >> startX >> startY;
     coords.push_back(startX);
     coords.push_back(startY);
@@ -49,13 +44,48 @@ bool HumanController::executeCmd(std::pair<int, int> from, std::pair<int, int> t
     return success;
 }
 
-int HumanController::getPlayerID()
-{
-    return playerID;
-}
 
 HumanController::~HumanController()
 {
     delete aiModule;
-    delete engine;
 }
+
+void HumanController::handlePlacement(state::Game* game)
+{
+    auto currentPlayer = game->getCurrentPlayer();
+    std::cout << "Player " << currentPlayer->getPlayerID() << ", choose your configuration " << std::endl;
+    std::cout << "(1: Offensive, 2:Defensive, 3:Balance): " << std::endl;
+    int choice;
+    std::cin >> choice;
+    std::string filePath;
+
+    while (choice < 1 || choice > 3)
+    {
+        std::cerr << "Invalid choice. Please choose a configuration (1: Offensive, 2:Defensive, 3:Balance): " <<std::endl;
+        std::cin >> choice;
+    }
+    switch (choice)
+    {
+    case 1:
+        filePath = constructPath("src/shared/state/config/Offensive.csv");
+        break;
+    case 2:
+        filePath = constructPath("src/shared/state/config/Defensive.csv");
+        break;
+    case 3:
+        filePath = constructPath("src/shared/state/config/Balance.csv");
+        break;
+    }
+    engine->handleCmdPlacement(filePath);
+}
+
+engine::Engine* HumanController::getEngine()
+{
+    return engine;
+}
+
+ai::AIInterface* HumanController::getAiModule()
+{
+    return aiModule;
+}
+
