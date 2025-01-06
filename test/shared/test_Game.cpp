@@ -260,4 +260,13 @@ BOOST_AUTO_TEST_CASE(testHasValidMove) {
     BOOST_CHECK(game->hasValidMoves());
 }
 
+BOOST_AUTO_TEST_CASE(testAddKnown) {
+    Game* game=new Game();
+    auto player=game->getCurrentPlayer();
+    auto& knownpiece=player->getKnown();
+    Pieces piece(1, Scout, 0, 0,player);
+    game->addKnown(&piece,player);
+    BOOST_CHECK(knownpiece[0]==&piece);
+}
+
 BOOST_AUTO_TEST_SUITE_END()

@@ -54,3 +54,7 @@ void Player:: displayCaptured () {
 int Player::getPlayerID() {
     return PlayerID;
 }
+
+std::vector<Pieces *> &Player::getKnown() {
+    return knownPieces;
+}

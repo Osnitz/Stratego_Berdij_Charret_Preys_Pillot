@@ -441,3 +441,7 @@ bool Game::hasValidMoves()
     }
     return false;
 }
+
+void Game::addKnown(Pieces * piece, Player* player) {
+    player->getKnown().push_back(piece);
+}

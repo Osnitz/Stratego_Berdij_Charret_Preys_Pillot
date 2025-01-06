@@ -86,10 +86,10 @@ BOOST_AUTO_TEST_SUITE(PlayerTestSuite)
 BOOST_AUTO_TEST_CASE(testGetters) {
     Player* player=new Player(0);
     Pieces piece(1, Scout, 0, 0,player);
-    std::vector<Pieces*> test={&piece};
     BOOST_CHECK(player->getPlayerID()==0);
     BOOST_CHECK(player->getMyPieces().empty());
     BOOST_CHECK(player->getCaptured().empty());
+    BOOST_CHECK(player->getKnown().empty());
 }
 
 BOOST_AUTO_TEST_CASE(testDisplayCaptured) {
@@ -125,57 +125,6 @@ BOOST_AUTO_TEST_CASE(testDisplayCaptured) {
     game->addCaptured(&bomb,player);
     BOOST_TEST_MESSAGE("DisplayCaptured  second output:");
     player->displayCaptured();
-
 }
 
-/*BOOST_AUTO_TEST_CASE(testRemovePiece) {
-    Player player;
-    Pieces piece(1, "Soldat", 0, 0);
-    Pieces notmypiece(1, "Soldat", 1, 1);
-
-    player.addPiece(&piece);
-    player.removePiece(&notmypiece); // Doit afficher un message : "Can't remove this piece : it doesn't exist!"
-    player.removePiece(&piece);
-
-    BOOST_CHECK(player.getMyPieces().empty());
-
-    player.removePiece(&piece); // Doit afficher un message : "No piece left"
-}
-
-BOOST_AUTO_TEST_CASE(testAddCaptured) {
-    Player player;
-    Pieces piece1(1, "Soldat", 0, 0);
-    Pieces piece2(2, "Cavalier", 0, 0);
-
-    player.addCaptured(&piece2);
-    player.addCaptured(&piece1);
-
-    BOOST_CHECK_EQUAL(player.getCaptured().size(), 2);
-    BOOST_CHECK(player.getCaptured()[0] == &piece1);
-    BOOST_CHECK(player.getCaptured()[1] == &piece2);
-}
-
-BOOST_AUTO_TEST_CASE(testBelongTo) {
-    Player player;
-    Pieces piece(1, "Soldat", 0, 0);
-    Pieces notmypiece(1, "Soldat", 1, 1);
-
-    player.addPiece(&piece);
-
-    BOOST_CHECK(player.belongTo(&piece));
-    BOOST_CHECK(!player.belongTo(&notmypiece));
-}
-
-BOOST_AUTO_TEST_CASE(testDisplayCaptured) {
-    Player player;
-    Pieces piece(1, "Soldat", 0, 0);
-
-    BOOST_TEST_MESSAGE("DisplayCaptured first output:");
-    player.displayCaptured();
-
-    player.addCaptured(&piece);
-    BOOST_TEST_MESSAGE("DisplayCaptured  second output:");
-    player.displayCaptured();
-}
-*/
 BOOST_AUTO_TEST_SUITE_END()

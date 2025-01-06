@@ -11,17 +11,18 @@
 #include <state/Pieces.h>
 #include <state/Player.h>
 
-state::Player currentPlayer;
+using namespace state;
 
 int ai::HeuristicAI::heuristicCalculator(state::Pieces& piece, const std::pair<int, int>& position, state::Game& game) {
     int weight = 0;
+    auto currentPlayer=game.getCurrentPlayer();
 
     if (piece.getType() == state::PieceType::Scout) {
         weight += 50;
     }
 
-    if (piece.getType() == state::PieceType::Miner || piece.getType() == state::PieceType::Flag) {
-        for (const auto& enemy : currentPlayer.knownPieces) {
+    else if (piece.getType() == state::PieceType::Miner || piece.getType() == state::PieceType::Flag) {
+        for (const auto& enemy : currentPlayer->knownPieces) {
             int distance = abs(position.first - enemy->state::Pieces::getPosition().first) + abs(position.second - enemy->getPosition().second);
             if (distance <= 2) {
                 weight += 100;
@@ -29,7 +30,7 @@ int ai::HeuristicAI::heuristicCalculator(state::Pieces& piece, const std::pair<i
         }
     }
 
-    for (const auto& enemy : currentPlayer.knownPieces) {
+    for (const auto& enemy : currentPlayer->knownPieces) {
         if (piece.getValue() > enemy->getValue()) {
             int distance = abs(position.first - enemy->state::Pieces::getPosition().first) + abs(position.second - enemy->state::Pieces::getPosition().second);
             if (distance == 1) {
@@ -60,8 +61,8 @@ std::vector<std::pair<std::pair<int, int>, int>> ai::HeuristicAI::calculateMove(
 
 std::vector<state::Pieces *> ai::HeuristicAI::getPlayablePieces(state::Game &game) {
     std::vector<state::Pieces*> playablePieces;
-
-    for (auto& piece : currentPlayer.myPieces) {
+    auto currentPlayer=game.getCurrentPlayer();
+    for (auto& piece : currentPlayer->getMyPieces()) {
         auto possibleMoves = game.possiblePositions(piece);
 
         if (!possibleMoves.empty()) {
