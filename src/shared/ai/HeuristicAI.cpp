@@ -11,7 +11,7 @@
 #include <state/Pieces.h>
 #include <state/Player.h>
 
-int ai::HeuristicAI::heuristicCalculator(state::Pieces& piece, const std::pair<int, int>& position) {
+int ai::HeuristicAI::heuristicCalculator(state::Pieces& piece, const std::pair<int, int>& position, state::Game& game) {
     int weight = 0;
     state::Player currentPlayer;
 
@@ -42,13 +42,12 @@ int ai::HeuristicAI::heuristicCalculator(state::Pieces& piece, const std::pair<i
     return weight;
 }
 
-std::vector<std::pair<std::pair<int, int>, int>> ai::HeuristicAI::calculateMove(state::Pieces* piece) {
-    state::Game gameInstance;
-    auto possibleMoves = gameInstance.possiblePositions(piece);
+std::vector<std::pair<std::pair<int, int>, int>> ai::HeuristicAI::calculateMove(state::Pieces* piece, state::Game& game) {
+    auto possibleMoves = game.possiblePositions(piece);
     std::vector<std::pair<std::pair<int, int>, int>> weightedMoves;
 
     for (const auto& pos : possibleMoves) {
-        int weight = heuristicCalculator(*piece, pos);
+        int weight = heuristicCalculator(*piece, pos, game);
         weightedMoves.push_back({pos, weight});
     }
 
@@ -58,7 +57,7 @@ std::vector<std::pair<std::pair<int, int>, int>> ai::HeuristicAI::calculateMove(
     return weightedMoves;
 }
 
-std::pair<state::Pieces*, std::pair<int, int>> ai::HeuristicAI::bestMove() {
+std::pair<state::Pieces*, std::pair<int, int>> ai::HeuristicAI::bestMove(state::Game& game) {
     int bestWeight = -1;
     state::Pieces* bestPiece = nullptr;
     std::pair<int, int> bestPosition = {-1, -1};
@@ -66,7 +65,7 @@ std::pair<state::Pieces*, std::pair<int, int>> ai::HeuristicAI::bestMove() {
     auto playablePieces = getPlayablePieces();
 
     for (auto& piece : playablePieces) {
-        auto moves = calculateMove(&piece);
+        auto moves = calculateMove(&piece, game);
 
         for (const auto& move : moves) {
             if (move.second > bestWeight) {

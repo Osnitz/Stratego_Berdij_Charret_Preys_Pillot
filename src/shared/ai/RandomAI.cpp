@@ -16,7 +16,7 @@ RandomAI::RandomAI()
 }
 
 
-std::vector<int> RandomAI::calculateMove(state::Game* game)
+std::vector<int> ai::RandomAI::calculateMove(state::Game* game)
 {
     std::vector<int> positions;
     int startX, startY, endX, endY;
@@ -37,7 +37,7 @@ std::vector<int> RandomAI::calculateMove(state::Game* game)
     std::vector<Pieces*> movablePieces;
     for (auto* piece : aiPieces)
     {
-        if (!game->PossiblePositions(piece).empty())
+        if (!game->possiblePositions(piece).empty())
         {
             movablePieces.push_back(piece);
         }
@@ -55,7 +55,7 @@ std::vector<int> RandomAI::calculateMove(state::Game* game)
     startX = pieceToMove->getPosition().first;
     startY = pieceToMove->getPosition().second;
     // Get the possible positions for this piece
-    auto possiblePositions = game->PossiblePositions(pieceToMove);
+    auto possiblePositions = game->possiblePositions(pieceToMove);
     std::uniform_int_distribution<> distr2(0, possiblePositions.size() - 1);
     auto destination = possiblePositions[distr2(gen)];
 
