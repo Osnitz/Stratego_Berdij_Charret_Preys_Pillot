@@ -10,7 +10,7 @@
 using namespace state;
 using namespace std;
 
-Player :: Player(int PlayerID) : PlayerID(PlayerID){
+Player::Player(int PlayerID) : PlayerID(PlayerID){
     vector<Pieces *> myPieces;
     vector<Pieces *> capturedPieces = {nullptr};
     vector<Pieces *> knownPieces;

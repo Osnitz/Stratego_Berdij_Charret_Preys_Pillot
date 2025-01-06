@@ -68,6 +68,4 @@ std::vector<int> ai::RandomAI::calculateMove(state::Game* game)
     return positions;
 }
 
-RandomAI::~RandomAI()
-{
-}
+RandomAI::~RandomAI() = default;
