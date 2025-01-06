@@ -2,9 +2,14 @@
 // Created by matthieu on 06/01/25.
 //
 #include "Render.h"
+#include "state/Board.h"
+#include "state/Pieces.h"
+#include "state/Game.h"
+
 #include <iostream>
 
 using namespace client;
+using namespace state;
 std::string getProjectRootDirectory() {
     // Full path to the current file
     std::string filePath = __FILE__;
@@ -23,9 +28,9 @@ std::string constructPath(const std::string& relativePath) {
     return getProjectRootDirectory() + "/" + relativePath;
 }
 
-Render::Render(int cellSize)
+Render::Render(int cellSize, state::Game* game)
         : window(sf::VideoMode(cellSize * 10, cellSize * 10), "Stratego - Plateau"),
-          cellSize(cellSize), rows(10), cols(10) {
+          cellSize(cellSize), rows(10), cols(10), game(game) {
     // Charger l'image de fond
     std::string filepath = constructPath("src/client/img_render/board.png");
     if (!boardTexture.loadFromFile(filepath)) {
@@ -131,13 +136,48 @@ void Render::drawHighlight(const sf::Vector2i& cellPos) {
     window.draw(highlight);
 }
 
-void Render::run() {
+void Render::drawPiecesOnBoard(state::Board* board) {
+    const std::vector<std::vector<Pieces*>>* grid = board->getGrid();
+
+    for (const auto& row : *grid) {
+        for (Pieces* piece : row) {
+            if (piece) {
+                sf::CircleShape pieceShape(static_cast<float>(cellSize) / 2);
+                pieceShape.setFillColor(sf::Color::Red); // Exemple de couleur
+
+                // Utilisation de la méthode getPosition() pour obtenir la position de la pièce
+                auto [x, y] = piece->getPosition();
+                sf::Vector2i pixelPos = cellToPixel(sf::Vector2i(x, y));
+
+                pieceShape.setPosition(static_cast<float>(pixelPos.x), static_cast<float>(pixelPos.y));
+                window.draw(pieceShape);
+            }
+        }
+    }
+}
+
+
+
+void Render::erasePieces() {
+    auto board = game->getBoard();
+    int x = 5, y = 5; // Position à effacer
+    auto piece = board->getPiece({x, y});
+    if (piece != nullptr) {
+        piece->setCoord(-1, -1); // Déplacer la pièce hors de l'écran ou la supprimer
+    }
+}
+
+
+
+void Render::run(Game* game) {
     while (window.isOpen()) {
+        auto board = game->getBoard();
         handleEvents();
         window.clear();
         drawBoard();
         drawGrid();
         drawCoordinates();
+        drawPiecesOnBoard(board);
         window.display();
     }
 }
