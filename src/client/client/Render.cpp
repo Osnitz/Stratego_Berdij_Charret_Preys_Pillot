@@ -306,20 +306,22 @@ std::vector<int> Render::getPlayerInput() {
                             selectedCell = {-1, -1};
                             continue;
                         }
+                        if (game->belongTo(selectedPiece))
+                        {
+                            std::vector<std::pair<int, int>> possiblePositions = game->possiblePositions(selectedPiece);
+                            // Redraw the board with the selected piece and possible positions highlighted
+                            window.clear();
+                            drawBoard();
+                            drawGrid();
+                            drawCoordinates();
+                            drawPiecesOnBoard(game);
+                            highlightSelectedPiece(selectedPair);
+                            highlightPossiblePositions(possiblePositions);
+                            window.display();
+                        }
 
-                        std::vector<std::pair<int, int>> possiblePositions = game->possiblePositions(selectedPiece);
 
-                        // Redraw the board with the selected piece and possible positions highlighted
-                        window.clear();
-                        drawBoard();
-                        drawGrid();
-                        drawCoordinates();
-                        drawPiecesOnBoard(game);
-                        highlightSelectedPiece(selectedPair);
-                        highlightPossiblePositions(possiblePositions);
-                        window.display();
-
-                        std::cout << "Cellule sélectionnée : " << selectedPair.second << ", " << selectedPair.first << std::endl;
+                        //std::cout << "Cellule sélectionnée : " << selectedPair.second << ", " << selectedPair.first << std::endl;
                     } else {
                         targetCell = clickedCell;
 
