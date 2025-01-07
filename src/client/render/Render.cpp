@@ -2,15 +2,17 @@
 // Created by matthieu on 06/01/25.
 //
 #include "Render.h"
-#include "state/Board.h"
-#include "state/Pieces.h"
-#include "state/Game.h"
+#include "../../shared/state/Board.h"
+#include "../../shared/state/Pieces.h"
+#include "../../shared/state/Game.h"
 #include <iostream>
-#include <ai/RandomAI.h>
+#include <../shared/ai/RandomAI.h>
 
 
 using namespace client;
 using namespace state;
+using namespace render;
+
 std::string getProjectRootDirectory() {
     // Full path to the current file
     std::string filePath = __FILE__;
