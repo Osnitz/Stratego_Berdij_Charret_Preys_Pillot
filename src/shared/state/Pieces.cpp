@@ -12,7 +12,7 @@ using namespace state;
 using namespace engine;
 
 Pieces::Pieces(const int value, const PieceType type, int x, int y, Player* owner)
-        : owner (owner), type(type), value(value), x(x), y(y) {
+        : owner (owner), type(type), value(value), x(x), y(y), revealed(false) {
 
     if (type == PieceType::Scout) {
         range = 10;
@@ -49,4 +49,12 @@ void Pieces::setCoord(int newx, int newy) {
 
 Player *Pieces::getOwner() {
     return owner;
+}
+
+bool Pieces::isRevealed() {
+    return revealed;
+}
+
+void Pieces::setReveal(bool status) {
+    revealed = status;
 }

@@ -177,10 +177,10 @@ void Render::highlightPossiblePositions(const std::vector<std::pair<int, int>>& 
 }
 
 
-void Render::highlightSelectedPiece(const std::pair<int, int> selectedPosition)
+void Render::highlightOnePiece(const std::pair<int, int> selectedPosition, sf::Color color)
 {
     sf::RectangleShape highlight(sf::Vector2f(cellSize, cellSize));
-    highlight.setFillColor(sf::Color(255, 255, 0, 150)); // Semi transparent yellow
+    highlight.setFillColor(color);
     sf::Vector2i pixelPos = cellToPixel({selectedPosition.second, selectedPosition.first});
     highlight.setPosition(static_cast<float>(pixelPos.x), static_cast<float>(pixelPos.y));
 
@@ -252,29 +252,39 @@ void Render::drawEnemyPiece(Pieces* piece) {
     static sf::Texture unknownTexture;
     static bool isTextureLoaded = false;
 
-    // Load the texture if it hasn't been loaded yet
-    if (!isTextureLoaded) {
-        std::string filepath = constructPath("src/client/img_render/inconnu3.png");
-        if (!unknownTexture.loadFromFile(filepath)) {
-            std::cerr << "Erreur : Impossible de charger inconnu3.png" << std::endl;
-            return;
+    if (piece->isRevealed())
+    {
+        drawAllyPiece(piece);
+        highlightOnePiece(piece->getPosition(), sf::Color(255, 0, 0, 150));
+        piece->setReveal(false);
+    }
+    else
+    {
+        // Load the texture if it hasn't been loaded yet
+        if (!isTextureLoaded) {
+            std::string filepath = constructPath("src/client/img_render/inconnu3.png");
+            if (!unknownTexture.loadFromFile(filepath)) {
+                std::cerr << "Erreur : Impossible de charger inconnu3.png" << std::endl;
+                return;
+            }
+            isTextureLoaded = true;
         }
-        isTextureLoaded = true;
+
+        auto cellPos = piece->getPosition();
+        sf::Vector2i cellPosVector(cellPos.second, cellPos.first);
+        sf::Vector2i pixelPos = cellToPixel(cellPosVector);
+
+        sf::Sprite sprite;
+        sprite.setTexture(unknownTexture);
+        sprite.setScale(
+                static_cast<float>(cellSize) / unknownTexture.getSize().x,
+                static_cast<float>(cellSize) / unknownTexture.getSize().y
+        );
+        sprite.setPosition(static_cast<float>(pixelPos.x), static_cast<float>(pixelPos.y));
+
+        window.draw(sprite);
     }
 
-    auto cellPos = piece->getPosition();
-    sf::Vector2i cellPosVector(cellPos.second, cellPos.first);
-    sf::Vector2i pixelPos = cellToPixel(cellPosVector);
-
-    sf::Sprite sprite;
-    sprite.setTexture(unknownTexture);
-    sprite.setScale(
-            static_cast<float>(cellSize) / unknownTexture.getSize().x,
-            static_cast<float>(cellSize) / unknownTexture.getSize().y
-    );
-    sprite.setPosition(static_cast<float>(pixelPos.x), static_cast<float>(pixelPos.y));
-
-    window.draw(sprite);
 }
 
 sf::RenderWindow* Render::getWindow() {
@@ -315,7 +325,7 @@ std::vector<int> Render::getPlayerInput() {
                             drawGrid();
                             drawCoordinates();
                             drawPiecesOnBoard(game);
-                            highlightSelectedPiece(selectedPair);
+                            highlightOnePiece(selectedPair,sf::Color(255, 255, 0, 150));//yellow
                             highlightPossiblePositions(possiblePositions);
                             window.display();
                         }
