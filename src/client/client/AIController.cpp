@@ -79,3 +79,8 @@ ai::AIInterface* AIController::getAiModule()
 }
 
 AIController::~AIController(){}
+
+bool AIController::isAI()
+{
+    return true;
+}

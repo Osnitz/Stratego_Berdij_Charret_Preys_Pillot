@@ -230,8 +230,6 @@ void Render::run() {
         drawCoordinates();
         drawPiecesOnBoard(game);
         window.display();
-        usleep(2000000);
-        game->switchTurn();
     }
 }
 
@@ -241,8 +239,8 @@ void Render::run() {
 void Render::drawAllyPiece(Pieces* piece) {
     if (!piece) return;
 
-    auto pieceType = piece->getType(); // Obtenir le type de la pièce
-    auto it = textures.find(pieceType);    // Trouver la texture associée
+    auto pieceType = piece->getType();
+    auto it = textures.find(pieceType);
     if (it == textures.end()) {
         std::cerr << "Erreur : Texture non trouvée pour le type de pièce " << static_cast<int>(pieceType) << std::endl;
         return;
@@ -251,7 +249,6 @@ void Render::drawAllyPiece(Pieces* piece) {
     sf::Sprite pieceSprite;
     pieceSprite.setTexture(it->second);
 
-    // Calculer la position de la cellule
     auto cellPos = piece->getPosition();
     sf::Vector2i cellPosVector(cellPos.second, cellPos.first);
     sf::Vector2i pixelPos = cellToPixel(cellPosVector);
@@ -288,4 +285,36 @@ void Render::drawEnemyPiece(Pieces* piece) {
 
 
     window.draw(pieceShape);
+}
+
+sf::RenderWindow* Render::getWindow() {
+    return &window;
+}
+
+std::vector<int> Render::getPlayerInput() {
+    sf::Vector2i selectedCell(-1, -1);
+    sf::Vector2i targetCell(-1, -1);
+
+    while (window.isOpen()) {
+        sf::Event event{};
+        while (window.pollEvent(event)) {
+            if (event.type == sf::Event::Closed) {
+                window.close();
+                return {-1, -1, -1, -1}; // Indique que le jeu doit se fermer
+            } else if (event.type == sf::Event::MouseButtonPressed) {
+                if (event.mouseButton.button == sf::Mouse::Left) {
+                    sf::Vector2i clickedCell = pixelToCell({event.mouseButton.x, event.mouseButton.y});
+                    if (selectedCell.x == -1) {
+                        selectedCell = clickedCell;
+                        std::cout << "Cellule sélectionnée : " << selectedCell.x << ", " << selectedCell.y << std::endl;
+                    } else {
+                        targetCell = clickedCell;
+                        std::cout << "Cellule destination : " << targetCell.x << ", " << targetCell.y << std::endl;
+                        return {selectedCell.y, selectedCell.x, targetCell.y, targetCell.x};
+                    }
+                }
+            }
+        }
+    }
+    return {-1, -1, -1, -1}; // Retour par défaut si la fenêtre est fermée
 }

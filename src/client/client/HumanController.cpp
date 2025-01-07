@@ -89,3 +89,8 @@ ai::AIInterface* HumanController::getAiModule()
     return aiModule;
 }
 
+bool HumanController::isAI()
+{
+    return false;
+}
+
