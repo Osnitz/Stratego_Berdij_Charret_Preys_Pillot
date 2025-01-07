@@ -51,6 +51,31 @@ Render::Render(int cellSize, state::Game* game)
             static_cast<float>(cellSize * cols) / static_cast<float>(boardTexture.getSize().x),
             static_cast<float>(cellSize * rows) / static_cast<float>(boardTexture.getSize().y)
     );
+    // Charger les textures des pièces
+    std::map<state::PieceType, std::string> texturePaths = {
+            {state::PieceType::Bomb, "src/client/img_render/bomb.png"},
+            {state::PieceType::Captain, "src/client/img_render/captain.png"},
+            {state::PieceType::Colonel, "src/client/img_render/colonel.png"},
+            {state::PieceType::Flag, "src/client/img_render/flag.png"},
+            {state::PieceType::General, "src/client/img_render/general.png"},
+            {state::PieceType::Lieutenant, "src/client/img_render/lieutenant.png"},
+            {state::PieceType::Major, "src/client/img_render/major.png"},
+            {state::PieceType::Marshal, "src/client/img_render/marshal.png"},
+            {state::PieceType::Miner, "src/client/img_render/miner.png"},
+            {state::PieceType::Scout, "src/client/img_render/scout.png"},
+            {state::PieceType::Sergeant, "src/client/img_render/sergeant.png"},
+            {state::PieceType::Spy, "src/client/img_render/spy.png"},
+
+    };
+
+    for (const auto& [pieceType, path] : texturePaths) {
+        sf::Texture texture;
+        if (!texture.loadFromFile(constructPath(path))) {
+            std::cerr << "Erreur : Impossible de charger " << path << std::endl;
+        } else {
+            textures[pieceType] = std::move(texture);
+        }
+    }
 }
 
 
@@ -214,27 +239,31 @@ void Render::run() {
 
 
 void Render::drawAllyPiece(Pieces* piece) {
+    if (!piece) return;
+
+    auto pieceType = piece->getType(); // Obtenir le type de la pièce
+    auto it = textures.find(pieceType);    // Trouver la texture associée
+    if (it == textures.end()) {
+        std::cerr << "Erreur : Texture non trouvée pour le type de pièce " << static_cast<int>(pieceType) << std::endl;
+        return;
+    }
+
+    sf::Sprite pieceSprite;
+    pieceSprite.setTexture(it->second);
+
+    // Calculer la position de la cellule
     auto cellPos = piece->getPosition();
-    sf::CircleShape pieceShape(static_cast<float>(cellSize) / 3);
-    pieceShape.setFillColor(sf::Color::Green); // Green color for allies
-
-
     sf::Vector2i cellPosVector(cellPos.second, cellPos.first);
     sf::Vector2i pixelPos = cellToPixel(cellPosVector);
 
-
-    // Compute the offset to center the circle in the cell
-    float offsetX = static_cast<float>(cellSize) / 2.0f - pieceShape.getRadius();
-    float offsetY = static_cast<float>(cellSize) / 2.0f - pieceShape.getRadius();
-
-
-    pieceShape.setPosition(
-            static_cast<float>(pixelPos.x) + offsetX,
-            static_cast<float>(pixelPos.y) + offsetY
+    // Redimensionner et positionner le sprite
+    pieceSprite.setScale(
+            static_cast<float>(cellSize) / pieceSprite.getTexture()->getSize().x,
+            static_cast<float>(cellSize) / pieceSprite.getTexture()->getSize().y
     );
+    pieceSprite.setPosition(static_cast<float>(pixelPos.x), static_cast<float>(pixelPos.y));
 
-
-    window.draw(pieceShape);
+    window.draw(pieceSprite);
 }
 
 
