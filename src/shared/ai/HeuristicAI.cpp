@@ -40,22 +40,24 @@ int ai::HeuristicAI::heuristicCalculator(state::Pieces& piece, const std::pair<i
         weight += 50;
     }
 
-    else if (piece.getType() == Miner || piece.getType() == Flag) {
-        for (const auto& enemy : currentPlayer->getKnown()) {
-            int distance = abs(position.first - enemy->state::Pieces::getPosition().first) +
-                           abs(position.second - enemy->getPosition().second);
-            if (distance <= 2) {
+    for (const auto& enemy : currentPlayer->knownPieces) {
+        int distance = abs(position.first - enemy->state::Pieces::getPosition().first) +
+                                   abs(position.second - enemy->state::Pieces::getPosition().second);
+        if (distance <= 2) {
+             if (piece.getType() == state::PieceType::Miner) {
                 weight += 100;
             }
         }
-    }
 
-    for (const auto& enemy : currentPlayer->getKnown()) {
-        if (piece.getValue() > enemy->getValue()) {
-            int distance = abs(position.first - enemy->state::Pieces::getPosition().first) +
-                           abs(position.second - enemy->state::Pieces::getPosition().second);
-            if (distance == 1) {
+        if (distance == 1) {
+            if ((piece.getType()== state::PieceType::Spy) && (enemy->getType() == state::PieceType::Marshal)) {
+                weight += 500;
+            }
+            if (piece.getValue() > enemy->getValue()) {
                 weight += 200;
+            }
+            if (piece.getValue() < enemy->getValue()) {
+                weight -= 100;
             }
         }
     }
@@ -69,9 +71,9 @@ vector<std::pair<std::pair<int, int>, int>> ai::HeuristicAI::weightedRanking(Pie
     auto possibleMoves = getPossibleMoves(piece, game);
     std::vector<std::pair<std::pair<int, int>, int>> weightedMoves;
 
-    for (const auto& pos : possibleMoves) {
-        int weight = heuristicCalculator(*piece, pos, game);
-        weightedMoves.push_back({pos, weight});
+    for (const auto& position : possibleMoves) {
+        int weight = heuristicCalculator(*piece, position, game);
+        weightedMoves.push_back({position, weight});
     }
 
     std::sort(weightedMoves.begin(), weightedMoves.end(),
