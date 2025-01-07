@@ -267,24 +267,32 @@ void Render::drawAllyPiece(Pieces* piece) {
 
 
 void Render::drawEnemyPiece(Pieces* piece) {
+    static sf::Texture unknownTexture;
+    static bool isTextureLoaded = false;
+
+    // Charger la texture de l'image inconnue une seule fois
+    if (!isTextureLoaded) {
+        std::string filepath = constructPath("src/client/img_render/inconnu3.png");
+        if (!unknownTexture.loadFromFile(filepath)) {
+            std::cerr << "Erreur : Impossible de charger inconnu3.png" << std::endl;
+            return;
+        }
+        isTextureLoaded = true;
+    }
+
     auto cellPos = piece->getPosition();
-    sf::CircleShape pieceShape(static_cast<float>(cellSize) / 3);
-    pieceShape.setFillColor(sf::Color::Red); // Red color for enemies
     sf::Vector2i cellPosVector(cellPos.second, cellPos.first);
     sf::Vector2i pixelPos = cellToPixel(cellPosVector);
 
-
-    float offsetX = static_cast<float>(cellSize) / 2.0f - pieceShape.getRadius();
-    float offsetY = static_cast<float>(cellSize) / 2.0f - pieceShape.getRadius();
-
-
-    pieceShape.setPosition(
-            static_cast<float>(pixelPos.x) + offsetX,
-            static_cast<float>(pixelPos.y) + offsetY
+    sf::Sprite sprite;
+    sprite.setTexture(unknownTexture);
+    sprite.setScale(
+            static_cast<float>(cellSize) / unknownTexture.getSize().x,
+            static_cast<float>(cellSize) / unknownTexture.getSize().y
     );
+    sprite.setPosition(static_cast<float>(pixelPos.x), static_cast<float>(pixelPos.y));
 
-
-    window.draw(pieceShape);
+    window.draw(sprite);
 }
 
 sf::RenderWindow* Render::getWindow() {
