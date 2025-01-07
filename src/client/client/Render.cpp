@@ -167,14 +167,12 @@ sf::Vector2i Render::cellToPixel(const sf::Vector2i& cellPos) {
 
 
 void Render::highlightPossiblePositions(const std::vector<std::pair<int, int>>& positions) {
+    sf::Color highlightColor(0, 255, 0, 100); // Semi-transparent green
     for (const auto& pos : positions) {
-        sf::RectangleShape highlight(sf::Vector2f(cellSize, cellSize));
-        highlight.setFillColor(sf::Color(0, 255, 0, 100)); // Semi transparent green
-        sf::Vector2i pixelPos = cellToPixel({pos.second, pos.first});
-        highlight.setPosition(static_cast<float>(pixelPos.x), static_cast<float>(pixelPos.y));
-        window.draw(highlight);
+        highlightOnePiece(pos, highlightColor); // Réutilisation de highlightOnePiece
     }
 }
+
 
 
 void Render::highlightOnePiece(const std::pair<int, int> selectedPosition, sf::Color color)
@@ -343,3 +341,46 @@ std::vector<int> Render::getPlayerInput() {
     }
     return {-1, -1, -1, -1}; // Retour par défaut si la fenêtre est fermée
 }
+
+
+void Render::displayEndScreen(int winnerPlayerID) {
+    sf::Font font;
+    std::string fontPath = constructPath("src/client/fonts/arial.ttf");
+    if (!font.loadFromFile(fontPath)) {
+        std::cerr << "Erreur : Impossible de charger la police arial.ttf" << std::endl;
+        return;
+    }
+
+    sf::Text endText;
+    endText.setFont(font);
+    endText.setCharacterSize(50);
+    endText.setFillColor(sf::Color::White);
+    endText.setString("Player " + std::to_string(winnerPlayerID) + " wins!");
+    endText.setPosition(
+        static_cast<float>(window.getSize().x) / 2 - endText.getLocalBounds().width / 2,
+        static_cast<float>(window.getSize().y) / 2 - endText.getLocalBounds().height / 2
+    );
+
+    sf::RectangleShape overlay(sf::Vector2f(static_cast<float>(window.getSize().x), static_cast<float>(window.getSize().y)));
+    overlay.setFillColor(sf::Color(0, 0, 0, 150));
+
+    window.clear();
+    window.draw(boardSprite);
+    window.draw(overlay);
+    window.draw(endText);
+    window.display();
+
+    sf::Event event;
+    while (window.isOpen()) {
+        while (window.pollEvent(event)) {
+            if (event.type == sf::Event::Closed) {
+                window.close();
+                return;
+            }
+            if (event.type == sf::Event::KeyPressed || event.type == sf::Event::MouseButtonPressed) {
+                return;
+            }
+        }
+    }
+}
+

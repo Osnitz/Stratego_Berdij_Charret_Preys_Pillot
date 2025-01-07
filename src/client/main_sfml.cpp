@@ -55,17 +55,12 @@ int main() {
         playerController = scenarioManager->getPlayerController(currentPlayer);
 
         WinCondition winCondition = gameEngine->checkWin();
-        if (winCondition != None)
-        {
-            if (winCondition == FlagCaptured)
-            {
-                std::cout << "Flag has been captured. Game over." << std::endl;
-            }
-            else if (winCondition == NoValidMoves)
-            {
-                std::cout << "Player " << currentPlayer->getPlayerID() << " has no valid moves left. Game over." << std::endl;
-                std::cout << "Player " << game->getOpponent()->getPlayerID() << " wins!" << std::endl;
-            }
+        if (winCondition != None) {
+            int winnerPlayerID = (winCondition == FlagCaptured || winCondition == NoValidMoves)
+                                     ? game->getOpponent()->getPlayerID()
+                                     : game->getCurrentPlayer()->getPlayerID();
+
+            render.displayEndScreen(winnerPlayerID);
             break;
         }
 
