@@ -14,8 +14,11 @@ using namespace engine;
 
 int main() {
     Game* game = new Game();
+    Render render(60, game); // Fenêtre 800x600, cases de 60 pixels
+    auto window = render.getWindow();
+
     Player* currentPlayer;
-    client::PlayerController* playerController;
+    PlayerController* playerController;
     std::vector<int> coords;
     std::pair<int, int> from;
     std::pair<int, int> to;
@@ -23,22 +26,30 @@ int main() {
     auto gameEngine = new engine::Engine(game);
     auto scenarioManager = new client::ScenarioManager(gameEngine);
 
-    auto gameMode = scenarioManager->getScenarioChoice();
-    scenarioManager->setMode(gameMode);
+    auto scenarioParameters = render.displayInitializationScreen();
+    scenarioManager->setMode(scenarioParameters.mode);
+    scenarioManager->setAiModules(scenarioParameters.aiModule0, scenarioParameters.aiModule1);
 
     scenarioManager->initializeControllers();
 
-    std::cout << "Game started. Entering Placement Phase." << std::endl;
 
     for (size_t i = 0; i < 2; i++)
     {
         currentPlayer = game->getCurrentPlayer();
         playerController = scenarioManager->getPlayerController(currentPlayer);
-        playerController->handlePlacement(game);
+        if (playerController->isAI())
+        {
+            playerController->handlePlacement(game);
+        }
+        else
+        {
+            auto filepath =render.displayConfigurationSelection("Choix de la configuration du joueur " +
+                std::to_string(currentPlayer->getPlayerID()));
+            gameEngine->handleCmdPlacement(filepath);
+        }
+
     }
 
-    Render render(60, game); // Fenêtre 800x600, cases de 60 pixels
-    auto window = render.getWindow();
 
     while (window->isOpen())
     {

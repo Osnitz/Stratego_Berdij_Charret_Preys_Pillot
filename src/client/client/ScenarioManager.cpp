@@ -178,6 +178,14 @@ namespace client
         return aiModule1;
     }
 
+    void ScenarioManager::setAiModules(ai::AIInterface* aiModule0, ai::AIInterface* aiModule1)
+    {
+        this->aiModule0 = aiModule0;
+        this->aiModule1 = aiModule1;
+    }
+
 }
+
+
 
 #endif

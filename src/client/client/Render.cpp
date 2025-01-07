@@ -6,6 +6,7 @@
 #include "state/Pieces.h"
 #include "state/Game.h"
 #include <iostream>
+#include <ai/RandomAI.h>
 
 
 using namespace client;
@@ -66,7 +67,7 @@ Render::Render(int cellSize, state::Game* game)
         if (!texture.loadFromFile(constructPath(path))) {
             std::cerr << "Erreur : Impossible de charger " << path << std::endl;
         } else {
-            textures[pieceType] = std::move(texture);
+            textures[pieceType] = texture;
         }
     }
 }
@@ -153,8 +154,8 @@ void Render::drawCoordinates() {
 
 sf::Vector2i Render::pixelToCell(const sf::Vector2i& pixelPos) {
     sf::Vector2f worldPos = window.mapPixelToCoords(pixelPos);
-    int gridX = (int)worldPos.x / cellSize;
-    int gridY = (int)worldPos.y / cellSize;
+    int gridX = static_cast<int>(worldPos.x) / cellSize;
+    int gridY = static_cast<int>(worldPos.y) / cellSize;
     return {gridX, gridY};
 }
 
@@ -370,7 +371,7 @@ void Render::displayEndScreen(int winnerPlayerID) {
     window.draw(endText);
     window.display();
 
-    sf::Event event;
+    sf::Event event{};
     while (window.isOpen()) {
         while (window.pollEvent(event)) {
             if (event.type == sf::Event::Closed) {
@@ -383,4 +384,267 @@ void Render::displayEndScreen(int winnerPlayerID) {
         }
     }
 }
+
+int Render::displayDifficultySelection(const std::string& titleText) {
+    sf::Font font;
+    std::string fontPath = constructPath("src/client/fonts/arial.ttf");
+
+    if (!font.loadFromFile(fontPath)) {
+        throw std::runtime_error("Erreur : Impossible de charger la police arial.ttf");
+    }
+
+    sf::Text title;
+    title.setFont(font);
+    title.setCharacterSize(40);
+    title.setFillColor(sf::Color::White);
+    title.setString(titleText);
+    title.setPosition(
+        static_cast<float>(window.getSize().x) / 2 - title.getLocalBounds().width / 2,
+        50
+    );
+
+    sf::Text easyButton, mediumButton, hardButton;
+    easyButton.setFont(font);
+    easyButton.setCharacterSize(30);
+    easyButton.setFillColor(sf::Color::White);
+    easyButton.setString("Easy");
+    easyButton.setPosition(100, 150);
+
+    mediumButton.setFont(font);
+    mediumButton.setCharacterSize(30);
+    mediumButton.setFillColor(sf::Color::White);
+    mediumButton.setString("Medium");
+    mediumButton.setPosition(100, 250);
+
+    hardButton.setFont(font);
+    hardButton.setCharacterSize(30);
+    hardButton.setFillColor(sf::Color::White);
+    hardButton.setString("Hard");
+    hardButton.setPosition(100, 350);
+
+    while (window.isOpen()) {
+        sf::Event event{};
+        while (window.pollEvent(event)) {
+            if (event.type == sf::Event::Closed) {
+                window.close();
+                return -1; // Retourne -1 si la fenêtre est fermée
+            } else if (event.type == sf::Event::MouseButtonPressed) {
+                sf::Vector2i mousePos = sf::Mouse::getPosition(window);
+
+                // Convertir les coordonnées du pixel en coordonnées du monde
+                sf::Vector2f worldPos = window.mapPixelToCoords(mousePos);
+
+                if (easyButton.getGlobalBounds().contains(worldPos)) {
+                    return 1; // Facile
+                } else if (mediumButton.getGlobalBounds().contains(worldPos)) {
+                    return 2; // Moyen
+                } else if (hardButton.getGlobalBounds().contains(worldPos)) {
+                    return 3; // Difficile
+                }
+            }
+        }
+
+        window.clear();
+        window.draw(title);
+        window.draw(easyButton);
+        window.draw(mediumButton);
+        window.draw(hardButton);
+        window.display();
+    }
+
+    return -1; // Si la boucle se termine sans choix
+}
+
+ScenarioParameters Render::displayInitializationScreen() {
+    sf::Font font;
+    std::string fontPath = constructPath("src/client/fonts/arial.ttf");
+
+    auto scenarioParameters = ScenarioParameters(PVP, nullptr, nullptr);
+
+    if (!font.loadFromFile(fontPath)) {
+        throw std::runtime_error("Erreur : Impossible de charger la police arial.ttf");
+    }
+
+    sf::Text title;
+    title.setFont(font);
+    title.setCharacterSize(40);
+    title.setFillColor(sf::Color::White);
+    title.setString("Choose Game Mode");
+    title.setPosition(
+        static_cast<float>(window.getSize().x) / 2 - title.getLocalBounds().width / 2,
+        50
+    );
+
+    sf::Text pvpButton, pveButton, aiButton;
+    pvpButton.setFont(font);
+    pvpButton.setCharacterSize(30);
+    pvpButton.setFillColor(sf::Color::White);
+    pvpButton.setString("Player vs Player");
+    pvpButton.setPosition(100, 150);
+
+    pveButton.setFont(font);
+    pveButton.setCharacterSize(30);
+    pveButton.setFillColor(sf::Color::White);
+    pveButton.setString("Player vs AI");
+    pveButton.setPosition(100, 250);
+
+    aiButton.setFont(font);
+    aiButton.setCharacterSize(30);
+    aiButton.setFillColor(sf::Color::White);
+    aiButton.setString("AI vs AI");
+    aiButton.setPosition(100, 350);
+
+    while (window.isOpen()) {
+        sf::Event event{};
+        while (window.pollEvent(event)) {
+            if (event.type == sf::Event::Closed) {
+                window.close();
+                return scenarioParameters;
+            } else if (event.type == sf::Event::MouseButtonPressed) {
+                sf::Vector2i mousePos = sf::Mouse::getPosition(window);
+
+                // Convertir les coordonnées de pixel en coordonnées de monde
+                sf::Vector2f worldPos = window.mapPixelToCoords(mousePos);
+
+                if (pvpButton.getGlobalBounds().contains(worldPos)) {
+                    return scenarioParameters;
+                }
+                if (pveButton.getGlobalBounds().contains(worldPos)) {
+                    scenarioParameters.mode = PVE;
+                    int difficulty = displayDifficultySelection("Choix du niveau de l'IA");
+                    switch (difficulty) {
+                        case 1:
+                            scenarioParameters.aiModule0 = new ai::RandomAI();
+                            break;
+                        case 2:
+                            scenarioParameters.aiModule0 = new ai::RandomAI();
+                            break;
+                        case 3:
+                            scenarioParameters.aiModule0 = new ai::RandomAI();
+                            break;
+                    default:
+                        scenarioParameters.aiModule0 = new ai::RandomAI();
+                    }
+                    return scenarioParameters;
+                }
+                if (aiButton.getGlobalBounds().contains(worldPos)) {
+                    scenarioParameters.mode = AIvsAI;
+                    int difficulty = displayDifficultySelection("Choix du niveau de l'IA 1");
+                    switch (difficulty) {
+                        case 1:
+                            scenarioParameters.aiModule0 = new ai::RandomAI();
+                            break;
+                        case 2:
+                            scenarioParameters.aiModule0 = new ai::RandomAI();
+                            break;
+                        case 3:
+                            scenarioParameters.aiModule0 = new ai::RandomAI();
+                            break;
+                    default:
+                        scenarioParameters.aiModule1 = new ai::RandomAI();
+                    }
+                    int difficulty2 = displayDifficultySelection("Choix du niveau de l'IA 2");
+                    switch (difficulty2) {
+                        case 1:
+                            scenarioParameters.aiModule1 = new ai::RandomAI();
+                            break;
+                        case 2:
+                            scenarioParameters.aiModule1 = new ai::RandomAI();
+                            break;
+                        case 3:
+                            scenarioParameters.aiModule1 = new ai::RandomAI();
+                            break;
+                        default:
+                            scenarioParameters.aiModule1 = new ai::RandomAI();
+                    }
+                    return scenarioParameters;
+                }
+            }
+        }
+
+        window.clear();
+        window.draw(title);
+        window.draw(pvpButton);
+        window.draw(pveButton);
+        window.draw(aiButton);
+        window.display();
+    }
+
+    return scenarioParameters;
+}
+
+std::string Render::displayConfigurationSelection(const std::string& titleText) {
+    sf::Font font;
+    std::string fontPath = constructPath("src/client/fonts/arial.ttf");
+
+    if (!font.loadFromFile(fontPath)) {
+        throw std::runtime_error("Erreur : Impossible de charger la police arial.ttf");
+    }
+
+    sf::Text title;
+    title.setFont(font);
+    title.setCharacterSize(30);
+    title.setFillColor(sf::Color::White);
+    title.setString(titleText);
+    title.setPosition(
+        static_cast<float>(window.getSize().x) / 2 - title.getLocalBounds().width / 2,
+        50
+    );
+
+    sf::Text defensiveButton, offensiveButton, balancedButton;
+    defensiveButton.setFont(font);
+    defensiveButton.setCharacterSize(30);
+    defensiveButton.setFillColor(sf::Color::White);
+    defensiveButton.setString("Defensive");
+    defensiveButton.setPosition(100, 150);
+
+    offensiveButton.setFont(font);
+    offensiveButton.setCharacterSize(30);
+    offensiveButton.setFillColor(sf::Color::White);
+    offensiveButton.setString("Offensive");
+    offensiveButton.setPosition(100, 250);
+
+    balancedButton.setFont(font);
+    balancedButton.setCharacterSize(30);
+    balancedButton.setFillColor(sf::Color::White);
+    balancedButton.setString("Balanced");
+    balancedButton.setPosition(100, 350);
+
+    while (window.isOpen()) {
+        sf::Event event{};
+        while (window.pollEvent(event)) {
+            if (event.type == sf::Event::Closed) {
+                window.close();
+                return "";
+            } else if (event.type == sf::Event::MouseButtonPressed) {
+                sf::Vector2i mousePos = sf::Mouse::getPosition(window);
+
+                sf::Vector2f worldPos = window.mapPixelToCoords(mousePos);
+
+                if (defensiveButton.getGlobalBounds().contains(worldPos)) {
+                    return constructPath("src/shared/state/config/Defensive.csv");
+                }
+                if (offensiveButton.getGlobalBounds().contains(worldPos)) {
+                    return constructPath("src/shared/state/config/Offensive.csv");
+                }
+                if (balancedButton.getGlobalBounds().contains(worldPos)) {
+                    return constructPath("src/shared/state/config/Balance.csv");
+                }
+            }
+        }
+
+        window.clear();
+
+        // Dessiner les autres éléments par-dessus
+        window.draw(title);
+        window.draw(defensiveButton);
+        window.draw(offensiveButton);
+        window.draw(balancedButton);
+        window.display();
+    }
+
+    return ""; // Si la boucle se termine sans choix
+}
+
+
 
