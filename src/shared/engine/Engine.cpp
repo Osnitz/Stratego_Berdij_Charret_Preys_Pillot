@@ -70,48 +70,53 @@ void Engine::attack(Pieces* mypiece, pair<int, int> position)
     }
     auto myvalue=mypiece->getValue();
     auto mytype=mypiece->getType();
-    auto othersvalue=attackedPiece->getValue();
-    auto otherstype=attackedPiece->getType();
+    auto attackedvalue=attackedPiece->getValue();
+    auto attackedtype=attackedPiece->getType();
 
-    if (otherstype == PieceType::Bomb) {
+    if (attackedtype == PieceType::Bomb) {
         if (mytype == PieceType::Miner) {
             cout << "Good job ! The bomb is no more.\n" << endl;
             game->addCaptured(attackedPiece, currentplayer);
             game->setPieceOnBoard(mypiece,position.first,position.second);
             game->removePiece(attackedPiece, opponent);
+            game->addKnown(mypiece,opponent);
             return;
         } else {
             cout << "Rest well ! The war is over for you.\n" << endl;
             game->addCaptured(mypiece, opponent);
             game->removeFromBoard(mypiece);
             game->removePiece(mypiece, currentplayer);
+            game->addKnown(attackedPiece,currentplayer);
             return;
         }
     }
 
-    if (otherstype == PieceType::Marshal && mytype == PieceType::Spy) {
+    if (attackedtype == PieceType::Marshal && mytype == PieceType::Spy) {
         cout << "Well done sir ! Their leader is gone.\n" << endl;
         game->addCaptured(attackedPiece, currentplayer);
         game->setPieceOnBoard(mypiece,position.first,position.second);
         game->removePiece(attackedPiece, opponent);
+        game->addKnown(mypiece,opponent);
         return;
     }
 
 
-    if (myvalue > othersvalue) {
-        cout << "The enemy is down ! It was a " << otherstype << ".\n" << endl;
+    if (myvalue > attackedvalue) {
+        cout << "The enemy is down ! It was a " << attackedtype << ".\n" << endl;
         game->addCaptured(attackedPiece, currentplayer);
         game->setPieceOnBoard(mypiece,position.first,position.second);
         game->removePiece(attackedPiece, opponent);
+        game->addKnown(mypiece,opponent);
     }
-    else if (myvalue < othersvalue) {
-        cout << "The enemy is too strong ! It was a " << otherstype << ".\n" << endl;
+    else if (myvalue < attackedvalue) {
+        cout << "The enemy is too strong ! It was a " << attackedtype << ".\n" << endl;
         game->removeFromBoard(mypiece);
         game->removePiece(mypiece, currentplayer);
         game->addCaptured(mypiece, opponent);
+        game->addKnown(attackedPiece,currentplayer);
     }
     else {
-        cout << "It's a tie ! It was a " << otherstype << " too.\n" << endl;
+        cout << "It's a tie ! It was a " << attackedtype << " too.\n" << endl;
         game->addCaptured(attackedPiece, currentplayer);
         game->addCaptured(mypiece, opponent);
         game->removeFromBoard(mypiece);

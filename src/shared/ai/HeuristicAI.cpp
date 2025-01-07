@@ -13,12 +13,19 @@
 #include <state/Player.h>
 
 using namespace state;
+using namespace std;
+
+ai::HeuristicAI::HeuristicAI() {
+    unordered_map<Pieces*, vector<pair<int, int>>> possibleMovesCache;
+}
+
+ai::HeuristicAI::~HeuristicAI() = default;
 
 void ai::HeuristicAI::clearCache() {
     possibleMovesCache.clear();
 }
 
-std::vector<std::pair<int, int>> ai::HeuristicAI::getPossibleMoves(state::Pieces* piece, state::Game* game) {
+vector<pair<int, int>> ai::HeuristicAI::getPossibleMoves(Pieces* piece, Game* game) {
     if (possibleMovesCache.find(piece) == possibleMovesCache.end()) {
         possibleMovesCache[piece] = game->possiblePositions(piece);
     }
@@ -33,8 +40,8 @@ int ai::HeuristicAI::heuristicCalculator(state::Pieces& piece, const std::pair<i
         weight += 50;
     }
 
-    else if (piece.getType() == state::PieceType::Miner || piece.getType() == state::PieceType::Flag) {
-        for (const auto& enemy : currentPlayer->knownPieces) {
+    else if (piece.getType() == Miner || piece.getType() == Flag) {
+        for (const auto& enemy : currentPlayer->getKnown()) {
             int distance = abs(position.first - enemy->state::Pieces::getPosition().first) +
                            abs(position.second - enemy->getPosition().second);
             if (distance <= 2) {
@@ -43,7 +50,7 @@ int ai::HeuristicAI::heuristicCalculator(state::Pieces& piece, const std::pair<i
         }
     }
 
-    for (const auto& enemy : currentPlayer->knownPieces) {
+    for (const auto& enemy : currentPlayer->getKnown()) {
         if (piece.getValue() > enemy->getValue()) {
             int distance = abs(position.first - enemy->state::Pieces::getPosition().first) +
                            abs(position.second - enemy->state::Pieces::getPosition().second);
@@ -58,7 +65,7 @@ int ai::HeuristicAI::heuristicCalculator(state::Pieces& piece, const std::pair<i
     return weight;
 }
 
-std::vector<std::pair<std::pair<int, int>, int>> ai::HeuristicAI::weightedRanking(state::Pieces* piece, state::Game* game) {
+vector<std::pair<std::pair<int, int>, int>> ai::HeuristicAI::weightedRanking(Pieces* piece, Game* game) {
     auto possibleMoves = getPossibleMoves(piece, game);
     std::vector<std::pair<std::pair<int, int>, int>> weightedMoves;
 
@@ -68,12 +75,12 @@ std::vector<std::pair<std::pair<int, int>, int>> ai::HeuristicAI::weightedRankin
     }
 
     std::sort(weightedMoves.begin(), weightedMoves.end(),
-              [](const auto& a, const auto& b) { return a.second > b.second; });
+              [](pair<pair<int,int>,int>& a, pair<pair<int,int>,int>& b) { return a.second > b.second; });
 
     return weightedMoves;
 }
 
-std::vector<state::Pieces*> ai::HeuristicAI::getPlayablePieces(state::Game* game) {
+vector<Pieces*> ai::HeuristicAI::getPlayablePieces(state::Game* game) {
     std::vector<state::Pieces*> playablePieces;
     auto currentPlayer=game->getCurrentPlayer();
     for (auto& piece : currentPlayer->getMyPieces()) {
@@ -85,10 +92,10 @@ std::vector<state::Pieces*> ai::HeuristicAI::getPlayablePieces(state::Game* game
     return playablePieces;
 }
 
-std::vector<int> ai::HeuristicAI::calculateMove(state::Game* game) {
+std::vector<int> ai::HeuristicAI::calculateMove(Game* game) {
     std::vector<int> positions;
     int bestWeight = -1;
-    state::Pieces* bestPiece = nullptr;
+    Pieces* bestPiece = nullptr;
     std::pair<int, int> bestPosition = {-1, -1};
 
     auto playablePieces = getPlayablePieces(game);
@@ -123,3 +130,4 @@ std::vector<int> ai::HeuristicAI::calculateMove(state::Game* game) {
 
     throw std::runtime_error("No valid moves found");
 }
+
