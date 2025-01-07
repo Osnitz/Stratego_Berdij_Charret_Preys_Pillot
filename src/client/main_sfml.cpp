@@ -5,11 +5,14 @@
 #include <SFML/Graphics.hpp>
 #include "client.h"
 #include "state.h"
+#include "engine.h"
+#include "render.h"
 
 
 using namespace client;
 using namespace state;
 using namespace engine;
+using namespace render;
 
 
 int main() {
