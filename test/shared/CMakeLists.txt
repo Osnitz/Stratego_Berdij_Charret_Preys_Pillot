@@ -1,5 +1,4 @@
 # List of test functions
-#add_custom_test(shared_dummy)
 add_custom_test(Board)
 add_custom_test(Game)
 add_custom_test(Pieces)

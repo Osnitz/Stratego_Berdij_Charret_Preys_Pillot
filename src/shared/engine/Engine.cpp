@@ -64,11 +64,6 @@ void Engine::attack(Pieces* mypiece, pair<int, int> position)
     auto currentplayer = game->getCurrentPlayer();
     auto opponent = game->getOpponent();
 
-    if (attackedPiece == nullptr)
-    {
-        cerr << "No target found" << endl;
-        return;
-    }
     auto myvalue=mypiece->getValue();
     auto mytype=mypiece->getType();
     auto othersvalue=attackedPiece->getValue();

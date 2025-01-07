@@ -114,5 +114,14 @@ BOOST_AUTO_TEST_SUITE(HumanControllerTestSuite)
         delete humanController;
     }
 
+    BOOST_AUTO_TEST_CASE(TestIsAI)
+{
+    auto mockEngine = new engine::Engine(new Game());
+
+    auto humanController = new client::HumanController(mockEngine, nullptr);
+    BOOST_CHECK_MESSAGE(humanController->isAI() == false, "HumanController should not be an AI module.");
+    delete humanController;
+}
+
 
 BOOST_AUTO_TEST_SUITE_END()

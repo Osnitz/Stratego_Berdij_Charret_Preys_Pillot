@@ -82,4 +82,13 @@ BOOST_AUTO_TEST_SUITE(AIControllerTestSuite)
         delete aiController;
     }
 
+    BOOST_AUTO_TEST_CASE(TestIsAI)
+    {
+        auto mockEngine = new engine::Engine(new Game());
+
+        auto aiController = new client::AIController(mockEngine, nullptr);
+        BOOST_CHECK_MESSAGE(aiController->isAI(), "The AIController should be an AI.");;
+        delete aiController;
+    }
+
 BOOST_AUTO_TEST_SUITE_END()

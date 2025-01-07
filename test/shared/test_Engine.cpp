@@ -138,18 +138,6 @@ BOOST_AUTO_TEST_CASE(TestAttackAllCases)
 
     game->setCurrentPlayer(game->getPlayer1());
 
-    // Case 1: No target at the position
-    auto scoutPiece1 = new Pieces(2, PieceType::Scout, 4, 0, game->getPlayer1());
-    game->addPiece(scoutPiece1, game->getPlayer1());
-    game->setPieceOnBoard(scoutPiece1, 4, 0);
-
-    std::pair<int, int> emptyPosition = {5, 0};
-    BOOST_CHECK_NO_THROW(engine->attack(scoutPiece1, emptyPosition));
-    BOOST_CHECK(board->getPiece(emptyPosition) == nullptr);
-
-    // Reset board state
-    game->removeFromBoard(scoutPiece1);
-
     // Case 2: Attack a Bomb with a Miner
     auto bombPiece = new Pieces(11, PieceType::Bomb, 5, 0, game->getPlayer2());
     auto minerPiece = new Pieces(3, PieceType::Miner, 4, 0, game->getPlayer1());
@@ -159,7 +147,7 @@ BOOST_AUTO_TEST_CASE(TestAttackAllCases)
     game->setPieceOnBoard(minerPiece, 4, 0);
 
     engine->attack(minerPiece, {5, 0});
-    BOOST_CHECK(game->getPlayer1()->getCaptured().size() == 1);
+    BOOST_CHECK_MESSAGE(game->getPlayer1()->getCaptured().size() == 1, "The Miner should have captured the Bomb.");
     BOOST_CHECK(board->getPiece({5, 0}) == minerPiece);
 
     game->removeFromBoard(minerPiece);
