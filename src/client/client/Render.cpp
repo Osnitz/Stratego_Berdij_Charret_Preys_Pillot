@@ -5,10 +5,7 @@
 #include "state/Board.h"
 #include "state/Pieces.h"
 #include "state/Game.h"
-
-
 #include <iostream>
-#include <unistd.h>
 
 
 using namespace client;
@@ -30,13 +27,9 @@ std::string getProjectRootDirectory() {
 }
 
 
-
-
 std::string constructPath(const std::string& relativePath) {
     return getProjectRootDirectory() + "/" + relativePath;
 }
-
-
 
 
 Render::Render(int cellSize, state::Game* game)
@@ -51,7 +44,7 @@ Render::Render(int cellSize, state::Game* game)
             static_cast<float>(cellSize * cols) / static_cast<float>(boardTexture.getSize().x),
             static_cast<float>(cellSize * rows) / static_cast<float>(boardTexture.getSize().y)
     );
-    // Charger les textures des pièces
+
     std::map<state::PieceType, std::string> texturePaths = {
             {state::PieceType::Bomb, "src/client/img_render/bomb.png"},
             {state::PieceType::Captain, "src/client/img_render/captain.png"},
@@ -79,8 +72,6 @@ Render::Render(int cellSize, state::Game* game)
 }
 
 
-
-
 void Render::handleEvents() {
     sf::Event event{};
     while (window.pollEvent(event)) {
@@ -103,13 +94,9 @@ void Render::handleEvents() {
 }
 
 
-
-
 void Render::drawBoard() {
     window.draw(boardSprite);
 }
-
-
 
 
 void Render::drawGrid() {
@@ -132,8 +119,6 @@ void Render::drawGrid() {
         window.draw(line);
     }
 }
-
-
 
 
 void Render::drawCoordinates() {
@@ -166,16 +151,12 @@ void Render::drawCoordinates() {
 }
 
 
-
-
 sf::Vector2i Render::pixelToCell(const sf::Vector2i& pixelPos) {
     sf::Vector2f worldPos = window.mapPixelToCoords(pixelPos);
     int gridX = (int)worldPos.x / cellSize;
     int gridY = (int)worldPos.y / cellSize;
     return {gridX, gridY};
 }
-
-
 
 
 sf::Vector2i Render::cellToPixel(const sf::Vector2i& cellPos) {
@@ -185,19 +166,26 @@ sf::Vector2i Render::cellToPixel(const sf::Vector2i& cellPos) {
 }
 
 
-
-
-void Render::drawHighlight(const sf::Vector2i& cellPos) {
-    sf::RectangleShape highlight(sf::Vector2f(cellSize, cellSize));
-    highlight.setFillColor(sf::Color(255, 255, 0, 100)); // semi-transparent yellow
-    sf::Vector2i pixelPos = cellToPixel(cellPos);
-    highlight.setPosition((float)pixelPos.x, (float)pixelPos.y);
-
-
-    window.draw(highlight);
+void Render::highlightPossiblePositions(const std::vector<std::pair<int, int>>& positions) {
+    for (const auto& pos : positions) {
+        sf::RectangleShape highlight(sf::Vector2f(cellSize, cellSize));
+        highlight.setFillColor(sf::Color(0, 255, 0, 100)); // Semi transparent green
+        sf::Vector2i pixelPos = cellToPixel({pos.second, pos.first});
+        highlight.setPosition(static_cast<float>(pixelPos.x), static_cast<float>(pixelPos.y));
+        window.draw(highlight);
+    }
 }
 
 
+void Render::highlightSelectedPiece(const std::pair<int, int> selectedPosition)
+{
+    sf::RectangleShape highlight(sf::Vector2f(cellSize, cellSize));
+    highlight.setFillColor(sf::Color(255, 255, 0, 150)); // Semi transparent yellow
+    sf::Vector2i pixelPos = cellToPixel({selectedPosition.second, selectedPosition.first});
+    highlight.setPosition(static_cast<float>(pixelPos.x), static_cast<float>(pixelPos.y));
+
+    window.draw(highlight);
+}
 
 
 void Render::drawPiecesOnBoard(state::Game* game) {
@@ -219,8 +207,6 @@ void Render::drawPiecesOnBoard(state::Game* game) {
 }
 
 
-
-
 void Render::run() {
     while (window.isOpen()) {
         handleEvents();
@@ -232,8 +218,6 @@ void Render::run() {
         window.display();
     }
 }
-
-
 
 
 void Render::drawAllyPiece(Pieces* piece) {
@@ -253,7 +237,7 @@ void Render::drawAllyPiece(Pieces* piece) {
     sf::Vector2i cellPosVector(cellPos.second, cellPos.first);
     sf::Vector2i pixelPos = cellToPixel(cellPosVector);
 
-    // Redimensionner et positionner le sprite
+    // Resize the sprite to fit the cell
     pieceSprite.setScale(
             static_cast<float>(cellSize) / pieceSprite.getTexture()->getSize().x,
             static_cast<float>(cellSize) / pieceSprite.getTexture()->getSize().y
@@ -264,13 +248,11 @@ void Render::drawAllyPiece(Pieces* piece) {
 }
 
 
-
-
 void Render::drawEnemyPiece(Pieces* piece) {
     static sf::Texture unknownTexture;
     static bool isTextureLoaded = false;
 
-    // Charger la texture de l'image inconnue une seule fois
+    // Load the texture if it hasn't been loaded yet
     if (!isTextureLoaded) {
         std::string filepath = constructPath("src/client/img_render/inconnu3.png");
         if (!unknownTexture.loadFromFile(filepath)) {
@@ -299,6 +281,7 @@ sf::RenderWindow* Render::getWindow() {
     return &window;
 }
 
+
 std::vector<int> Render::getPlayerInput() {
     sf::Vector2i selectedCell(-1, -1);
     sf::Vector2i targetCell(-1, -1);
@@ -308,16 +291,38 @@ std::vector<int> Render::getPlayerInput() {
         while (window.pollEvent(event)) {
             if (event.type == sf::Event::Closed) {
                 window.close();
-                return {-1, -1, -1, -1}; // Indique que le jeu doit se fermer
+                return {-1, -1, -1, -1};
             } else if (event.type == sf::Event::MouseButtonPressed) {
                 if (event.mouseButton.button == sf::Mouse::Left) {
                     sf::Vector2i clickedCell = pixelToCell({event.mouseButton.x, event.mouseButton.y});
+
                     if (selectedCell.x == -1) {
                         selectedCell = clickedCell;
-                        std::cout << "Cellule sélectionnée : " << selectedCell.x << ", " << selectedCell.y << std::endl;
+
+                        std::pair<int, int> selectedPair(selectedCell.y, selectedCell.x);
+                        Pieces* selectedPiece = game->getBoard()->getPiece(selectedPair);
+                        if (!selectedPiece) {
+                            std::cout << "Aucune pièce à cette position !" << std::endl;
+                            selectedCell = {-1, -1};
+                            continue;
+                        }
+
+                        std::vector<std::pair<int, int>> possiblePositions = game->possiblePositions(selectedPiece);
+
+                        // Redraw the board with the selected piece and possible positions highlighted
+                        window.clear();
+                        drawBoard();
+                        drawGrid();
+                        drawCoordinates();
+                        drawPiecesOnBoard(game);
+                        highlightSelectedPiece(selectedPair);
+                        highlightPossiblePositions(possiblePositions);
+                        window.display();
+
+                        std::cout << "Cellule sélectionnée : " << selectedPair.second << ", " << selectedPair.first << std::endl;
                     } else {
                         targetCell = clickedCell;
-                        std::cout << "Cellule destination : " << targetCell.x << ", " << targetCell.y << std::endl;
+
                         return {selectedCell.y, selectedCell.x, targetCell.y, targetCell.x};
                     }
                 }
