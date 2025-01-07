@@ -32,31 +32,39 @@ vector<pair<int, int>> ai::HeuristicAI::getPossibleMoves(Pieces* piece, Game* ga
     return possibleMovesCache[piece];
 }
 
-int ai::HeuristicAI::heuristicCalculator(state::Pieces& piece, const std::pair<int, int>& position, state::Game* game) {
+int ai::HeuristicAI::heuristicCalculator(Pieces* piece, const std::pair<int, int>& position, Game* game) {
     int weight = 0;
     auto currentPlayer=game->getCurrentPlayer();
 
-    if (piece.getType() == state::PieceType::Scout) {
+    if (piece->getType() == Scout) {
         weight += 50;
     }
 
-    for (const auto& enemy : currentPlayer->knownPieces) {
-        int distance = abs(position.first - enemy->state::Pieces::getPosition().first) +
-                                   abs(position.second - enemy->state::Pieces::getPosition().second);
-        if (distance <= 2) {
-             if (piece.getType() == state::PieceType::Miner) {
+    for (const auto& enemy : currentPlayer->getKnown()) {
+        int distance = abs(position.first - enemy->getPosition().first) +
+                                   abs(position.second - enemy->getPosition().second);
+        if (distance == 2) {
+            if (piece->getType() == Miner ||piece->getValue() < enemy->getValue()) {
                 weight += 100;
             }
         }
-
         if (distance == 1) {
-            if ((piece.getType()== state::PieceType::Spy) && (enemy->getType() == state::PieceType::Marshal)) {
+
+            if (piece->getValue() > enemy->getValue()) {
+                weight += 100;
+            }
+            else if (piece->getValue() < enemy->getValue()) {
+                weight -= 50;
+            }
+        }
+        if (distance==0) {
+            if ((piece->getType()== Spy) && (enemy->getType() == Marshal)) {
                 weight += 500;
             }
-            if (piece.getValue() > enemy->getValue()) {
+            else if (piece->getValue() > enemy->getValue()) {
                 weight += 200;
             }
-            if (piece.getValue() < enemy->getValue()) {
+            else if (piece->getValue() < enemy->getValue()) {
                 weight -= 100;
             }
         }
@@ -67,23 +75,23 @@ int ai::HeuristicAI::heuristicCalculator(state::Pieces& piece, const std::pair<i
     return weight;
 }
 
-vector<std::pair<std::pair<int, int>, int>> ai::HeuristicAI::weightedRanking(Pieces* piece, Game* game) {
+/*vector<std::pair<std::pair<int, int>, int>> ai::HeuristicAI::weightedRanking(Pieces* piece, Game* game) {
     auto possibleMoves = getPossibleMoves(piece, game);
     std::vector<std::pair<std::pair<int, int>, int>> weightedMoves;
 
     for (const auto& position : possibleMoves) {
         int weight = heuristicCalculator(*piece, position, game);
-        weightedMoves.push_back({position, weight});
+        weightedMoves.emplace_back(position, weight);
     }
 
     std::sort(weightedMoves.begin(), weightedMoves.end(),
               [](pair<pair<int,int>,int>& a, pair<pair<int,int>,int>& b) { return a.second > b.second; });
 
     return weightedMoves;
-}
+}*/
 
-vector<Pieces*> ai::HeuristicAI::getPlayablePieces(state::Game* game) {
-    std::vector<state::Pieces*> playablePieces;
+vector<Pieces*> ai::HeuristicAI::getPlayablePieces(Game* game) {
+    std::vector<Pieces*> playablePieces;
     auto currentPlayer=game->getCurrentPlayer();
     for (auto& piece : currentPlayer->getMyPieces()) {
         auto possibleMoves = getPossibleMoves(piece, game);
@@ -102,19 +110,21 @@ std::vector<int> ai::HeuristicAI::calculateMove(Game* game) {
 
     auto playablePieces = getPlayablePieces(game);
 
-    for (const auto& piece : playablePieces) {
-        auto moves = weightedRanking(piece, game);
+    for (auto piece : playablePieces) {
 
-        for (const auto& move : moves) {
-            if (move.second > bestWeight) {
-                bestWeight = move.second;
+        auto possibleMoves=getPossibleMoves(piece,game);
+
+        for (auto& move : possibleMoves) {
+            int weight=heuristicCalculator(piece,move,game);
+            if (weight > bestWeight) {
+                bestWeight = weight;
                 bestPiece = piece;
-                bestPosition = move.first;
+                bestPosition = move;
             }
         }
     }
 
-    if (bestPiece){
+    if (bestPiece!=nullptr){
         auto currentPosition = bestPiece->getPosition();
         auto currentX = currentPosition.first;
         auto currentY = currentPosition.second;

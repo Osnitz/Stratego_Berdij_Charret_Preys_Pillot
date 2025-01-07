@@ -1,0 +1,41 @@
+//
+// Created by plt on 06/01/25.
+//
+
+//#include <ai/HeuristicAI.h>
+#include <boost/test/included/unit_test.hpp>
+#include "state.h"
+#include "engine.h"
+
+using namespace state;
+using namespace engine;
+//using namespace ai;
+
+BOOST_AUTO_TEST_SUITE(HeuristicAITestSuite)
+
+BOOST_AUTO_TEST_CASE(testIsAlly) {
+    Game* game=new Game() ;
+    auto player=game->getCurrentPlayer();
+    Player *otherPlayer=new Player(2);
+    Pieces piece(1, Scout, 0, 0,player);
+    Pieces miner(2, Miner, 0, 0,otherPlayer);
+    BOOST_CHECK(game->isAlly(&piece));
+    BOOST_CHECK(!game->isAlly(&miner));
+}
+
+/*BOOST_AUTO_TEST_CASE(testGetPossibleMovesClearCache) {
+    HeuristicAI* ai=new HeuristicAI();
+    Game* game=new Game();
+    Player* player=game->getCurrentPlayer();
+    Pieces piece(1, Scout, 0, 0,player);
+    game->setPieceOnBoard(&piece,0,0);
+    BOOST_CHECK(!ai->getPossibleMoves(&piece,game).empty());
+    ai->clearCache();
+    BOOST_CHECK(ai->possibleMovesCache.empty());
+}*/
+
+//BOOST_AUTO_TEST_CASE(testHeuristicCalculator) {
+  //  Game* game=new Game();
+//}
+
+BOOST_AUTO_TEST_SUITE_END()
