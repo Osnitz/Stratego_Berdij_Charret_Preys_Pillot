@@ -33,10 +33,18 @@ endif ()
 
 # Compile "client_sfml" executable
 set(sfml_client_target client_sfml)
-add_executable(${sfml_client_target} main_sfml.cpp render/Render.cpp)
+add_executable(${sfml_client_target} main_sfml.cpp)
 target_link_libraries(${sfml_client_target} ${lib_client_target})
 if (BUILD_CODE_COVERAGE)
     add_dependencies(code-coverage ${sfml_client_target})
+endif ()
+
+# Compile "client_network" executable
+set(network_client_target client_network)
+add_executable(${network_client_target} main_clientNetwork.cpp)
+target_link_libraries(${network_client_target} ${lib_client_target})
+if (BUILD_CODE_COVERAGE)
+    add_dependencies(code-coverage ${network_client_target})
 endif ()
 
 # vim: set sw=2 sts=2 et:
