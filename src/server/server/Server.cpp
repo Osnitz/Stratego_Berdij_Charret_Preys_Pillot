@@ -4,11 +4,12 @@
 #include <unistd.h>
 #include <cstring>
 #include <iostream>
-#include <server.h>
+#include <state.h>
 
 using namespace server;
+using namespace state;
 
-Server::Server(int port, bool running) : server_fd(-1), port(port), running(running) {}
+Server::Server(int port, bool running,Game* game) : server_fd(-1), port(port), running(running), game(game) {}
 
 Server::~Server() {
     stop();
@@ -64,8 +65,10 @@ void Server::acceptClients() {
     }
 
     clients.push_back(client_fd);
-    std::cout << "New client connected." << std::endl;
+    clientIds[client_fd] = nextClientId++;
+    std::cout << "New client connected with ID: " << clientIds[client_fd] << std::endl;
 }
+
 
 std::string Server::receiveData(int client_fd) {
     char buffer[1024] = {0};
@@ -86,3 +89,71 @@ void Server::broadcastData(const std::string& message) {
         sendData(client_fd, message);
     }
 }
+
+void Server::sendRequestToClient(int clientId, const std::string& request) {
+    for (const auto& [fd, id] : clientIds) {
+        if (id == clientId) {
+            sendData(fd, request); // Méthode existante
+            std::cout << "Request sent to client " << clientId << ": " << request << std::endl;
+            return;
+        }
+    }
+    std::cerr << "Client " << clientId << " not found!" << std::endl;
+}
+
+std::string Server::waitForResponseFromClient(int clientId) {
+    for (const auto& [fd, id] : clientIds) {
+        if (id == clientId) {
+            std::string response = receiveData(fd); // Méthode existante
+            //std::cout << "Response from client " << clientId << ": " << response << std::endl;
+            return response;
+        }
+    }
+    std::cerr << "Client " << clientId << " not found!" << std::endl;
+    return "";
+}
+
+Json::Value Server::serializeOnePiece(Pieces* piece) {
+    Json::Value jsonPiece;
+    jsonPiece["value"] = piece->getValue();
+    jsonPiece["x"] = piece->getPosition().first;
+    jsonPiece["y"] = piece->getPosition().second;
+    jsonPiece["range"] = piece->getRange();
+    jsonPiece["owner"] = piece->getOwner()->getPlayerID();
+    jsonPiece["type"] = piece->getType();
+    jsonPiece["revealed"] = piece->isRevealed();
+    return jsonPiece;
+}
+
+std::string Server::serializeGameState() {
+    Json::Value root;
+    auto board = game->getBoard();
+    auto grid = *board->getGrid();
+    for (auto row:grid)
+    {
+        for (auto piecePtr:row)
+        {
+            if (piecePtr ==nullptr)
+            {
+                continue;
+            }
+            root["pieces"].append(serializeOnePiece(piecePtr));
+        }
+    }
+    root["currentPlayer"] = game->getCurrentPlayer()->getPlayerID();
+    Json::StreamWriterBuilder writer;
+    return Json::writeString(writer, root);
+}
+
+void Server::sendIdentifierToClients() {
+    for (const auto& [client_fd, clientId] : clientIds) {
+        // Envoie de l'identifiant au client
+        ssize_t sent = send(client_fd, &clientId, sizeof(clientId), 0);
+        if (sent != sizeof(clientId)) {
+            perror("Failed to send identifier");
+            throw std::runtime_error("Error sending identifier to client.");
+        }
+        std::cout << "Sent identifier " << clientId << " to client " << client_fd << std::endl;
+    }
+}
+

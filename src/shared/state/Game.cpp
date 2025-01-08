@@ -118,9 +118,13 @@ Player* Game::getOpponent()
     return Player1;
 }
 
-bool Game::belongTo(Pieces* piece)
+bool Game::belongTo(Pieces* piece, Player* player)
 {
-    auto myPieces = currentPlayer->getMyPieces();
+    if (player == nullptr)
+    {
+        player = currentPlayer;
+    }
+    auto myPieces = player->getMyPieces();
     for (size_t i = 0; i < myPieces.size(); i++)
     {
         if (myPieces[i] == piece)
@@ -370,7 +374,7 @@ void Game::displayBoard(Player& player)
                 {
                     cout << "|      "; // Empty box
                 }
-                else if (belongTo(piece))
+                else if (belongTo(piece,&player))
                 {
                     int value = piece->getValue();
                     if (value < 10)
@@ -440,4 +444,29 @@ bool Game::hasValidMoves()
         }
     }
     return false;
+}
+
+void Game::clearBoard()
+{
+    auto grid = *board->getGrid();
+    for (auto row : grid)
+    {
+        for (auto piece : row)
+        {
+            if (piece != nullptr)
+            {
+                delete piece;
+                piece = nullptr;
+            }
+        }
+    }
+}
+
+Player* Game::getPlayerByID(int playerID)
+{
+    if (playerID == 0)
+    {
+        return Player1;
+    }
+    return Player2;
 }
