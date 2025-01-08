@@ -135,7 +135,6 @@ std::vector<int> ai::HeuristicAI::calculateMove(Game* game) {
         positions.push_back(currentY);
         positions.push_back(newX);
         positions.push_back(newY);
-
         clearCache();
         return positions;
     }

@@ -82,4 +82,30 @@ BOOST_AUTO_TEST_CASE(testGetPlayablePieces) {
     BOOST_CHECK(ai->getPlayablePieces(game)[0]==&piece);
 }
 
+BOOST_AUTO_TEST_CASE(testCalculateMove) {
+    HeuristicAI* ai=new HeuristicAI();
+    Game* game=new Game();
+    auto player=game->getCurrentPlayer();
+    auto opponent=game->getOpponent();
+    Pieces bomb1(10, Bomb, 1, 0,player);
+    game->addPiece(&bomb1,player);
+    game->setPieceOnBoard(&bomb1,1,0);
+    //case no possible piece
+    BOOST_CHECK_THROW(ai->calculateMove(game), std::runtime_error);
+
+    Pieces marshalE(10, Marshal, 10, 10,opponent);
+    game->addKnown(&marshalE,player);
+    Pieces spy(2, Spy, 10, 9,player);
+    Pieces miner(2, Miner, 5, 5,player);
+    game->addPiece(&miner,player);
+    game->addPiece(&spy,player);
+    std::vector<int> res=ai->calculateMove(game);
+    BOOST_CHECK(res.size()==4);
+    BOOST_CHECK(res[0]=10);
+    BOOST_CHECK(res[1]=9);
+    BOOST_CHECK(res[2]=10);
+    BOOST_CHECK(res[3]=10);
+
+}
+
 BOOST_AUTO_TEST_SUITE_END()
