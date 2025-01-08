@@ -94,7 +94,7 @@ namespace client
                 this->aiModule0 = new ai::RandomAI();
                 break;
             case 2:
-                this->aiModule0 = new ai::RandomAI();
+                this->aiModule0 = new ai::HeuristicAI();
                 break;
             case 3:
                 this->aiModule0 = new ai::RandomAI();
@@ -117,7 +117,7 @@ namespace client
                 this->aiModule0 = new ai::RandomAI();
                 break;
             case 2:
-                this->aiModule0 = new ai::RandomAI();
+                this->aiModule0 = new ai::HeuristicAI();
                 break;
             case 3:
                 this->aiModule0 = new ai::RandomAI();
@@ -138,7 +138,7 @@ namespace client
                 aiModule1 = new ai::RandomAI();
                 break;
             case 2:
-                aiModule1 = new ai::RandomAI();
+                aiModule1 = new ai::HeuristicAI();
                 break;
             case 3:
                 aiModule1 = new ai::RandomAI();
