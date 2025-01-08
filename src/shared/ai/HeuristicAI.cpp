@@ -34,46 +34,104 @@ vector<pair<int, int>> ai::HeuristicAI::getPossibleMoves(Pieces* piece, Game* ga
 
 int ai::HeuristicAI::heuristicCalculator(Pieces* piece, const std::pair<int, int>& position, Game* game) {
     int weight = 0;
-    auto currentPlayer=game->getCurrentPlayer();
+    auto currentPlayer = game->getCurrentPlayer();
+    auto opponentPlayer = game->getOpponent();
+    int totalMyPieces = currentPlayer->getMyPieces().size();
 
     if (piece->getType() == Scout) {
         weight += 50;
     }
 
-    for (const auto& enemy : currentPlayer->getKnown()) {
+    for (const auto& enemy : opponentPlayer->getKnown()) {
         int distance = abs(position.first - enemy->getPosition().first) +
-                                   abs(position.second - enemy->getPosition().second);
-        if (distance == 2) {
-            if (piece->getType() == Miner ||piece->getValue() < enemy->getValue()) {
-                weight += 100;
-            }
-        }
-        if (distance == 1) {
+                       abs(position.second - enemy->getPosition().second);
 
-            if (piece->getValue() > enemy->getValue()) {
-                weight += 100;
-            }
-            else if (piece->getValue() < enemy->getValue()) {
-                weight -= 50;
-            }
+        if (distance == 2 && piece->getType() == Miner) {
+            weight += 150;
         }
-        if (distance==0) {
-            if ((piece->getType()== Spy) && (enemy->getType() == Marshal)) {
-                weight += 500;
-            }
-            else if (piece->getValue() > enemy->getValue()) {
-                weight += 200;
-            }
-            else if (piece->getValue() < enemy->getValue()) {
+
+        if (distance == 1) {
+            if (piece->getValue() > enemy->getValue()) {
+                weight += 150;
+            } else if (piece->getValue() < enemy->getValue()) {
                 weight -= 100;
             }
         }
+
+        if (distance == 0) {
+            if ((piece->getType() == Spy) && (enemy->getType() == Marshal)) {
+                weight += 500;
+            } else if (piece->getValue() > enemy->getValue()) {
+                weight += 300;
+            } else if (piece->getValue() < enemy->getValue()) {
+                weight -= 200;
+            }
+        }
     }
+
+    if (opponentPlayer->getKnown().empty()) {
+        if (piece->getType() != Miner) {
+            weight += 20;
+            if (position.second > piece->getPosition().second) {
+                weight += 30;
+            }
+        }
+    }
+
+    for (const auto& enemy : opponentPlayer->getKnown()) {
+        if (piece->getValue() > enemy->getValue()) {
+            int distance = abs(position.first - enemy->getPosition().first) +
+                           abs(position.second - enemy->getPosition().second);
+            if (distance < 5) {
+                weight += 50;
+            }
+        }
+    }
+
+    for (const auto& enemy : opponentPlayer->getKnown()) {
+        if (immobileCounter[enemy] >= 10) { // Seuil d'immobilité
+            int distance = abs(position.first - enemy->getPosition().first) +
+                           abs(position.second - enemy->getPosition().second);
+
+            if (piece->getType() == Miner) {
+                weight += 300 / (distance + 1);
+            } else {
+                weight += 50 / (distance + 1);
+            }
+        }
+    }
+
+    for (const auto& ally : currentPlayer->getMyPieces()) {
+        if (ally->getPosition() != position) {
+            int distance = abs(position.first - ally->getPosition().first) +
+                           abs(position.second - ally->getPosition().second);
+            if (distance <= 2) {
+                weight += 10;
+            } else if (distance > 5) {
+                weight -= 10;
+            }
+        }
+    }
+
+    /*if (totalMyPieces > 25) { // Début de partie
+        if (piece->getType() != Miner && piece->getType() != Flag) {
+            weight += 20; // Favoriser les pièces non essentielles pour explorer
+        }
+    } else if (totalMyPieces > 10) { // Milieu de partie
+        weight += 10; // Bonus générique pour toutes les actions stratégiques
+    } else { // Fin de partie
+        if (piece->getType() == Miner) {
+            weight += 50; // Protection des Miners
+        } else if (piece->getType() == Flag) {
+            weight -= 100; // Décourager tout mouvement de la Flag
+        }
+    }*/
 
     weight += 10;
 
     return weight;
 }
+
 
 /*vector<std::pair<std::pair<int, int>, int>> ai::HeuristicAI::weightedRanking(Pieces* piece, Game* game) {
     auto possibleMoves = getPossibleMoves(piece, game);
@@ -101,6 +159,30 @@ vector<Pieces*> ai::HeuristicAI::getPlayablePieces(Game* game) {
     }
     return playablePieces;
 }
+
+void ai::HeuristicAI::immobileCounting(state::Game* game) {
+    auto currentBoard = game->getBoard()->grid;
+    if (boardSnapshot.empty()) {
+        boardSnapshot = currentBoard;
+        return;
+    }
+
+    for (int row = 0; row < currentBoard.size(); ++row) {
+        for (int col = 0; col < currentBoard[row].size(); ++col) {
+            auto currentPiece = currentBoard[row][col];
+            auto previousPiece = boardSnapshot[row][col];
+
+            if (currentPiece != nullptr && currentPiece == previousPiece) {
+                immobileCounter[currentPiece]++;
+            } else if (currentPiece != nullptr) {
+                immobileCounter[currentPiece] = 0;
+            }
+        }
+    }
+
+    boardSnapshot = currentBoard;
+}
+
 
 std::vector<int> ai::HeuristicAI::calculateMove(Game* game) {
     std::vector<int> positions;
