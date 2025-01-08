@@ -115,6 +115,7 @@ add_subdirectory(src/shared)
 add_subdirectory(src/client)
 add_subdirectory(src/server)
 
+
 # Rapport generation
 add_subdirectory(rapport)
 

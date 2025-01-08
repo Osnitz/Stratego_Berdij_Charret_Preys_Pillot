@@ -4,9 +4,9 @@
 //
 #include <fstream>
 
-#include "client.h"
+#include "server.h"
 #include <thread>
-using namespace client;
+using namespace server;
 
 int main()
 {
@@ -17,7 +17,7 @@ int main()
     //client->monitorServerConnection();
     //client->handleServerRequest();
     int id = client->receiveIdentifier();
-    client->setPlayerId(id);
+    client->setPlayerID(id);
     std::cout<<"clientID :"<<client->getPlayerID()<<std::endl;
 
     gamestate = client->receiveGameStateWithDynamicBuffer();

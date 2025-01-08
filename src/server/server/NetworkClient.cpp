@@ -1,12 +1,11 @@
-#include "client.h"
 #include <sys/socket.h>
 #include <arpa/inet.h>
 #include <unistd.h>
 #include <iostream>
 #include <thread>
-#include <json/json.h>
+#include <server.h>
 
-using namespace client;
+using namespace server;
 using namespace state;
 
 NetworkClient::NetworkClient(std::string server_ip, int port,Game* game) : client_fd(-1), server_ip(server_ip),
@@ -210,6 +209,6 @@ int NetworkClient::getPlayerID() {
     return playerID;
 }
 
-void NetworkClient::setPlayerId(int playerId) {
+void NetworkClient::setPlayerID(int playerId) {
     playerID = playerId;
 }
