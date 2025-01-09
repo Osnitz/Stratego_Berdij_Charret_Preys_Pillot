@@ -291,17 +291,10 @@ void Server::sendLargeJson(int client_fd, const std::string& jsonString) {
 }
 
 
-void Server::handlePlacement(engine::Engine* gameEngine, std::vector<client::PlayerController*>& playerControllersVector)
+void Server::handlePlacement(engine::Engine* gameEngine)
 {
     ServerRequest configRequest;
     configRequest.type = server::RequestType::Configuration;
-    for (  auto& playerController : playerControllersVector)
-    {
-        if (playerController->isAI())
-        {
-            playerController->handlePlacement(game);
-        }
-    }
     for (int client_fd : clients)
     {
         sendRequestToClient(client_fd, configRequest);
