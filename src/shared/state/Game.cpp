@@ -448,10 +448,15 @@ bool Game::hasValidMoves()
 
 void Game::clearBoard()
 {
-    auto grid = *board->getGrid();
-    for (auto row : grid)
+    std::vector<std::vector<Pieces*>>* grid = board->getGrid();
+    if (!grid) {
+        std::cerr << "Error: Grid is null." << std::endl;
+        return;
+    }
+
+    for (std::vector<Pieces*>& row : *grid) // Déréférencement de grid avec *
     {
-        for (auto piece : row)
+        for (auto& piece : row) // Utilisation de références pour modifier directement
         {
             if (piece != nullptr)
             {
@@ -461,6 +466,7 @@ void Game::clearBoard()
         }
     }
 }
+
 
 Player* Game::getPlayerByID(int playerID)
 {

@@ -18,6 +18,7 @@ target_include_directories(${lib_server_target} PUBLIC
 target_link_libraries(${lib_server_target} PUBLIC
   ${MHD_LIBRARY}
   $<TARGET_NAME:shared_static>
+        $<TARGET_NAME:client_static>
   )
 
 # Compile "server" executable

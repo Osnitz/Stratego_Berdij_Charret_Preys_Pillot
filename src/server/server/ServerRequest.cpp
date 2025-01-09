@@ -18,7 +18,7 @@ ServerRequest ServerRequest::deserialize (std::string& jsonString) {
     Json::CharReaderBuilder reader;
     Json::Value root;
     std::string errors;
-    std::cout<<"request :"<<jsonString<<std::endl;
+    //std::cout<<"request :"<<jsonString<<std::endl;
     std::istringstream jsonStream(jsonString);
     if (!Json::parseFromStream(reader, jsonStream, &root, &errors)) {
         throw std::runtime_error("Failed to parse JSON: " + errors);

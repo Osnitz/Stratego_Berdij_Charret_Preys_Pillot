@@ -166,15 +166,15 @@ std::string Server::serializeGameState() {
 }
 
 void Server::sendIdentifierToClients() {
-    for (const auto& [client_fd, clientId] : clientIds) {
+    for (int i=0; i<clients.size(); i++) {
         // Envoie de l'identifiant au client
-        ssize_t sent = send(client_fd, &clientId, sizeof(clientId), 0);
-        if (sent != sizeof(clientId)) {
+        ssize_t sent = send(clients[i], &i, sizeof(i), 0);
+        if (sent != sizeof(i)) {
             perror("Failed to send identifier");
             throw std::runtime_error("Error sending identifier to client.");
         }
-        std::cout << "Sent identifier " << clientId << " to client " << client_fd << std::endl;
-        if (!waitForAcknowledgment(client_fd)) {
+        std::cout << "Sent identifier " << i << " to client " <<clients[i] << std::endl;
+        if (!waitForAcknowledgment(clients[i])) {
             throw std::runtime_error("Failed to receive acknowledgment sendIdentifier.");
         }
         std::cout<<"ACK received"<<std::endl;

@@ -180,7 +180,6 @@ GameState NetworkClient::deserializeGameState(const std::string& jsonString)
 
 void NetworkClient::updateGameState(GameState gameState)
 {
-    // Met à jour le jeu avec les nouvelles pièces
     game->clearBoard();
     for (Pieces* piece : gameState.pieces)
     {
@@ -253,12 +252,12 @@ void NetworkClient::sendResponseToServer (RequestType type, Json::Value response
         throw std::runtime_error("Error sending response to server.");
     }
 
-    std::cout << "Response sent to server." << std::endl;
-    std::cout << "Waiting fo ACK" << std::endl;
+    //std::cout << "Response sent to server." << std::endl;
+    //std::cout << "Waiting fo ACK" << std::endl;
     if (!waitForAcknowledgment()) {
         throw std::runtime_error("Failed to receive acknowledgment sendResponseToServer.");
     }
-    std::cout << "ACK received" << std::endl;
+    //std::cout << "ACK received" << std::endl;
 }
 
 ServerRequest NetworkClient::receiveRequest() {
@@ -270,7 +269,7 @@ ServerRequest NetworkClient::receiveRequest() {
 
     buffer[bytesReceived] = '\0';
     std::string jsonString(buffer);
-    std::cout<<"jsonString receiveRequest:"<<jsonString<<std::endl;
+    //std::cout<<"jsonString receiveRequest:"<<jsonString<<std::endl;
     ServerRequest request;
     try {
         sendAcknowledgment();
@@ -299,7 +298,7 @@ void NetworkClient::sendAcknowledgment() {
     if (sent != static_cast<ssize_t>(ACK_MESSAGE.size())) {
         throw std::runtime_error("Failed to send acknowledgment to server.");
     }
-    std::cout<<"ACK sent :"<<ACK_MESSAGE<<std::endl;
+    //std::cout<<"ACK sent :"<<ACK_MESSAGE<<std::endl;
 }
 
 std::string NetworkClient::receiveLargeJson() {
@@ -340,7 +339,7 @@ std::string NetworkClient::receiveLargeJson() {
         }*/
     }
 
-    std::cout << "JSON file received successfully!" << std::endl;
+    //std::cout << "JSON file received successfully!" << std::endl;
     try {
         sendAcknowledgment();
     } catch (const std::exception& e) {
