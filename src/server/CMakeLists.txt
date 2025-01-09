@@ -2,7 +2,7 @@
 set(lib_server_target server_static)
 
 # Generate header files from dia UML files
-#generate_dia_header("${CMAKE_CURRENT_SOURCE_DIR}/../server.dia")
+generate_dia_header("${CMAKE_CURRENT_SOURCE_DIR}/../server.dia")
 
 # Find all source files to include in library
 file(GLOB_RECURSE server_sources *.cpp)
@@ -18,6 +18,7 @@ target_include_directories(${lib_server_target} PUBLIC
 target_link_libraries(${lib_server_target} PUBLIC
   ${MHD_LIBRARY}
   $<TARGET_NAME:shared_static>
+        $<TARGET_NAME:client_static>
   )
 
 # Compile "server" executable
@@ -28,5 +29,12 @@ if(BUILD_CODE_COVERAGE)
   add_dependencies(code-coverage ${server_target})
 endif()
 
+# Compile "client_network" executable
+set(client_server_target client_network)
+add_executable(${client_server_target} main_clientNetwork.cpp)
+target_link_libraries(${client_server_target} ${lib_server_target})
+if (BUILD_CODE_COVERAGE)
+  add_dependencies(code-coverage ${client_server_target})
+endif ()
 # vim: set sw=2 sts=2 et:
 

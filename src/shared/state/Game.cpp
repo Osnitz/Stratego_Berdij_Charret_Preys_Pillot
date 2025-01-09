@@ -118,9 +118,13 @@ Player* Game::getOpponent()
     return Player1;
 }
 
-bool Game::belongTo(Pieces* piece)
+bool Game::belongTo(Pieces* piece, Player* player)
 {
-    auto myPieces = currentPlayer->getMyPieces();
+    if (player == nullptr)
+    {
+        player = currentPlayer;
+    }
+    auto myPieces = player->getMyPieces();
     for (size_t i = 0; i < myPieces.size(); i++)
     {
         if (myPieces[i] == piece)
@@ -370,7 +374,7 @@ void Game::displayBoard(Player& player)
                 {
                     cout << "|      "; // Empty box
                 }
-                else if (belongTo(piece))
+                else if (belongTo(piece,&player))
                 {
                     int value = piece->getValue();
                     if (value < 10)
@@ -442,7 +446,33 @@ bool Game::hasValidMoves()
     return false;
 }
 
-void Game::addKnown(Pieces * piece, Player* player) {
-    player->getKnown().push_back(piece);
+void Game::clearBoard()
+{
+    std::vector<std::vector<Pieces*>>* grid = board->getGrid();
+    if (!grid) {
+        std::cerr << "Error: Grid is null." << std::endl;
+        return;
+    }
+
+    for (std::vector<Pieces*>& row : *grid) // Déréférencement de grid avec *
+    {
+        for (auto& piece : row) // Utilisation de références pour modifier directement
+        {
+            if (piece != nullptr)
+            {
+                delete piece;
+                piece = nullptr;
+            }
+        }
+    }
 }
 
+
+Player* Game::getPlayerByID(int playerID)
+{
+    if (playerID == 0)
+    {
+        return Player1;
+    }
+    return Player2;
+}
