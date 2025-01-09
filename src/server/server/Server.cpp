@@ -79,39 +79,44 @@ void Server::acceptClients() {
 
 void Server::sendData(int client_fd, const std::string& message) {
     send(client_fd, message.c_str(), message.size(), 0);
+    if (!waitForAcknowledgment(client_fd)) {
+        throw std::runtime_error("Failed to receive acknowledgment sendLargeJson.");
+    }
 }
 
 void Server::broadcastData(const std::string& message) {
     for (int client_fd : clients) {
         sendLargeJson(client_fd, message);
-        waitForAcknowledgment(client_fd);
     }
 }
 
 void Server::sendRequestToClient(int client_fd, ServerRequest& request) {
     std::string serializedRequest = request.serialize();
-    std::cout<<"serializedRequest :"<<serializedRequest<<std::endl;
+    //std::cout<<"serializedRequest :"<<serializedRequest<<std::endl;
     ssize_t sent = send(client_fd, serializedRequest.c_str(), serializedRequest.size(), 0);
     if (sent != static_cast<ssize_t>(serializedRequest.size())) {
         perror("Failed to send request");
         throw std::runtime_error("Error sending request to client.");
     }
-    std::cout << "Sent request of type " << static_cast<int>(request.type)
-              << " to client " << client_fd << std::endl;
-    waitForAcknowledgment(client_fd);
+    std::cout << "Sending request to client " << client_fd << ": " << serializedRequest << std::endl;
+    if (!waitForAcknowledgment(client_fd)) {
+        throw std::runtime_error("Failed to receive acknowledgment sendLargeJson.");
+    }
+    std::cout << "ACK received" << std::endl;
 }
 
 Json::Value Server::receiveResponseFromClient(int clientId) {
+    std::cout<<"Waiting for response"<<std::endl;
     char buffer[4096];
     ssize_t bytesReceived = recv(clientId, buffer, sizeof(buffer) - 1, 0);
     if (bytesReceived <= 0) {
         throw std::runtime_error("Failed to receive response from client.");
     }
-
+    std::cout<<"Response received"<<std::endl;
     buffer[bytesReceived] = '\0';
     std::string jsonString(buffer);
     std::istringstream jsonStream(jsonString);
-    std::cout<<"jsonString :"<<jsonString<<std::endl;
+    //std::cout<<"jsonString :"<<jsonString<<std::endl;
     Json::CharReaderBuilder reader;
     Json::Value root;
     std::string errors;
@@ -119,7 +124,12 @@ Json::Value Server::receiveResponseFromClient(int clientId) {
     if (!Json::parseFromStream(reader, jsonStream, &root, &errors)) {
         throw std::runtime_error("Failed to parse JSON response: " + errors);
     }
-    sendAcknowledgment(clientId);
+    try {
+        sendAcknowledgment(clientId);
+    } catch (const std::exception& e) {
+        std::cerr << "Failed to send acknowledgment receiveRequest: " << e.what() << std::endl;
+        throw;
+    }
     return root;
 }
 
@@ -164,7 +174,10 @@ void Server::sendIdentifierToClients() {
             throw std::runtime_error("Error sending identifier to client.");
         }
         std::cout << "Sent identifier " << clientId << " to client " << client_fd << std::endl;
-        waitForAcknowledgment(client_fd);
+        if (!waitForAcknowledgment(client_fd)) {
+            throw std::runtime_error("Failed to receive acknowledgment sendIdentifier.");
+        }
+        std::cout<<"ACK received"<<std::endl;
     }
 }
 
@@ -196,11 +209,12 @@ std::vector<int> Server::handleClientResponse(int client_fd, Json::Value& respon
 
 
 bool server::Server::waitForAcknowledgment(int client_fd) {
+    std::cout<<"Waiting for ACK"<<std::endl;
     char buffer[4096];
     ssize_t bytesReceived = recv(client_fd, buffer, sizeof(buffer) - 1, 0);
-    if (bytesReceived <= 0) {
+    /*if (bytesReceived <= 0) {
         throw std::runtime_error("Failed to receive acknowledgment from client.");
-    }
+    }*/
 
     buffer[bytesReceived] = '\0';
     std::string response(buffer);
@@ -210,10 +224,13 @@ bool server::Server::waitForAcknowledgment(int client_fd) {
 
 
 void server::Server::sendAcknowledgment(int client_fd) {
+    std::cout<<"sending ACK :"<<ACK_MESSAGE<<std::endl;
     ssize_t sent = send(client_fd, ACK_MESSAGE.c_str(), ACK_MESSAGE.size(), 0);
+
     if (sent != static_cast<ssize_t>(ACK_MESSAGE.size())) {
         throw std::runtime_error("Failed to send acknowledgment to client.");
     }
+    std::cout<<"ACK sent :"<<ACK_MESSAGE<<std::endl;
 }
 
 void Server::sendLargeJson(int client_fd, const std::string& jsonString) {
@@ -240,10 +257,14 @@ void Server::sendLargeJson(int client_fd, const std::string& jsonString) {
         bytesSent += sent;
 
         // Attendez un acquittement pour chaque chunk
-        waitForAcknowledgment(client_fd);
+        /*if (!waitForAcknowledgment(client_fd)) {
+            throw std::runtime_error("Failed to receive acknowledgment sendLargeJson.");
+        }*/
     }
-
-    std::cout << "JSON file sent successfully!" << std::endl;
+    if (!waitForAcknowledgment(client_fd)) {
+        throw std::runtime_error("Failed to receive acknowledgment sendLargeJson.");
+    }
+    std::cout << "Ack received for largeJson" << std::endl;
 }
 
 

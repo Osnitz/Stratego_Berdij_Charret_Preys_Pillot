@@ -6,6 +6,7 @@
 
 #include "server.h"
 #include <thread>
+#include <state/Player.h>
 using namespace server;
 
 /*int main()
@@ -43,9 +44,10 @@ using namespace server;
 
 #include <iostream>
 
-int main() {
-    try {
-        // Connectez-vous au serveur
+int main()
+{
+    try
+    {
         auto game = new state::Game();
         auto client = new NetworkClient("127.0.0.1", 8080, game);
         client->connectToServer();
@@ -55,19 +57,25 @@ int main() {
         client->setPlayerID(id);
         auto myPlayer = game->getPlayerByID(client->getPlayerID());
         // Boucle principale pour recevoir et traiter les requêtes
-        while (true) {
-                auto gameStateString = client->receiveLargeJson();
-                auto gameState = client->deserializeGameState(gameStateString);
-                client->updateGameState(gameState);
-                game->displayBoard(*myPlayer);
+        while (true)
+        {
+            auto gameStateString = client->receiveLargeJson();
+            auto gameState = client->deserializeGameState(gameStateString);
+            client->updateGameState(gameState);
+            //std::cout << "Game state updated!" << std::endl;
+            //game->displayBoard(*myPlayer);
 
+            if (game->getCurrentPlayer()->getPlayerID() == client->getPlayerID())
+            {
                 // Recevez une requête du serveur
                 server::ServerRequest request = client->receiveRequest();
                 // Traitez la requête (demandera des inputs utilisateur)
                 client->handleServerRequest(request);
+            }
         }
-
-    } catch (const std::exception& e) {
+    }
+    catch (const std::exception& e)
+    {
         std::cerr << "Error: " << e.what() << std::endl;
         return 1;
     }

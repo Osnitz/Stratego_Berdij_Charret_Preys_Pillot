@@ -81,8 +81,8 @@ int main()
 {
     // Initialisez le jeu (placeholder pour votre logique de jeu)
     Game* game = new Game();
-    auto currentPlayer = game->getPlayer1();
-    game->setCurrentPlayer(currentPlayer);
+    auto gameEngine = new GameEngine();
+    auto currentPlayer = game->getCurrentPlayer();
     int clientId;
 
     std::string filepath =
@@ -104,11 +104,12 @@ int main()
     }
 
     server->sendIdentifierToClients();
-
+    ServerRequest moveRequest;
+    moveRequest.type = server::RequestType::Move;
     std::thread serverThread([&]()
     {
         int index = 0;
-        while (index < 5)
+        while (index < 10)
         {
             auto gameState = server->serializeGameState();
             for (int client_fd : server->clients)
@@ -117,10 +118,9 @@ int main()
             }
 
             std::cout << "game state bien reçu par tout les clients" << std::endl;
-            // Envoyez une requête de déplacement (Move)
+            // Envoyez une requête de déplacement (Move)*/
             clientId = currentPlayer->getPlayerID();
-            ServerRequest moveRequest;
-            moveRequest.type = server::RequestType::Move;
+
             server->sendRequestToClient(server->clients[clientId], moveRequest);
             // Recevez la réponse du client
             Json::Value moveResponse = server->receiveResponseFromClient(server->clients[clientId]);

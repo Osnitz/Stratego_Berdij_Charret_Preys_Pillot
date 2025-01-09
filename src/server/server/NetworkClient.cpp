@@ -78,7 +78,6 @@ void NetworkClient::handleServerRequest(ServerRequest& request)
             response["toX"] = toX;
             response["toY"] = toY;
 
-            //sendAcknowledgment();
             sendResponseToServer(request.type, response);
             break;
     }
@@ -94,9 +93,8 @@ void NetworkClient::handleServerRequest(ServerRequest& request)
             Json::Value response;
             response["choice"] = choice;
 
-            //sendAcknowledgment();
+
             sendResponseToServer(request.type, response);
-            waitForAcknowledgment();
             break;
     }
 
@@ -210,7 +208,7 @@ std::string NetworkClient::receiveGameStateWithDynamicBuffer() {
     try {
         sendAcknowledgment();
     } catch (const std::exception& e) {
-        std::cerr << "Failed to send acknowledgment: " << e.what() << std::endl;
+        std::cerr << "Failed to send acknowledgment receiveGameStateDynamic: " << e.what() << std::endl;
         throw;
     }
     return jsonString;
@@ -227,7 +225,7 @@ int NetworkClient::receiveIdentifier() {
     try {
         sendAcknowledgment();
     } catch (const std::exception& e) {
-        std::cerr << "Failed to send acknowledgment: " << e.what() << std::endl;
+        std::cerr << "Failed to send acknowledgment receiveIdentifier: " << e.what() << std::endl;
         throw;
     }
     return identifier;
@@ -256,7 +254,11 @@ void NetworkClient::sendResponseToServer (RequestType type, Json::Value response
     }
 
     std::cout << "Response sent to server." << std::endl;
-    waitForAcknowledgment();
+    std::cout << "Waiting fo ACK" << std::endl;
+    if (!waitForAcknowledgment()) {
+        throw std::runtime_error("Failed to receive acknowledgment sendResponseToServer.");
+    }
+    std::cout << "ACK received" << std::endl;
 }
 
 ServerRequest NetworkClient::receiveRequest() {
@@ -273,7 +275,7 @@ ServerRequest NetworkClient::receiveRequest() {
     try {
         sendAcknowledgment();
     } catch (const std::exception& e) {
-        std::cerr << "Failed to send acknowledgment: " << e.what() << std::endl;
+        std::cerr << "Failed to send acknowledgment receiveRequest: " << e.what() << std::endl;
         throw;
     }
     return request.deserialize(jsonString);
@@ -282,9 +284,9 @@ ServerRequest NetworkClient::receiveRequest() {
 bool NetworkClient::waitForAcknowledgment() {
     char buffer[4096];
     ssize_t bytesReceived = recv(client_fd, buffer, sizeof(buffer) - 1, 0);
-    if (bytesReceived <= 0) {
+    /*if (bytesReceived <= 0) {
         throw std::runtime_error("Failed to receive acknowledgment from server.");
-    }
+    }*/
 
     buffer[bytesReceived] = '\0';
     std::string response(buffer);
@@ -297,6 +299,7 @@ void NetworkClient::sendAcknowledgment() {
     if (sent != static_cast<ssize_t>(ACK_MESSAGE.size())) {
         throw std::runtime_error("Failed to send acknowledgment to server.");
     }
+    std::cout<<"ACK sent :"<<ACK_MESSAGE<<std::endl;
 }
 
 std::string NetworkClient::receiveLargeJson() {
@@ -327,12 +330,23 @@ std::string NetworkClient::receiveLargeJson() {
 
         jsonString.append(buffer, received);
         bytesReceived += received;
-        std::cout<<"jsonString :"<<jsonString<<std::endl;
+        //std::cout<<"jsonString :"<<jsonString<<std::endl;
         // Envoyez un acquittement pour chaque chunk
-        sendAcknowledgment();
+        /*try {
+            sendAcknowledgment();
+        } catch (const std::exception& e) {
+            std::cerr << "Failed to send acknowledgment chunck receiveLargeJson: " << e.what() << std::endl;
+            throw;
+        }*/
     }
 
     std::cout << "JSON file received successfully!" << std::endl;
+    try {
+        sendAcknowledgment();
+    } catch (const std::exception& e) {
+        std::cerr << "Failed to send acknowledgment chunck receiveLargeJson: " << e.what() << std::endl;
+        throw;
+    }
     return jsonString;
 }
 
