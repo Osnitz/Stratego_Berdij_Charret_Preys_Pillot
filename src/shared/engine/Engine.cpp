@@ -61,6 +61,7 @@ void Engine::attack(Pieces* mypiece, pair<int, int> position)
 {
     auto board = game->getBoard();
     Pieces* attackedPiece = board->getPiece(position);
+    attackedPiece->setReveal(true);
     auto currentplayer = game->getCurrentPlayer();
     auto opponent = game->getOpponent();
 
