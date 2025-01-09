@@ -77,16 +77,18 @@ void Engine::attack(Pieces* mypiece, pair<int, int> position)
         if (mytype == PieceType::Miner) {
             cout << "Good job ! The bomb is no more.\n" << endl;
             game->addCaptured(attackedPiece, currentplayer);
-            game->setPieceOnBoard(mypiece,position.first,position.second);
+            game->removeFromBoard(attackedPiece);
             game->removePiece(attackedPiece, opponent);
-            game->addKnown(mypiece,opponent);
+            game->setPieceOnBoard(mypiece,position.first,position.second);
             return;
         } else {
             cout << "Rest well ! The war is over for you.\n" << endl;
             game->addCaptured(mypiece, opponent);
             game->removeFromBoard(mypiece);
             game->removePiece(mypiece, currentplayer);
-            game->addKnown(attackedPiece,currentplayer);
+            game->addCaptured(attackedPiece, currentplayer);
+            game->removeFromBoard(attackedPiece);
+            game->removePiece(attackedPiece, opponent);
             return;
         }
     }
@@ -94,8 +96,9 @@ void Engine::attack(Pieces* mypiece, pair<int, int> position)
     if (attackedtype == PieceType::Marshal && mytype == PieceType::Spy) {
         cout << "Well done sir ! Their leader is gone.\n" << endl;
         game->addCaptured(attackedPiece, currentplayer);
-        game->setPieceOnBoard(mypiece,position.first,position.second);
+        game->removeFromBoard(attackedPiece);
         game->removePiece(attackedPiece, opponent);
+        game->setPieceOnBoard(mypiece,position.first,position.second);
         game->addKnown(mypiece,opponent);
         return;
     }
@@ -104,8 +107,9 @@ void Engine::attack(Pieces* mypiece, pair<int, int> position)
     if (myvalue > attackedvalue) {
         cout << "The enemy is down ! It was a " << attackedtype << ".\n" << endl;
         game->addCaptured(attackedPiece, currentplayer);
-        game->setPieceOnBoard(mypiece,position.first,position.second);
+        game->removeFromBoard(attackedPiece);
         game->removePiece(attackedPiece, opponent);
+        game->setPieceOnBoard(mypiece,position.first,position.second);
         game->addKnown(mypiece,opponent);
     }
     else if (myvalue < attackedvalue) {

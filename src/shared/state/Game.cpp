@@ -278,8 +278,7 @@ vector<pair<int, int>> Game::possiblePositions(Pieces* pieceToMove)
 {
     vector<pair<int, int>> possiblePositions;
 
-    if (pieceToMove == nullptr)
-    {
+    if (pieceToMove == nullptr || pieceToMove->getType() == PieceType::Flag || pieceToMove->getType() == PieceType::Bomb)    {
         return possiblePositions;
     }
 
@@ -305,7 +304,7 @@ vector<pair<int, int>> Game::possiblePositions(Pieces* pieceToMove)
             }
             if (!limitBoard(posToCheck, true))
             {
-                break; // Si hors limites, arrêter cette direction
+                break;
             }
 
             Pieces* targetPiece = board->getPiece(posToCheck);
