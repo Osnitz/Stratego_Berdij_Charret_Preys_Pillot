@@ -14,7 +14,7 @@ int main()
     try
     {
         auto game = new state::Game();
-        auto client = new NetworkClient("127.0.0.1", 8080, game);
+        auto client = new NetworkClient("192.168.32.234", 8080, game);
         client->connectToServer();
         auto id = client->receiveIdentifier();
         client->setPlayerID(id);
