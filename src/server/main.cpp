@@ -35,7 +35,7 @@ using namespace server;
     return 0;
 }*/
 
-int main() {
+/*int main() {
     auto game = new Game();
     auto currentPlayer= game->getCurrentPlayer();
     std::string filepath ="/home/matthieu/CLionProjects/Stratego_Berdij_Charret_Preys_Pillot/src/shared/state/config/Balance.csv";
@@ -75,5 +75,65 @@ int main() {
     serverThread.join();
 
     return 0;
-}
+}*/
 
+int main()
+{
+    // Initialisez le jeu (placeholder pour votre logique de jeu)
+    Game* game = new Game();
+    auto currentPlayer = game->getPlayer1();
+    game->setCurrentPlayer(currentPlayer);
+    int clientId;
+
+    std::string filepath =
+        "/home/matthieu/CLionProjects/Stratego_Berdij_Charret_Preys_Pillot/src/shared/state/config/Balance.csv";
+    game->loadConfig(filepath);
+    game->switchTurn();
+    game->loadConfig(filepath);
+    game->switchTurn();
+
+    // Créez le serveur
+    auto server = new Server(8080, true, game);
+    server->start();
+
+    // Attendez deux clients
+    std::cout << "Waiting for clients..." << std::endl;
+    while (server->clients.size() < 2)
+    {
+        server->acceptClients();
+    }
+
+    server->sendIdentifierToClients();
+
+    std::thread serverThread([&]()
+    {
+        int index = 0;
+        while (index < 5)
+        {
+            auto gameState = server->serializeGameState();
+            for (int client_fd : server->clients)
+            {
+                server->sendLargeJson(client_fd, gameState);
+            }
+
+            std::cout << "game state bien reçu par tout les clients" << std::endl;
+            // Envoyez une requête de déplacement (Move)
+            clientId = currentPlayer->getPlayerID();
+            ServerRequest moveRequest;
+            moveRequest.type = server::RequestType::Move;
+            server->sendRequestToClient(server->clients[clientId], moveRequest);
+            // Recevez la réponse du client
+            Json::Value moveResponse = server->receiveResponseFromClient(server->clients[clientId]);
+            //std::cout<<"moveResponse :"<<moveResponse<<std::endl;
+            auto coords = server->handleClientResponse(server->clients[clientId], moveResponse);
+            index++;
+            game->switchTurn();
+            currentPlayer = game->getCurrentPlayer();
+        }
+    });
+
+    std::this_thread::sleep_for(std::chrono::seconds(600));
+    server->stop();
+    serverThread.join();
+    return 0;
+}

@@ -8,6 +8,7 @@
 
 using namespace server;
 using namespace state;
+const std::string ACK_MESSAGE = "ACK";
 
 Server::Server(int port, bool running,Game* game) : server_fd(-1), port(port), running(running), game(game) {}
 
@@ -17,9 +18,16 @@ Server::~Server() {
 
 void Server::start() {
     server_fd = socket(AF_INET, SOCK_STREAM, 0);
-    if (server_fd == -1) {
+    if (server_fd < 0) {
         perror("Socket creation failed");
-        return;
+        throw std::runtime_error("Failed to create socket");
+    }
+
+    // Activer SO_REUSEADDR pour permettre la réutilisation du port
+    int opt = 1;
+    if (setsockopt(server_fd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)) < 0) {
+        perror("setsockopt failed");
+        throw std::runtime_error("Failed to set SO_REUSEADDR");
     }
 
     sockaddr_in address{};
@@ -69,48 +77,50 @@ void Server::acceptClients() {
     std::cout << "New client connected with ID: " << clientIds[client_fd] << std::endl;
 }
 
-
-std::string Server::receiveData(int client_fd) {
-    char buffer[1024] = {0};
-    ssize_t bytes_received = read(client_fd, buffer, sizeof(buffer));
-    if (bytes_received < 0) {
-        perror("Receive failed");
-        return "";
-    }
-    return std::string(buffer, bytes_received);
-}
-
 void Server::sendData(int client_fd, const std::string& message) {
     send(client_fd, message.c_str(), message.size(), 0);
 }
 
 void Server::broadcastData(const std::string& message) {
     for (int client_fd : clients) {
-        sendData(client_fd, message);
+        sendLargeJson(client_fd, message);
+        waitForAcknowledgment(client_fd);
     }
 }
 
-void Server::sendRequestToClient(int clientId, const std::string& request) {
-    for (const auto& [fd, id] : clientIds) {
-        if (id == clientId) {
-            sendData(fd, request); // Méthode existante
-            std::cout << "Request sent to client " << clientId << ": " << request << std::endl;
-            return;
-        }
+void Server::sendRequestToClient(int client_fd, ServerRequest& request) {
+    std::string serializedRequest = request.serialize();
+    std::cout<<"serializedRequest :"<<serializedRequest<<std::endl;
+    ssize_t sent = send(client_fd, serializedRequest.c_str(), serializedRequest.size(), 0);
+    if (sent != static_cast<ssize_t>(serializedRequest.size())) {
+        perror("Failed to send request");
+        throw std::runtime_error("Error sending request to client.");
     }
-    std::cerr << "Client " << clientId << " not found!" << std::endl;
+    std::cout << "Sent request of type " << static_cast<int>(request.type)
+              << " to client " << client_fd << std::endl;
+    waitForAcknowledgment(client_fd);
 }
 
-std::string Server::waitForResponseFromClient(int clientId) {
-    for (const auto& [fd, id] : clientIds) {
-        if (id == clientId) {
-            std::string response = receiveData(fd); // Méthode existante
-            //std::cout << "Response from client " << clientId << ": " << response << std::endl;
-            return response;
-        }
+Json::Value Server::receiveResponseFromClient(int clientId) {
+    char buffer[4096];
+    ssize_t bytesReceived = recv(clientId, buffer, sizeof(buffer) - 1, 0);
+    if (bytesReceived <= 0) {
+        throw std::runtime_error("Failed to receive response from client.");
     }
-    std::cerr << "Client " << clientId << " not found!" << std::endl;
-    return "";
+
+    buffer[bytesReceived] = '\0';
+    std::string jsonString(buffer);
+    std::istringstream jsonStream(jsonString);
+    std::cout<<"jsonString :"<<jsonString<<std::endl;
+    Json::CharReaderBuilder reader;
+    Json::Value root;
+    std::string errors;
+
+    if (!Json::parseFromStream(reader, jsonStream, &root, &errors)) {
+        throw std::runtime_error("Failed to parse JSON response: " + errors);
+    }
+    sendAcknowledgment(clientId);
+    return root;
 }
 
 Json::Value Server::serializeOnePiece(Pieces* piece) {
@@ -154,6 +164,86 @@ void Server::sendIdentifierToClients() {
             throw std::runtime_error("Error sending identifier to client.");
         }
         std::cout << "Sent identifier " << clientId << " to client " << client_fd << std::endl;
+        waitForAcknowledgment(client_fd);
     }
 }
+
+std::vector<int> Server::handleClientResponse(int client_fd, Json::Value& response) {
+    RequestType type = static_cast<RequestType>(response["type"].asInt());
+    const Json::Value& data = response["response"];
+    std::vector<int> coords;
+
+    switch (type) {
+    case RequestType::Move:
+        std::cout << "Client Move Response: from (" << data["fromX"].asInt() << ", " << data["fromY"].asInt()
+                  << ") to (" << data["toX"].asInt() << ", " << data["toY"].asInt() << ")" << std::endl;
+        coords.push_back(data["fromY"].asInt());
+        coords.push_back(data["fromX"].asInt());
+        coords.push_back(data["toY"].asInt());
+        coords.push_back(data["toX"].asInt());
+        return coords;
+
+    case RequestType::Configuration:
+        std::cout << "Client Configuration Response:  " << data["choice"].asInt() << std::endl;
+        coords.push_back(data["choice"].asInt());
+        return coords;
+
+    default:
+        std::cerr << "Unknown response type received." << std::endl;
+        break;
+    }
+}
+
+
+bool server::Server::waitForAcknowledgment(int client_fd) {
+    char buffer[4096];
+    ssize_t bytesReceived = recv(client_fd, buffer, sizeof(buffer) - 1, 0);
+    if (bytesReceived <= 0) {
+        throw std::runtime_error("Failed to receive acknowledgment from client.");
+    }
+
+    buffer[bytesReceived] = '\0';
+    std::string response(buffer);
+
+    return response == ACK_MESSAGE; // Retourne true si l'acquittement est reçu
+}
+
+
+void server::Server::sendAcknowledgment(int client_fd) {
+    ssize_t sent = send(client_fd, ACK_MESSAGE.c_str(), ACK_MESSAGE.size(), 0);
+    if (sent != static_cast<ssize_t>(ACK_MESSAGE.size())) {
+        throw std::runtime_error("Failed to send acknowledgment to client.");
+    }
+}
+
+void Server::sendLargeJson(int client_fd, const std::string& jsonString) {
+    // Envoyez la taille totale du fichier JSON
+    uint32_t totalSize = htonl(jsonString.size());
+    ssize_t sent = send(client_fd, &totalSize, sizeof(totalSize), 0);
+    if (sent != sizeof(totalSize)) {
+        throw std::runtime_error("Failed to send total size.");
+    }
+
+    // Envoyez les données en chunks
+    size_t chunkSize = 4096; // Taille du chunk (4 KB)
+    size_t bytesSent = 0;
+
+    while (bytesSent < jsonString.size()) {
+        size_t remaining = jsonString.size() - bytesSent;
+        size_t currentChunkSize = std::min(chunkSize, remaining);
+
+        sent = send(client_fd, jsonString.data() + bytesSent, currentChunkSize, 0);
+        if (sent != static_cast<ssize_t>(currentChunkSize)) {
+            throw std::runtime_error("Failed to send JSON chunk.");
+        }
+
+        bytesSent += sent;
+
+        // Attendez un acquittement pour chaque chunk
+        waitForAcknowledgment(client_fd);
+    }
+
+    std::cout << "JSON file sent successfully!" << std::endl;
+}
+
 

@@ -1,3 +1,4 @@
+#include <cstring>
 #include <sys/socket.h>
 #include <arpa/inet.h>
 #include <unistd.h>
@@ -7,7 +8,7 @@
 
 using namespace server;
 using namespace state;
-
+const std::string ACK_MESSAGE = "ACK";
 NetworkClient::NetworkClient(std::string server_ip, int port,Game* game) : client_fd(-1), server_ip(server_ip),
 server_port(port), game(game)
 {
@@ -54,36 +55,54 @@ void NetworkClient::disconnect()
     }
 }
 
-void NetworkClient::sendData(const std::string& message)
+void NetworkClient::handleServerRequest(ServerRequest& request)
 {
-    send(client_fd, message.c_str(), message.size(), 0);
-}
+    switch (request.type) {
+    case RequestType::Move: {
+            std::cout << "Move Request Received. Provide the coordinates:" << std::endl;
 
-std::string NetworkClient::receiveData()
-{
-    char buffer[1024] = {0};
-    ssize_t bytes_received = read(client_fd, buffer, sizeof(buffer));
-    if (bytes_received < 0)
-    {
-        perror("Receive failed");
-        return "";
+            int fromX, fromY, toX, toY;
+            std::cout << "Enter fromX: ";
+            std::cin >> fromX;
+            std::cout << "Enter fromY: ";
+            std::cin >> fromY;
+            std::cout << "Enter toX: ";
+            std::cin >> toX;
+            std::cout << "Enter toY: ";
+            std::cin >> toY;
+
+            // Préparez la réponse
+            Json::Value response;
+            response["fromX"] = fromX;
+            response["fromY"] = fromY;
+            response["toX"] = toX;
+            response["toY"] = toY;
+
+            //sendAcknowledgment();
+            sendResponseToServer(request.type, response);
+            break;
     }
-    return std::string(buffer, bytes_received);
-}
 
-void NetworkClient::handleServerRequest()
-{
-    std::string request = receiveData(); // Lire la requête
-    if (!request.empty())
-    {
-        std::cout << "Server: " << request << std::endl;
+    case RequestType::Configuration: {
+            std::cout << "Configuration Request Received. Choose : (1)" << std::endl;
 
-        // Simuler un input
-        /*std::string response;
-        std::cout << "Enter your response: ";
-        std::getline(std::cin, response);
+            int choice;
+            std::cout << "Enter your choice: ";
+            std::cin >> choice;
 
-        sendData(response); // Envoyer la réponse*/
+            // Préparez la réponse
+            Json::Value response;
+            response["choice"] = choice;
+
+            //sendAcknowledgment();
+            sendResponseToServer(request.type, response);
+            waitForAcknowledgment();
+            break;
+    }
+
+    default:
+        std::cerr << "Unknown request type received." << std::endl;
+        break;
     }
 }
 
@@ -179,8 +198,6 @@ std::string NetworkClient::receiveGameStateWithDynamicBuffer() {
 
     while ((bytesReceived = recv(client_fd, buffer, sizeof(buffer), 0)) > 0) {
         jsonString.append(buffer, bytesReceived);
-
-        // Vérifiez si le JSON est complet (par exemple, dernier caractère = '}')
         if (jsonString.back() == '}') {
             break;
         }
@@ -190,9 +207,14 @@ std::string NetworkClient::receiveGameStateWithDynamicBuffer() {
         throw std::runtime_error("Failed to receive JSON data.");
     }
 
+    try {
+        sendAcknowledgment();
+    } catch (const std::exception& e) {
+        std::cerr << "Failed to send acknowledgment: " << e.what() << std::endl;
+        throw;
+    }
     return jsonString;
 }
-
 
 int NetworkClient::receiveIdentifier() {
     int identifier;
@@ -202,6 +224,12 @@ int NetworkClient::receiveIdentifier() {
         throw std::runtime_error("Error receiving identifier from server.");
     }
     std::cout << "Received identifier: " << identifier << std::endl;
+    try {
+        sendAcknowledgment();
+    } catch (const std::exception& e) {
+        std::cerr << "Failed to send acknowledgment: " << e.what() << std::endl;
+        throw;
+    }
     return identifier;
 }
 
@@ -212,3 +240,99 @@ int NetworkClient::getPlayerID() {
 void NetworkClient::setPlayerID(int playerId) {
     playerID = playerId;
 }
+
+void NetworkClient::sendResponseToServer (RequestType type, Json::Value response) {
+    Json::Value root;
+    root["type"] = static_cast<int>(type);
+    root["response"] = response;
+
+    Json::StreamWriterBuilder writer;
+    std::string serializedResponse = Json::writeString(writer, root);
+
+    ssize_t sent = send(client_fd, serializedResponse.c_str(), serializedResponse.size(), 0);
+    if (sent != static_cast<ssize_t>(serializedResponse.size())) {
+        perror("Failed to send response to server");
+        throw std::runtime_error("Error sending response to server.");
+    }
+
+    std::cout << "Response sent to server." << std::endl;
+    waitForAcknowledgment();
+}
+
+ServerRequest NetworkClient::receiveRequest() {
+    char buffer[4096];
+    ssize_t bytesReceived = recv(client_fd, buffer, sizeof(buffer) - 1, 0);
+    if (bytesReceived <= 0) {
+        throw std::runtime_error("Failed to receive request from server.");
+    }
+
+    buffer[bytesReceived] = '\0';
+    std::string jsonString(buffer);
+    std::cout<<"jsonString receiveRequest:"<<jsonString<<std::endl;
+    ServerRequest request;
+    try {
+        sendAcknowledgment();
+    } catch (const std::exception& e) {
+        std::cerr << "Failed to send acknowledgment: " << e.what() << std::endl;
+        throw;
+    }
+    return request.deserialize(jsonString);
+}
+
+bool NetworkClient::waitForAcknowledgment() {
+    char buffer[4096];
+    ssize_t bytesReceived = recv(client_fd, buffer, sizeof(buffer) - 1, 0);
+    if (bytesReceived <= 0) {
+        throw std::runtime_error("Failed to receive acknowledgment from server.");
+    }
+
+    buffer[bytesReceived] = '\0';
+    std::string response(buffer);
+
+    return response == ACK_MESSAGE; // Retourne true si l'acquittement est reçu
+}
+
+void NetworkClient::sendAcknowledgment() {
+    ssize_t sent = send(client_fd, ACK_MESSAGE.c_str(), ACK_MESSAGE.size(), 0);
+    if (sent != static_cast<ssize_t>(ACK_MESSAGE.size())) {
+        throw std::runtime_error("Failed to send acknowledgment to server.");
+    }
+}
+
+std::string NetworkClient::receiveLargeJson() {
+    // Recevez la taille totale
+    uint32_t totalSize;
+    ssize_t received = recv(client_fd, &totalSize, sizeof(totalSize), 0);
+    if (received != sizeof(totalSize)) {
+        throw std::runtime_error("Failed to receive total size.");
+    }
+
+    totalSize = ntohl(totalSize); // Convertir en ordre d'octets hôte
+
+    // Préparez un buffer pour recevoir les données
+    std::string jsonString;
+    jsonString.reserve(totalSize);
+
+    char buffer[4096];
+    size_t bytesReceived = 0;
+
+    while (bytesReceived < totalSize) {
+        size_t remaining = totalSize - bytesReceived;
+        size_t currentChunkSize = std::min(sizeof(buffer), remaining);
+
+        received = recv(client_fd, buffer, currentChunkSize, 0);
+        if (received <= 0) {
+            throw std::runtime_error("Failed to receive JSON chunk.");
+        }
+
+        jsonString.append(buffer, received);
+        bytesReceived += received;
+        std::cout<<"jsonString :"<<jsonString<<std::endl;
+        // Envoyez un acquittement pour chaque chunk
+        sendAcknowledgment();
+    }
+
+    std::cout << "JSON file received successfully!" << std::endl;
+    return jsonString;
+}
+
