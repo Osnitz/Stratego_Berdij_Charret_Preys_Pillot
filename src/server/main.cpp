@@ -15,29 +15,6 @@ int main()
 {
     // Initialisez le jeu (placeholder pour votre logique de jeu)
     Game* game = new Game();
-    auto gameEngine = new Engine(game);
-    auto scenarioManager = new ScenarioManager(gameEngine);
-
-    client::PlayerController* playerController;
-    auto gameMode = scenarioManager->getScenarioChoice();
-    scenarioManager->setMode(gameMode);
-    scenarioManager->initializeControllers();
-    Player* currentPlayer;
-    for (size_t i = 0; i < 2; i++)
-    {
-        currentPlayer = game->getCurrentPlayer();
-        playerController = scenarioManager->getPlayerController(currentPlayer);
-        playerController->handlePlacement(game);
-    }
-    std::string filepath =
-        "/home/matthieu/CLionProjects/Stratego_Berdij_Charret_Preys_Pillot/src/shared/state/config/Balance.csv";
-    game->loadConfig(filepath);
-    game->switchTurn();
-    game->loadConfig(filepath);
-    game->switchTurn();
-    currentPlayer = game->getCurrentPlayer();
-
-    int clientId;
 
     // Créez le serveur
     auto server = new Server(8080, true, game);
@@ -53,12 +30,37 @@ int main()
     server->sendIdentifierToClients();
     ServerRequest moveRequest;
     moveRequest.type = server::RequestType::Move;
+
+
+    auto gameEngine = new Engine(game);
+    auto scenarioManager = new ScenarioManager(gameEngine);
+
+    client::PlayerController* playerController;
+    auto gameMode = scenarioManager->getScenarioChoice();
+    scenarioManager->setMode(gameMode);
+    scenarioManager->initializeControllers();
+    Player* currentPlayer;
+    for (size_t i = 0; i < 2; i++)
+    {
+        currentPlayer = game->getCurrentPlayer();
+        playerController = scenarioManager->getPlayerController(currentPlayer);
+        playerController->handlePlacement(game);
+    }
+    /*std::string filepath =
+        "/home/matthieu/CLionProjects/Stratego_Berdij_Charret_Preys_Pillot/src/shared/state/config/Balance.csv";
+    game->loadConfig(filepath);
+    game->switchTurn();
+    game->loadConfig(filepath);
+    game->switchTurn();*/
+    currentPlayer = game->getCurrentPlayer();
+
+    int clientId;
+
     std::thread serverThread([&]()
     {
         int index = 0;
         while (index < 10)
         {
-
             auto gameState = server->serializeGameState();
             for (int client_fd : server->clients)
             {
@@ -75,7 +77,7 @@ int main()
             auto coords = server->handleClientResponse(server->clients[clientId], moveResponse);
             playerController = scenarioManager->getPlayerController(currentPlayer);
             playerController->executeCmd(std::make_pair(coords[0], coords[1]),
-                std::make_pair(coords[2], coords[3]), currentPlayer);
+                                         std::make_pair(coords[2], coords[3]), currentPlayer);
             index++;
             currentPlayer = game->getCurrentPlayer();
         }
