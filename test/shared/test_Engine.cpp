@@ -163,6 +163,7 @@ BOOST_AUTO_TEST_CASE(TestAttackAllCases)
 
     engine->attack(scoutPiece2, {5, 0});
     BOOST_CHECK(game->getPlayer2()->getCaptured().size() == 1);
+    BOOST_CHECK(game->getPlayer1()->getCaptured().size() == 2);
 
     game->removeFromBoard(scoutPiece2);
     game->removeFromBoard(bombPiece2);
@@ -176,7 +177,7 @@ BOOST_AUTO_TEST_CASE(TestAttackAllCases)
     game->setPieceOnBoard(spyPiece, 4, 0);
 
     engine->attack(spyPiece, {5, 0});
-    BOOST_CHECK(game->getPlayer1()->getCaptured().size() == 2);
+    BOOST_CHECK(game->getPlayer1()->getCaptured().size() == 3);
     BOOST_CHECK(board->getPiece({5, 0}) == spyPiece);
 
     game->removeFromBoard(spyPiece);
@@ -191,7 +192,7 @@ BOOST_AUTO_TEST_CASE(TestAttackAllCases)
     game->setPieceOnBoard(scoutPiece3, 4, 0);
 
     engine->attack(scoutPiece3, {5, 0});
-    BOOST_CHECK(game->getPlayer1()->getCaptured().size() == 3);
+    BOOST_CHECK(game->getPlayer1()->getCaptured().size() == 4);
     BOOST_CHECK(board->getPiece({5, 0}) == scoutPiece3);
 
     game->removeFromBoard(scoutPiece3);
@@ -223,7 +224,7 @@ BOOST_AUTO_TEST_CASE(TestAttackAllCases)
     engine->attack(tiedAttacker, {5, 0});
     BOOST_CHECK(board->getPiece({5, 0}) == nullptr);
     BOOST_CHECK(board->getPiece({4, 0}) == nullptr);
-    BOOST_CHECK(game->getPlayer1()->getCaptured().size() == 4);
+    BOOST_CHECK(game->getPlayer1()->getCaptured().size() == 5);
     BOOST_CHECK(game->getPlayer2()->getCaptured().size() == 3);
 
     game->removeFromBoard(tiedPiece);

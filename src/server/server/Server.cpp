@@ -98,13 +98,6 @@ void Server::acceptClients() {
     std::cout << "New client connected with ID: " << clientIds[client_fd] << std::endl;
 }
 
-void Server::sendData(int client_fd, const std::string& message) {
-    send(client_fd, message.c_str(), message.size(), 0);
-    if (!waitForAcknowledgment(client_fd)) {
-        throw std::runtime_error("Failed to receive acknowledgment sendLargeJson.");
-    }
-}
-
 void Server::broadcastGameState() {
     auto gameState = serializeGameState();
     for (int client_fd : clients)

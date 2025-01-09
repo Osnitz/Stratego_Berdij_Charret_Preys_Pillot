@@ -103,27 +103,6 @@ void NetworkClient::handleServerRequest(ServerRequest& request)
     }
 }
 
-void NetworkClient::monitorServerConnection()
-{
-    char buffer[1]; // Buffer minimal pour tester la connexion
-
-    ssize_t bytes_received = recv(client_fd, buffer, sizeof(buffer), MSG_PEEK);
-    if (bytes_received == 0)
-    {
-        // Le serveur s'est déconnecté proprement
-        std::cout << "Server disconnected. Closing client..." << std::endl;
-        disconnect();
-        exit(0); // Quitte le programme ou gère la fin de connexion
-    }
-    else if (bytes_received < 0)
-    {
-        perror("Error while monitoring server connection");
-    }
-
-    // Petite pause pour éviter une surcharge du CPU
-    std::this_thread::sleep_for(std::chrono::milliseconds(100));
-}
-
 GameState NetworkClient::deserializeGameState(const std::string& jsonString)
 {
     // Parse le JSON reçu
@@ -185,31 +164,6 @@ void NetworkClient::updateGameState(GameState gameState)
         game->setPieceOnBoard(piece, piece->getPosition().first, piece->getPosition().second);
     }
     game->setCurrentPlayer(game->getPlayerByID(gameState.currentPlayerID));
-}
-
-std::string NetworkClient::receiveGameStateWithDynamicBuffer() {
-    std::string jsonString;
-    char buffer[4096];
-    ssize_t bytesReceived;
-
-    while ((bytesReceived = recv(client_fd, buffer, sizeof(buffer), 0)) > 0) {
-        jsonString.append(buffer, bytesReceived);
-        if (jsonString.back() == '}') {
-            break;
-        }
-    }
-
-    if (bytesReceived < 0) {
-        throw std::runtime_error("Failed to receive JSON data.");
-    }
-
-    try {
-        sendAcknowledgment();
-    } catch (const std::exception& e) {
-        std::cerr << "Failed to send acknowledgment receiveGameStateDynamic: " << e.what() << std::endl;
-        throw;
-    }
-    return jsonString;
 }
 
 int NetworkClient::receiveIdentifier() {
