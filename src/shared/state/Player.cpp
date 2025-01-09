@@ -27,6 +27,10 @@ std::vector<Pieces *> &Player::getMyPieces() {
     return myPieces;
 }
 
+std::vector<Pieces *> &Player::getKnown() {
+    return knownPieces;
+}
+
 void Player:: displayCaptured () {
     if(capturedPieces.empty()) {
         cerr<<"You have no captured pieces"<<endl;
@@ -54,3 +58,4 @@ void Player:: displayCaptured () {
 int Player::getPlayerID() {
     return PlayerID;
 }
+
