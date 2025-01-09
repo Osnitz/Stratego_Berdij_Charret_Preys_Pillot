@@ -57,11 +57,12 @@ int main() {
     while (window->isOpen())
     {
         render.handleEvents();
-        window->clear();
+        window->clear(sf::Color(255, 255, 255));
         render.drawBoard();
         render.drawGrid();
         render.drawCoordinates();
         render.drawPiecesOnBoard(game);
+        render.drawCapturedPieces();
         window->display();
 
         currentPlayer = game->getCurrentPlayer();

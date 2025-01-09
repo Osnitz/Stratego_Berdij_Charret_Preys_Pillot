@@ -5,6 +5,7 @@
 #include "../../shared/state/Board.h"
 #include "../../shared/state/Pieces.h"
 #include "../../shared/state/Game.h"
+#include "../../shared/state/Player.h"
 #include <iostream>
 #include <../shared/ai/RandomAI.h>
 
@@ -36,8 +37,17 @@ std::string constructPath(const std::string& relativePath) {
 
 
 Render::Render(int cellSize, state::Game* game)
-        : window(sf::VideoMode(cellSize * 10, cellSize * 10), "Stratego - Plateau"),
-          cellSize(cellSize), rows(10), cols(10), game(game) {
+        : cellSize(cellSize), rows(10), cols(10), game(game) {
+    // Ajouter une marge pour les pièces capturées à gauche et à droite
+    const int marginCapturedPieces = 160;
+
+    // Définir la taille de la fenêtre en tenant compte de la marge pour les pièces capturées
+    window.create(sf::VideoMode(cellSize * cols + 2* marginCapturedPieces, cellSize * rows), "Stratego - Plateau");
+
+    // Stocker la taille initiale de la fenêtre
+    initialWindowSize = window.getSize();
+
+    // Charger le plateau
     std::string filepath = constructPath("src/client/img_render/board.png");
     if (!boardTexture.loadFromFile(filepath)) {
         std::cerr << "Erreur : Impossible de charger board.png" << std::endl;
@@ -48,6 +58,7 @@ Render::Render(int cellSize, state::Game* game)
             static_cast<float>(cellSize * rows) / static_cast<float>(boardTexture.getSize().y)
     );
 
+    // Chargement des textures pour les pièces
     std::map<state::PieceType, std::string> texturePaths = {
             {state::PieceType::Bomb, "src/client/img_render/bomb.png"},
             {state::PieceType::Captain, "src/client/img_render/captain.png"},
@@ -61,7 +72,6 @@ Render::Render(int cellSize, state::Game* game)
             {state::PieceType::Scout, "src/client/img_render/scout.png"},
             {state::PieceType::Sergeant, "src/client/img_render/sergeant.png"},
             {state::PieceType::Spy, "src/client/img_render/spy.png"},
-
     };
 
     for (const auto& [pieceType, path] : texturePaths) {
@@ -75,19 +85,20 @@ Render::Render(int cellSize, state::Game* game)
 }
 
 
+
 void Render::handleEvents() {
     sf::Event event{};
     while (window.pollEvent(event)) {
         if (event.type == sf::Event::Closed) {
             window.close();
-        }
-        else if (event.type == sf::Event::MouseButtonPressed) {
+        } else if (event.type == sf::Event::Resized) {
+            // Ajuster la vue pour couvrir toute la fenêtre redimensionnée
+            sf::FloatRect visibleArea(0, 0, event.size.width, event.size.height);
+            window.setView(sf::View(visibleArea));
+        } else if (event.type == sf::Event::MouseButtonPressed) {
             if (event.mouseButton.button == sf::Mouse::Left) {
                 sf::Vector2i pixelPos(event.mouseButton.x, event.mouseButton.y);
                 sf::Vector2i cellPos = pixelToCell(pixelPos);
-
-
-
 
                 std::cout << "Clic sur la case : "
                           << cellPos.x << ", " << cellPos.y << std::endl;
@@ -97,61 +108,78 @@ void Render::handleEvents() {
 }
 
 
+
+
 void Render::drawBoard() {
+    // Ajuster la position et la taille du sprite pour couvrir uniquement la zone du plateau
+    boardSprite.setPosition(0, 0); // La zone de jeu commence à (0, 0)
+    boardSprite.setScale(
+            static_cast<float>(cellSize * cols) / static_cast<float>(boardTexture.getSize().x),
+            static_cast<float>(cellSize * rows) / static_cast<float>(boardTexture.getSize().y)
+    );
+
+    // Dessiner uniquement dans la zone du plateau
     window.draw(boardSprite);
 }
+
 
 
 void Render::drawGrid() {
     sf::RectangleShape line;
     line.setFillColor(sf::Color::Black);
 
+    // Définir les limites du plateau (sans les marges des pièces capturées)
+    int gridWidth = cellSize * cols;  // Largeur du plateau
+    int gridHeight = cellSize * rows; // Hauteur du plateau
 
-    // horizontal lines
+    // Lignes horizontales
     for (int i = 0; i <= rows; ++i) {
-        line.setSize(sf::Vector2f(window.getSize().x, 1));//width of the window, height 1
-        line.setPosition(0, i * cellSize);
+        line.setSize(sf::Vector2f(gridWidth, 1)); // Largeur limitée au plateau, hauteur 1
+        line.setPosition(0, i * cellSize);       // Positionner les lignes dans le plateau
         window.draw(line);
     }
 
-
-    // Vertical lines
+    // Lignes verticales
     for (int j = 0; j <= cols; ++j) {
-        line.setSize(sf::Vector2f(1, window.getSize().y)); // height of the window, width 1
-        line.setPosition(j * cellSize, 0);
+        line.setSize(sf::Vector2f(1, gridHeight)); // Hauteur limitée au plateau, largeur 1
+        line.setPosition(j * cellSize, 0);        // Positionner les lignes dans le plateau
         window.draw(line);
     }
 }
 
 
+
 void Render::drawCoordinates() {
     sf::Font font;
     std::string filepath = constructPath("src/client/fonts/arial.ttf");
-    if (!font.loadFromFile(filepath)) { // Load the font
+    if (!font.loadFromFile(filepath)) { // Charger la police
         std::cerr << "Erreur : Impossible de charger arial.ttf" << std::endl;
+        return;
     }
-
 
     sf::Text text;
     text.setFont(font);
     text.setCharacterSize(14);
     text.setFillColor(sf::Color::Black);
 
-
-    // Draw the row and column numbers
+    // Limiter le dessin des numéros de ligne et de colonne à la zone du plateau
     for (int i = 0; i < rows; ++i) {
         text.setString(std::to_string(i));
-        text.setPosition(5, i * cellSize + 5); // Shift for readability
-        window.draw(text);
+        text.setPosition(5, i * cellSize + 5); // Décalage pour la lisibilité
+        if (i * cellSize < rows * cellSize) { // S'assurer que c'est dans les limites du plateau
+            window.draw(text);
+        }
     }
-
 
     for (int j = 0; j < cols; ++j) {
         text.setString(std::to_string(j));
-        text.setPosition(j * cellSize + 5, 5); // Shift for readability
-        window.draw(text);
+        text.setPosition(j * cellSize + 5, 5); // Décalage pour la lisibilité
+        if (j * cellSize < cols * cellSize) { // S'assurer que c'est dans les limites du plateau
+            window.draw(text);
+        }
     }
 }
+
 
 
 sf::Vector2i Render::pixelToCell(const sf::Vector2i& pixelPos) {
@@ -195,6 +223,7 @@ void Render::drawPiecesOnBoard(state::Game* game) {
 
 
     for (const auto& row : *grid) {
+        drawCapturedPieces();
         for (Pieces* piece : row) {
             if (piece) {
                 if (game->belongTo(piece)) {
@@ -211,14 +240,106 @@ void Render::drawPiecesOnBoard(state::Game* game) {
 void Render::run() {
     while (window.isOpen()) {
         handleEvents();
+
+        // Rectangle de fond blanc couvrant toute la fenêtre
+        sf::RectangleShape fullBackground(sf::Vector2f(window.getSize().x, window.getSize().y));
+        fullBackground.setFillColor(sf::Color(255, 255, 255));
         window.clear();
+        window.draw(fullBackground); // Dessiner le fond blanc
+
+        // Dessiner les éléments du jeu
         drawBoard();
         drawGrid();
         drawCoordinates();
         drawPiecesOnBoard(game);
+        drawCapturedPieces();
+
         window.display();
     }
 }
+
+void Render::drawCapturedPieces() {
+    const int margin = 5; // Réduit la marge entre les pièces et les bords
+    const int offsetY = 20; // Réduit l'espacement vertical entre les lignes
+    const int maxCapturedPerRow = 7; // Chaque ligne peut contenir jusqu'à 10 pièces capturées
+    const int capturedAreaWidth = maxCapturedPerRow * (cellSize / 2) + 2 * margin; // Zone fixe pour les pièces capturées
+
+    // Rectangle blanc pour le fond des pièces capturées
+    sf::RectangleShape background(sf::Vector2f(capturedAreaWidth, cellSize * rows));
+    background.setFillColor(sf::Color(255, 255, 255)); // Fond blanc
+    background.setPosition(cellSize * cols, 0); // Toujours aligné à droite du plateau
+    window.draw(background);
+
+    auto player1Captured = game->getPlayer1()->getCaptured();
+    auto player2Captured = game->getPlayer2()->getCaptured();
+
+    // Dessiner les pièces capturées du joueur 1 en bas à droite
+    for (size_t i = 0; i < player1Captured.size(); ++i) {
+        Pieces* piece = player1Captured[i];
+        if (!piece) continue;
+
+        sf::Sprite pieceSprite;
+        auto pieceType = piece->getType();
+        auto it = textures.find(pieceType);
+        if (it != textures.end()) {
+            pieceSprite.setTexture(it->second);
+        } else {
+            std::cerr << "Erreur : Texture non trouvée pour le type de pièce " << static_cast<int>(pieceType) << std::endl;
+            continue;
+        }
+
+        int row = i / maxCapturedPerRow;
+        int col = i % maxCapturedPerRow;
+
+        sf::Vector2i capturedPos(
+        cellSize * cols + margin + col * (cellSize / 1.4), // Réduction de l'espacement horizontal
+                cellSize * rows - (row + 1) * (cellSize / 2 + offsetY) // Réduction de l'espacement vertical
+        );
+
+        pieceSprite.setScale(
+                static_cast<float>(cellSize) / (1.3 * pieceSprite.getTexture()->getSize().x), // Réduction de la taille
+                static_cast<float>(cellSize) / (1.3 * pieceSprite.getTexture()->getSize().y)
+        );
+        pieceSprite.setPosition(static_cast<float>(capturedPos.x), static_cast<float>(capturedPos.y));
+        window.draw(pieceSprite);
+    }
+
+    // Dessiner les pièces capturées du joueur 2 en haut à droite
+    for (size_t i = 0; i < player2Captured.size(); ++i) {
+        Pieces* piece = player2Captured[i];
+        if (!piece) continue;
+
+        sf::Sprite pieceSprite;
+        auto pieceType = piece->getType();
+        auto it = textures.find(pieceType);
+        if (it != textures.end()) {
+            pieceSprite.setTexture(it->second);
+        } else {
+            std::cerr << "Erreur : Texture non trouvée pour le type de pièce " << static_cast<int>(pieceType) << std::endl;
+            continue;
+        }
+
+        int row = i / maxCapturedPerRow;
+        int col = i % maxCapturedPerRow;
+
+        sf::Vector2i capturedPos(
+        cellSize * cols + margin + col * (cellSize / 1.4), // Réduction de l'espacement horizontal
+                margin + row * (cellSize / 2 + offsetY) // Réduction de l'espacement vertical
+        );
+
+        pieceSprite.setScale(
+                static_cast<float>(cellSize) / (1.3* pieceSprite.getTexture()->getSize().x), // Réduction de la taille
+                static_cast<float>(cellSize) / (1.3 * pieceSprite.getTexture()->getSize().y)
+        );
+        pieceSprite.setPosition(static_cast<float>(capturedPos.x), static_cast<float>(capturedPos.y));
+        window.draw(pieceSprite);
+    }
+}
+
+
+
+
+
 
 
 void Render::drawAllyPiece(Pieces* piece) {
@@ -288,6 +409,8 @@ void Render::drawEnemyPiece(Pieces* piece) {
 
 }
 
+
+
 sf::RenderWindow* Render::getWindow() {
     return &window;
 }
@@ -317,25 +440,20 @@ std::vector<int> Render::getPlayerInput() {
                             selectedCell = {-1, -1};
                             continue;
                         }
-                        if (game->belongTo(selectedPiece))
-                        {
+                        if (game->belongTo(selectedPiece)) {
                             std::vector<std::pair<int, int>> possiblePositions = game->possiblePositions(selectedPiece);
                             // Redraw the board with the selected piece and possible positions highlighted
-                            window.clear();
+                            window.clear(sf::Color(255, 255, 255)); // Fond blanc
                             drawBoard();
                             drawGrid();
                             drawCoordinates();
                             drawPiecesOnBoard(game);
-                            highlightOnePiece(selectedPair,sf::Color(255, 255, 0, 150));//yellow
+                            highlightOnePiece(selectedPair, sf::Color(255, 255, 0, 150)); // jaune
                             highlightPossiblePositions(possiblePositions);
                             window.display();
                         }
-
-
-                        //std::cout << "Cellule sélectionnée : " << selectedPair.second << ", " << selectedPair.first << std::endl;
                     } else {
                         targetCell = clickedCell;
-
                         return {selectedCell.y, selectedCell.x, targetCell.y, targetCell.x};
                     }
                 }
@@ -360,8 +478,8 @@ void Render::displayEndScreen(int winnerPlayerID) {
     endText.setFillColor(sf::Color::White);
     endText.setString("Player " + std::to_string(winnerPlayerID) + " wins!");
     endText.setPosition(
-        static_cast<float>(window.getSize().x) / 2 - endText.getLocalBounds().width / 2,
-        static_cast<float>(window.getSize().y) / 2 - endText.getLocalBounds().height / 2
+            static_cast<float>(initialWindowSize.x) / 2 - endText.getLocalBounds().width / 2,
+            static_cast<float>(initialWindowSize.y) / 2 - endText.getLocalBounds().height / 2
     );
 
     sf::RectangleShape overlay(sf::Vector2f(static_cast<float>(window.getSize().x), static_cast<float>(window.getSize().y)));
@@ -395,33 +513,41 @@ int Render::displayDifficultySelection(const std::string& titleText) {
         throw std::runtime_error("Erreur : Impossible de charger la police arial.ttf");
     }
 
+    // Création du titre
     sf::Text title;
     title.setFont(font);
     title.setCharacterSize(40);
     title.setFillColor(sf::Color::White);
     title.setString(titleText);
+
+    // Calcul initial pour centrer le titre (ne change pas si la fenêtre est redimensionnée)
     title.setPosition(
-        static_cast<float>(window.getSize().x) / 2 - title.getLocalBounds().width / 2,
-        50
+            static_cast<float>(initialWindowSize.x) / 2 - title.getLocalBounds().width / 2,
+            50
     );
 
+
+
+    // Création des boutons
     sf::Text easyButton, mediumButton, hardButton;
     easyButton.setFont(font);
     easyButton.setCharacterSize(30);
     easyButton.setFillColor(sf::Color::White);
     easyButton.setString("Easy");
-    easyButton.setPosition(100, 150);
 
     mediumButton.setFont(font);
     mediumButton.setCharacterSize(30);
     mediumButton.setFillColor(sf::Color::White);
     mediumButton.setString("Medium");
-    mediumButton.setPosition(100, 250);
 
     hardButton.setFont(font);
     hardButton.setCharacterSize(30);
     hardButton.setFillColor(sf::Color::White);
     hardButton.setString("Hard");
+
+    // Positions initiales des boutons
+    easyButton.setPosition(100, 150);
+    mediumButton.setPosition(100, 250);
     hardButton.setPosition(100, 350);
 
     while (window.isOpen()) {
@@ -446,6 +572,7 @@ int Render::displayDifficultySelection(const std::string& titleText) {
             }
         }
 
+        // Dessin des éléments
         window.clear();
         window.draw(title);
         window.draw(easyButton);
@@ -473,8 +600,8 @@ ScenarioParameters Render::displayInitializationScreen() {
     title.setFillColor(sf::Color::White);
     title.setString("Choose Game Mode");
     title.setPosition(
-        static_cast<float>(window.getSize().x) / 2 - title.getLocalBounds().width / 2,
-        50
+            static_cast<float>(window.getSize().x) / 2 - title.getLocalBounds().width / 2,
+            50
     );
 
     sf::Text pvpButton, pveButton, aiButton;
@@ -524,8 +651,8 @@ ScenarioParameters Render::displayInitializationScreen() {
                         case 3:
                             scenarioParameters.aiModule0 = new ai::RandomAI();
                             break;
-                    default:
-                        scenarioParameters.aiModule0 = new ai::RandomAI();
+                        default:
+                            scenarioParameters.aiModule0 = new ai::RandomAI();
                     }
                     return scenarioParameters;
                 }
@@ -542,8 +669,8 @@ ScenarioParameters Render::displayInitializationScreen() {
                         case 3:
                             scenarioParameters.aiModule0 = new ai::RandomAI();
                             break;
-                    default:
-                        scenarioParameters.aiModule1 = new ai::RandomAI();
+                        default:
+                            scenarioParameters.aiModule1 = new ai::RandomAI();
                     }
                     int difficulty2 = displayDifficultySelection("Choix du niveau de l'IA 2");
                     switch (difficulty2) {
@@ -589,9 +716,11 @@ std::string Render::displayConfigurationSelection(const std::string& titleText) 
     title.setFillColor(sf::Color::White);
     title.setString(titleText);
     title.setPosition(
-        static_cast<float>(window.getSize().x) / 2 - title.getLocalBounds().width / 2,
-        50
+            static_cast<float>(initialWindowSize.x) / 2 - title.getLocalBounds().width / 2,
+            50
     );
+
+
 
     sf::Text defensiveButton, offensiveButton, balancedButton;
     defensiveButton.setFont(font);
