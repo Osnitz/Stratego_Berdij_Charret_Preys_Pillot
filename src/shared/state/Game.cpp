@@ -476,3 +476,8 @@ Player* Game::getPlayerByID(int playerID)
     }
     return Player2;
 }
+
+void Game::addKnown(Pieces* piece, Player* player)
+{
+    player->getKnown().push_back(piece);
+}

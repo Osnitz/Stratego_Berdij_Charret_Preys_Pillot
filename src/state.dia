@@ -1982,7 +1982,7 @@
             <dia:string>##</dia:string>
           </dia:attribute>
           <dia:attribute name="type">
-            <dia:string>#std::vecto&lt;Pieces*&gt;&amp;#</dia:string>
+            <dia:string>#std::vector&lt;Pieces*&gt;&amp;#</dia:string>
           </dia:attribute>
           <dia:attribute name="visibility">
             <dia:enum val="0"/>

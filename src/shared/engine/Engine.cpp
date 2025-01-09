@@ -134,10 +134,9 @@ void Engine::attack(Pieces* mypiece, pair<int, int> position)
         game->removeFromBoard(attackedPiece);
         game->removePiece(mypiece, currentplayer);
         game->removePiece(attackedPiece, opponent);
-
-
     }
 }
+
 
 
 bool Engine::isValidMove(Pieces* piece, pair<int, int> to)

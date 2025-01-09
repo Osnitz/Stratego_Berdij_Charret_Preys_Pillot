@@ -58,4 +58,3 @@ void Player:: displayCaptured () {
 int Player::getPlayerID() {
     return PlayerID;
 }
-
