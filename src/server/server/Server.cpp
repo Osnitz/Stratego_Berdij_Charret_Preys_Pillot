@@ -103,9 +103,11 @@ void Server::sendData(int client_fd, const std::string& message) {
     }
 }
 
-void Server::broadcastData(const std::string& message) {
-    for (int client_fd : clients) {
-        sendLargeJson(client_fd, message);
+void Server::broadcastGameState() {
+    auto gameState = serializeGameState();
+    for (int client_fd : clients)
+    {
+        sendLargeJson(client_fd, gameState);
     }
 }
 

@@ -15,54 +15,44 @@ int main()
 {
     Game* game = new Game();
 
-    // Créez le serveur
     auto server = new Server(8080, true, game);
     server->start();
 
     std::cout << "Waiting for clients..." << std::endl;
-    while (server->clients.size() < 2)
+    while (server->clients.size() < 1)
     {
         server->acceptClients();
     }
 
     server->sendIdentifierToClients();
+
     ServerRequest moveRequest;
     moveRequest.type = server::RequestType::Move;
 
     auto gameEngine = new Engine(game);
     auto scenarioManager = new ScenarioManager(gameEngine);
 
-
     client::PlayerController* playerController;
-    auto gameMode = GameMode::PVP; //scenarioManager->getScenarioChoice();
+    auto gameMode = GameMode::PVE; //scenarioManager->getScenarioChoice();
     scenarioManager->setMode(gameMode);
     scenarioManager->initializeControllers();
     Player* currentPlayer;
 
-  server->handlePlacement(gameEngine);
-
-
-    int clientId;
+    server->handlePlacement(gameEngine);
 
     std::thread serverThread([&]()
     {
+        int clientId = -1;
         while (true)
         {
-            currentPlayer = game->getCurrentPlayer();
-            auto gameState = server->serializeGameState();
-            for (int client_fd : server->clients)
-            {
-                server->sendLargeJson(client_fd, gameState);
-            }
-
-            //std::cout << "game state bien reçu par tout les clients" << std::endl;
             WinCondition winCondition = gameEngine->checkWin();
+
+
             if (winCondition != None)
             {
                 if (winCondition == FlagCaptured)
                 {
                     std::cout << "Flag has been captured. Game over." << std::endl;
-
                 }
                 else if (winCondition == NoValidMoves)
                 {
@@ -73,13 +63,25 @@ int main()
                 break;
             }
 
-            // Envoyez une requête de déplacement (Move)*/
+
+            currentPlayer = game->getCurrentPlayer();
+
+            server->broadcastGameState();
+
             clientId = currentPlayer->getPlayerID();
-            server->sendRequestToClient(server->clients[clientId], moveRequest);
+            std::vector<int> coords;
 
-            Json::Value moveResponse = server->receiveResponseFromClient(server->clients[clientId]);
+            if (playerController->isAI())
+            {
+                coords = playerController->getPlayerInput();
+            }
+            else
+            {
+                server->sendRequestToClient(server->clients[clientId], moveRequest);
+                Json::Value moveResponse = server->receiveResponseFromClient(server->clients[clientId]);
+                coords = server->handleClientResponse(server->clients[clientId], moveResponse);
+            }
 
-            auto coords = server->handleClientResponse(server->clients[clientId], moveResponse);
 
             playerController = scenarioManager->getPlayerController(currentPlayer);
             playerController->executeCmd(std::make_pair(coords[0], coords[1]),
