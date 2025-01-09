@@ -44,7 +44,7 @@ int Pieces::getRange() {
 void Pieces::setCoord(int newx, int newy) {
     this->x = newx;
     this->y = newy;
-    cout << type << " was moved to (" << newx << ", " << newy << ").\n" << endl;
+    //cout << type << " was moved to (" << newx << ", " << newy << ").\n" << endl;
 }
 
 Player *Pieces::getOwner() {
