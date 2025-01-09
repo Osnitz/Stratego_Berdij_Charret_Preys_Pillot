@@ -5,9 +5,11 @@
 #include <cstring>
 #include <iostream>
 #include <state.h>
+#include <client/PlayerController.h>
 
 using namespace server;
 using namespace state;
+using namespace client;
 const std::string ACK_MESSAGE = "ACK";
 
 std::string getProjectRootDirectory()
@@ -289,10 +291,17 @@ void Server::sendLargeJson(int client_fd, const std::string& jsonString) {
 }
 
 
-void Server::handlePlacement(engine::Engine* gameEngine)
+void Server::handlePlacement(engine::Engine* gameEngine, std::vector<client::PlayerController*>& playerControllersVector)
 {
     ServerRequest configRequest;
     configRequest.type = server::RequestType::Configuration;
+    for (  auto& playerController : playerControllersVector)
+    {
+        if (playerController->isAI())
+        {
+            playerController->handlePlacement(game);
+        }
+    }
     for (int client_fd : clients)
     {
         sendRequestToClient(client_fd, configRequest);

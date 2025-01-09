@@ -38,7 +38,8 @@ int main()
     scenarioManager->initializeControllers();
     Player* currentPlayer;
 
-    server->handlePlacement(gameEngine);
+    server->handlePlacement(gameEngine,scenarioManager->getPlayerControllersVector());
+
 
     std::thread serverThread([&]()
     {
