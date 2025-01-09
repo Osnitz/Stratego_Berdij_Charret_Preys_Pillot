@@ -10,6 +10,25 @@ using namespace server;
 using namespace state;
 const std::string ACK_MESSAGE = "ACK";
 
+std::string getProjectRootDirectory()
+{
+    std::string filePath = __FILE__;
+    std::size_t pos = filePath.find("Stratego_Berdij_Charret_Preys_Pillot");
+    if (pos == std::string::npos)
+    {
+        throw std::runtime_error("Unable to find 'Stratego_Berdij_Charret_Preys_Pillot' in the path");
+    }
+
+    return filePath.substr(0, pos + std::string("Stratego_Berdij_Charret_Preys_Pillot").length());
+}
+
+
+std::string constructPath(const std::string& relativePath)
+{
+    return getProjectRootDirectory() + "/" + relativePath;
+}
+
+
 Server::Server(int port, bool running,Game* game) : server_fd(-1), port(port), running(running), game(game) {}
 
 Server::~Server() {
@@ -265,6 +284,35 @@ void Server::sendLargeJson(int client_fd, const std::string& jsonString) {
         throw std::runtime_error("Failed to receive acknowledgment sendLargeJson.");
     }
     std::cout << "Ack received for largeJson" << std::endl;
+}
+
+
+void Server::handlePlacement(engine::Engine* gameEngine)
+{
+    ServerRequest configRequest;
+    configRequest.type = server::RequestType::Configuration;
+    for (int client_fd : clients)
+    {
+        sendRequestToClient(client_fd, configRequest);
+        Json::Value configResponse = receiveResponseFromClient(client_fd);
+        auto choice = handleClientResponse(client_fd, configResponse)[0];
+        std::string filepath;
+        switch (choice)
+        {
+        case 1:
+            filepath = constructPath("src/shared/state/config/Offensive.csv");
+            break;
+        case 2:
+            filepath = constructPath("src/shared/state/config/Defensive.csv");
+            break;
+        case 3:
+            filepath = constructPath("src/shared/state/config/Balance.csv");
+            break;
+        default:
+            filepath = constructPath("src/shared/state/config/Defensive.csv");
+        }
+        gameEngine->handleCmdPlacement(filepath);
+    }
 }
 
 

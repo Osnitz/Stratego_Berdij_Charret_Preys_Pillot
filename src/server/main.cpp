@@ -13,14 +13,12 @@ using namespace client;
 
 int main()
 {
-    // Initialisez le jeu (placeholder pour votre logique de jeu)
     Game* game = new Game();
 
     // Créez le serveur
     auto server = new Server(8080, true, game);
     server->start();
 
-    // Attendez deux clients
     std::cout << "Waiting for clients..." << std::endl;
     while (server->clients.size() < 2)
     {
@@ -31,55 +29,61 @@ int main()
     ServerRequest moveRequest;
     moveRequest.type = server::RequestType::Move;
 
-
     auto gameEngine = new Engine(game);
     auto scenarioManager = new ScenarioManager(gameEngine);
 
+
     client::PlayerController* playerController;
-    auto gameMode = scenarioManager->getScenarioChoice();
+    auto gameMode = GameMode::PVP; //scenarioManager->getScenarioChoice();
     scenarioManager->setMode(gameMode);
     scenarioManager->initializeControllers();
     Player* currentPlayer;
-    for (size_t i = 0; i < 2; i++)
-    {
-        currentPlayer = game->getCurrentPlayer();
-        playerController = scenarioManager->getPlayerController(currentPlayer);
-        playerController->handlePlacement(game);
-    }
-    /*std::string filepath =
-        "/home/matthieu/CLionProjects/Stratego_Berdij_Charret_Preys_Pillot/src/shared/state/config/Balance.csv";
-    game->loadConfig(filepath);
-    game->switchTurn();
-    game->loadConfig(filepath);
-    game->switchTurn();*/
-    currentPlayer = game->getCurrentPlayer();
+
+  server->handlePlacement(gameEngine);
+
 
     int clientId;
 
     std::thread serverThread([&]()
     {
-        int index = 0;
-        while (index < 10)
+        while (true)
         {
+            currentPlayer = game->getCurrentPlayer();
             auto gameState = server->serializeGameState();
             for (int client_fd : server->clients)
             {
                 server->sendLargeJson(client_fd, gameState);
             }
 
-            std::cout << "game state bien reçu par tout les clients" << std::endl;
+            //std::cout << "game state bien reçu par tout les clients" << std::endl;
+            WinCondition winCondition = gameEngine->checkWin();
+            if (winCondition != None)
+            {
+                if (winCondition == FlagCaptured)
+                {
+                    std::cout << "Flag has been captured. Game over." << std::endl;
+
+                }
+                else if (winCondition == NoValidMoves)
+                {
+                    std::cout << "Player " << currentPlayer->getPlayerID() << " has no valid moves left. Game over." <<
+                        std::endl;
+                    std::cout << "Player " << game->getOpponent()->getPlayerID() << " wins!" << std::endl;
+                }
+                break;
+            }
 
             // Envoyez une requête de déplacement (Move)*/
             clientId = currentPlayer->getPlayerID();
             server->sendRequestToClient(server->clients[clientId], moveRequest);
-            // Recevez la réponse du client
+
             Json::Value moveResponse = server->receiveResponseFromClient(server->clients[clientId]);
+
             auto coords = server->handleClientResponse(server->clients[clientId], moveResponse);
+
             playerController = scenarioManager->getPlayerController(currentPlayer);
             playerController->executeCmd(std::make_pair(coords[0], coords[1]),
                                          std::make_pair(coords[2], coords[3]), currentPlayer);
-            index++;
-            currentPlayer = game->getCurrentPlayer();
         }
     });
 

@@ -83,7 +83,7 @@ void NetworkClient::handleServerRequest(ServerRequest& request)
     }
 
     case RequestType::Configuration: {
-            std::cout << "Configuration Request Received. Choose : (1)" << std::endl;
+            std::cout << "Configuration Request Received. Choose : (1) Offensive (2) Defensive, (3) Balance)\n" << std::endl;
 
             int choice;
             std::cout << "Enter your choice: ";
@@ -92,7 +92,6 @@ void NetworkClient::handleServerRequest(ServerRequest& request)
             // Préparez la réponse
             Json::Value response;
             response["choice"] = choice;
-
 
             sendResponseToServer(request.type, response);
             break;

@@ -20,7 +20,11 @@ int main()
         client->setPlayerID(id);
 
         auto myPlayer = game->getPlayerByID(client->getPlayerID());
-        // Boucle principale pour recevoir et traiter les requêtes
+
+        ServerRequest configRequest = client->receiveRequest();
+        client->handleServerRequest(configRequest);
+
+
         while (true)
         {
             auto gameStateString = client->receiveLargeJson();
