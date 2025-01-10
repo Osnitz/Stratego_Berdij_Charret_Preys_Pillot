@@ -44,7 +44,7 @@ void Server::start() {
         throw std::runtime_error("Failed to create socket");
     }
 
-    // Activer SO_REUSEADDR pour permettre la réutilisation du port
+    // Activate SO_REUSEADDR option
     int opt = 1;
     if (setsockopt(server_fd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)) < 0) {
         perror("setsockopt failed");
@@ -235,7 +235,7 @@ bool server::Server::waitForAcknowledgment(int client_fd) {
     buffer[bytesReceived] = '\0';
     std::string response(buffer);
 
-    return response == ACK_MESSAGE; // Retourne true si l'acquittement est reçu
+    return response == ACK_MESSAGE;
 }
 
 
@@ -250,15 +250,15 @@ void server::Server::sendAcknowledgment(int client_fd) {
 }
 
 void Server::sendLargeJson(int client_fd, const std::string& jsonString) {
-    // Envoyez la taille totale du fichier JSON
+    // Send total size of Json string
     uint32_t totalSize = htonl(jsonString.size());
     ssize_t sent = send(client_fd, &totalSize, sizeof(totalSize), 0);
     if (sent != sizeof(totalSize)) {
         throw std::runtime_error("Failed to send total size.");
     }
 
-    // Envoyez les données en chunks
-    size_t chunkSize = 4096; // Taille du chunk (4 KB)
+    // Send JSON string in chunks
+    size_t chunkSize = 4096;
     size_t bytesSent = 0;
 
     while (bytesSent < jsonString.size()) {
@@ -287,7 +287,7 @@ void Server::sendLargeJson(int client_fd, const std::string& jsonString) {
 void Server::handlePlacement(engine::Engine* gameEngine)
 {
     ServerRequest configRequest;
-    configRequest.type = server::RequestType::Configuration;
+    configRequest.type = Configuration;
     for (int client_fd : clients)
     {
         sendRequestToClient(client_fd, configRequest);

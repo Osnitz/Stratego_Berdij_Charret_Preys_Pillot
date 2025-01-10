@@ -58,7 +58,7 @@ void NetworkClient::disconnect()
 void NetworkClient::handleServerRequest(ServerRequest& request)
 {
     switch (request.type) {
-    case RequestType::Move: {
+    case Move: {
             std::cout << "Move Request Received. Provide the coordinates:" << std::endl;
 
             int fromX, fromY, toX, toY;
@@ -71,7 +71,6 @@ void NetworkClient::handleServerRequest(ServerRequest& request)
             std::cout << "Enter toY: ";
             std::cin >> toY;
 
-            // Préparez la réponse
             Json::Value response;
             response["fromX"] = fromX;
             response["fromY"] = fromY;
@@ -82,14 +81,13 @@ void NetworkClient::handleServerRequest(ServerRequest& request)
             break;
     }
 
-    case RequestType::Configuration: {
+    case Configuration: {
             std::cout << "Configuration Request Received. Choose : (1) Offensive (2) Defensive, (3) Balance)\n" << std::endl;
 
             int choice;
             std::cout << "Enter your choice: ";
             std::cin >> choice;
 
-            // Préparez la réponse
             Json::Value response;
             response["choice"] = choice;
 
@@ -105,26 +103,21 @@ void NetworkClient::handleServerRequest(ServerRequest& request)
 
 GameState NetworkClient::deserializeGameState(const std::string& jsonString)
 {
-    // Parse le JSON reçu
     Json::CharReaderBuilder reader;
     Json::Value root;
     std::string errors;
 
     std::istringstream jsonStream(jsonString);
-    if (!Json::parseFromStream(reader, jsonStream, &root, &errors)) {
+    if (!parseFromStream(reader, jsonStream, &root, &errors)) {
         throw std::runtime_error("Failed to parse JSON: " + errors);
     }
 
-
-    // Préparez le tableau 1D pour les pièces
     GameState gameState;
 
-    // Vérifiez si la clé "pieces" existe
     if (!root.isMember("pieces") || !root["pieces"].isArray()) {
         throw std::runtime_error("Invalid JSON: Missing 'pieces' array.");
     }
 
-    // Désérialisez chaque pièce
     for (const auto& jsonPiece : root["pieces"]) {
         int value = jsonPiece["value"].asInt();
         int x = jsonPiece["x"].asInt();
@@ -142,11 +135,10 @@ GameState NetworkClient::deserializeGameState(const std::string& jsonString)
         default:
             throw std::runtime_error("Invalid owner ID in JSON.");
         }
-            // Implémentez cette méthode pour associer l'ID au Player*
+
         PieceType type = static_cast<PieceType>(jsonPiece["type"].asInt());
         bool revealed = jsonPiece["revealed"].asBool();
 
-        // Créez la pièce et ajoutez-la au tableau
         auto* piece = new Pieces(value, type,x, y, owner);
         piece->setReveal(revealed);
         gameState.pieces.push_back(piece);
@@ -243,7 +235,7 @@ bool NetworkClient::waitForAcknowledgment() {
     buffer[bytesReceived] = '\0';
     std::string response(buffer);
 
-    return response == ACK_MESSAGE; // Retourne true si l'acquittement est reçu
+    return response == ACK_MESSAGE;
 }
 
 void NetworkClient::sendAcknowledgment() {
@@ -255,16 +247,14 @@ void NetworkClient::sendAcknowledgment() {
 }
 
 std::string NetworkClient::receiveLargeJson() {
-    // Recevez la taille totale
     uint32_t totalSize;
     ssize_t received = recv(client_fd, &totalSize, sizeof(totalSize), 0);
     if (received != sizeof(totalSize)) {
         throw std::runtime_error("Failed to receive total size.");
     }
 
-    totalSize = ntohl(totalSize); // Convertir en ordre d'octets hôte
+    totalSize = ntohl(totalSize);
 
-    // Préparez un buffer pour recevoir les données
     std::string jsonString;
     jsonString.reserve(totalSize);
 
@@ -283,13 +273,7 @@ std::string NetworkClient::receiveLargeJson() {
         jsonString.append(buffer, received);
         bytesReceived += received;
         //std::cout<<"jsonString :"<<jsonString<<std::endl;
-        // Envoyez un acquittement pour chaque chunk
-        /*try {
-            sendAcknowledgment();
-        } catch (const std::exception& e) {
-            std::cerr << "Failed to send acknowledgment chunck receiveLargeJson: " << e.what() << std::endl;
-            throw;
-        }*/
+
     }
 
     //std::cout << "JSON file received successfully!" << std::endl;
