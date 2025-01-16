@@ -97,7 +97,7 @@ namespace client
                 this->aiModule0 = new ai::HeuristicAI();
                 break;
             case 3:
-                this->aiModule0 = new ai::RandomAI();
+                this->aiModule0 = new ai::AdvancedAI();
                 break;
             }
             return GameMode::PVE;

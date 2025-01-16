@@ -20,8 +20,8 @@ using namespace std;
 Game::Game()
 {
     board = new Board();
-    Player1 = new Player(0);
-    Player2 = new Player(1);
+    Player1 = new Player(1);
+    Player2 = new Player(2);
     currentPlayer = nullptr;
 
     std::random_device rd; // Obtain a random number from hardware

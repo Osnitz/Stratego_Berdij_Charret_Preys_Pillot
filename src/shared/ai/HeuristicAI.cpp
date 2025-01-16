@@ -64,44 +64,28 @@ int ai::HeuristicAI::heuristicCalculator(Pieces* piece, const std::pair<int, int
     int distanceToEnemyFlag = abs(position.second - 9);
     weight += 100/(distanceToEnemyFlag+1);
 
-    for (const auto& enemy : opponentPlayer->getKnown()) {
-        int distance = abs(position.first - enemy->getPosition().first) +
-                       abs(position.second - enemy->getPosition().second);
-
-        if (distance == 0) {
-            if (piece->getValue() > enemy->getValue()) {
-                weight += 300;
-            } else {
-                weight -= 100;
-            }
-        }
-
-        else if (distance == 1) {
-            if (piece->getValue() > enemy->getValue()) {
-                weight += 150;
-            } else {
-                weight -= 50;
-            }
-        }
-    }
-
     for (int x = 0; x < 10; ++x) {
         for (int y = 0; y < 10; ++y) {
             std::pair<int, int> piecePosition = {x, y};
             Pieces* pieceName = game->getBoard()->getPiece(piecePosition);
             if (pieceName != nullptr && game->isEnemy(pieceName)) {
-                int distToFlag = abs(flagPosition.first - x) + abs(flagPosition.second - y);
-                if (distToFlag <= 2) {
-                    int currentDistanceToFlag = abs(piece->getPosition().first - flagPosition.first) +
-                                                abs(piece->getPosition().second - flagPosition.second);
-                    int newDistanceToFlag = abs(position.first - flagPosition.first) +
-                                            abs(position.second - flagPosition.second);
+                int distance = abs(position.first - x) +
+                       abs(position.second - y);
 
-                    if (newDistanceToFlag < currentDistanceToFlag) {
+                if (distance == 0) {
+                    if (piece->getValue() > pieceName->getValue()) {
                         weight += 300;
                     }
                 }
+
+                else if (distance == 1) {
+                    if (piece->getValue() > pieceName->getValue()) {
+                        weight += 150;
+                    }
+                }
+
             }
+
         }
     }
 
